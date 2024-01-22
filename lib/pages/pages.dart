@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:langgam_project/configs/configs.dart';
 import 'package:langgam_project/widgets/widgets.dart';
+import 'package:lottie/lottie.dart';
 import 'package:pod_player/pod_player.dart';
 import 'package:video_player/video_player.dart';
 import 'package:uicons/uicons.dart';

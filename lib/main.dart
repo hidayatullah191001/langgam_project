@@ -13,13 +13,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Langgam',
-      initialRoute: '/layanan-detail',
+      initialRoute: '/',
       routes: {
         '/': (context) => const IndexPage(),
         '/login': (context) => const LoginPage(),
         '/my-account': (context) => const MyAccountPage(),
         '/layanan': (context) => const ProductLayananPage(),
-        '/layanan-detail': (context) => const DetailProductLayananPage(),
+        '/layanan/detail': (context) => const DetailProductLayananPage(),
       },
     );
   }

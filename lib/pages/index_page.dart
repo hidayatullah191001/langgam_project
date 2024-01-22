@@ -63,31 +63,57 @@ class _IndexPageState extends State<IndexPage> {
     // );
 
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverList(
-            delegate: SliverChildListDelegate([
-              const BannerTop(),
-            ]),
-          ),
-          const SliverAppBar(
-            pinned: true,
-            floating: true,
-            snap: true,
-            collapsedHeight: 101.0,
-            automaticallyImplyLeading: false,
-            flexibleSpace: Navbar(),
-          ),
-          SliverList(
-            delegate: SliverChildListDelegate([
-              OpeningSection(context),
-              LayananBMKGSection(),
-              LayananPopulerSection(),
-              UpdateSection(),
-              const Footer(),
-            ]),
-          ),
-        ],
+      body: LayoutBuilder(
+        builder: (context, BoxConstraints constraints) {
+          if (constraints.maxWidth <= 1200) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Lottie.asset('lottie/maintenance.json'),
+                      Text(
+                        'Saat ini hanya tersedia untuk Website. Gunakan laptop untuk membuka',
+                        style: AppTheme.blackTextStyle.copyWith(
+                          fontSize: 18,
+                          fontWeight: AppTheme.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ]),
+              ),
+            );
+          } else {
+            return CustomScrollView(
+              slivers: [
+                SliverList(
+                  delegate: SliverChildListDelegate([
+                    const BannerTop(),
+                  ]),
+                ),
+                const SliverAppBar(
+                  pinned: true,
+                  floating: false,
+                  collapsedHeight: 101.0,
+                  automaticallyImplyLeading: false,
+                  flexibleSpace: Navbar(),
+                  actions: [SizedBox()],
+                ),
+                SliverList(
+                  delegate: SliverChildListDelegate([
+                    OpeningSection(context),
+                    LayananBMKGSection(),
+                    LayananPopulerSection(),
+                    UpdateSection(),
+                    const Footer(),
+                  ]),
+                ),
+              ],
+            );
+          }
+        },
       ),
       endDrawer: const LoginDrawer(),
     );
@@ -274,39 +300,33 @@ class _IndexPageState extends State<IndexPage> {
             const SizedBox(
               width: 25,
             ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.5,
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'LANGGAM',
-                        style: AppTheme.blackTextStyle.copyWith(
-                          fontSize: 60,
-                          fontWeight: AppTheme.bold,
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 12,
-                      ),
-                      SizedBox(
-                        width: 400,
-                        child: Text(
-                          'Layanan Dalam Genggaman. BMKG Melayani berbagai penyediaan data meteorologi, klimatologi, geofisika, konsultasi dan peralatan meteorologi.',
-                          style: AppTheme.blackTextStyle.copyWith(
-                            fontSize: 18,
-                            fontWeight: AppTheme.medium,
-                          ),
-                          maxLines: 5,
-                          softWrap: true,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
+                  Text(
+                    'LANGGAM',
+                    style: AppTheme.blackTextStyle.copyWith(
+                      fontSize: 60,
+                      fontWeight: AppTheme.bold,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 12,
+                  ),
+                  Text(
+                    'Layanan Dalam Genggaman. BMKG Melayani berbagai penyediaan data meteorologi, klimatologi, geofisika, konsultasi dan peralatan meteorologi.',
+                    style: AppTheme.blackTextStyle.copyWith(
+                      fontSize: 18,
+                      fontWeight: AppTheme.medium,
+                    ),
+                    maxLines: 5,
+                    softWrap: true,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(
+                    height: 20,
                   ),
                   PrimaryButton(
                     onTap: () {},

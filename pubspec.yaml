@@ -53,6 +53,7 @@ dependencies:
   pod_player: ^0.1.0
   video_player: ^2.7.2
   youtube_player_iframe: ^4.0.4
+  lottie: ^1.4.3
 
 dev_dependencies:
   flutter_test:

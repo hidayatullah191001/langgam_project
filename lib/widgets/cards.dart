@@ -270,19 +270,18 @@ class UpdateCard extends StatelessWidget {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: 25,
-              horizontal: 18,
-            ),
-            child: Expanded(
-              child: Center(
-                child: Text(
-                  'Gempa Berkekuatan 6.5 Skala Richter Guncang Selatan Jawa ',
-                  style: AppTheme.blackTextStyle.copyWith(
-                    fontWeight: AppTheme.bold,
-                    fontSize: 18,
-                  ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 25,
+                horizontal: 18,
+              ),
+              child: Text(
+                'Gempa Berkekuatan 6.5 Skala Richter Guncang Selatan Jawa ',
+                style: AppTheme.blackTextStyle.copyWith(
+                  fontWeight: AppTheme.bold,
+                  fontSize: 18,
+                  overflow: TextOverflow.fade,
                 ),
               ),
             ),
@@ -327,7 +326,9 @@ class ItemLayananCardList extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     TextButtonHovered(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.pushNamed(context, '/layanan/detail');
+                      },
                       text:
                           'Tampilan cepat Analisis dan prakiraan Hujan Bulanan',
                       styleBeforeHovered: AppTheme.blackTextStyle.copyWith(

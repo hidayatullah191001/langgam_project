@@ -15,11 +15,11 @@ class ProductLayananPage extends StatelessWidget {
           ),
           const SliverAppBar(
             pinned: true,
-            floating: true,
-            snap: true,
+            floating: false,
             collapsedHeight: 101.0,
             automaticallyImplyLeading: false,
             flexibleSpace: Navbar(),
+            actions: [SizedBox()],
           ),
           SliverToBoxAdapter(
             child: Column(
