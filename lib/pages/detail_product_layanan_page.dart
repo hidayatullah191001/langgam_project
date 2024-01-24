@@ -330,6 +330,98 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
               : ContentSyaratKetentuan(),
           Divider(),
           UlasanSection(),
+          Divider(),
+          ProdukTerkaitSection(),
+        ],
+      ),
+    );
+  }
+
+  Widget ProdukTerkaitSection() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 150, vertical: 50.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Text(
+            'PRODUK TERKAIT',
+            style: AppTheme.blackTextStyle.copyWith(
+              fontWeight: AppTheme.bold,
+              fontSize: 18,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Container(
+            width: 30,
+            height: 2,
+            color: AppColors.primaryColor,
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            width: double.infinity,
+            height: MediaQuery.of(context).size.height * 0.5,
+            child: ListView.builder(
+              padding: EdgeInsets.zero,
+              physics: NeverScrollableScrollPhysics(),
+              scrollDirection: Axis.horizontal,
+              shrinkWrap: true,
+              itemCount: 4,
+              itemBuilder: (context, index) {
+                return Container(
+                  width: MediaQuery.of(context).size.width * 0.19,
+                  padding: EdgeInsets.only(
+                    left: index == 0 ? 0 : 8,
+                    right: index == 3 ? 0 : 8,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        height: 150,
+                        decoration: BoxDecoration(
+                          image: const DecorationImage(
+                            image: AssetImage('images/product-1.jpg'),
+                            fit: BoxFit.cover,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Informasi Data Cuaca Untuk Pelbuhan',
+                        style: AppTheme.blackTextStyle
+                            .copyWith(fontWeight: AppTheme.bold),
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Rp 225.000',
+                              style: AppTheme.primaryTextStyle.copyWith(
+                                fontWeight: AppTheme.bold,
+                              ),
+                            ),
+                            const SizedBox(width: 5),
+                            Text(
+                              '/ lokasi / hari',
+                              style: AppTheme.greyTextStyle,
+                            ),
+                          ]),
+                      const SizedBox(height: 10),
+                      Expanded(
+                        child: PrimaryButton(
+                          onTap: () {},
+                          titleButton: 'TAMBAHKAN KE KERANJANG',
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
         ],
       ),
     );
@@ -340,6 +432,7 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
       padding: const EdgeInsets.symmetric(horizontal: 150, vertical: 50.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
             child: Column(
@@ -352,67 +445,107 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                SizedBox(
-                  height: 600,
-                  child: ListView.builder(
-                    padding: EdgeInsets.zero,
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: ulasanUser.length,
-                    itemBuilder: (context, index) {
-                      final Map data = ulasanUser[index];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 15),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                const CircleAvatar(
-                                  backgroundColor: AppColors.primaryColor,
-                                  radius: 18,
-                                  child: FaIcon(
-                                    FontAwesomeIcons.user,
-                                    color: AppColors.whiteColor,
+                ListView.builder(
+                  padding: EdgeInsets.zero,
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: ulasanUser.length,
+                  itemBuilder: (context, index) {
+                    final Map data = ulasanUser[index];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 15),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const CircleAvatar(
+                                backgroundColor: AppColors.primaryColor,
+                                radius: 18,
+                                child: FaIcon(
+                                  FontAwesomeIcons.user,
+                                  color: AppColors.backgroundColor2,
+                                  size: 15,
+                                ),
+                              ),
+                              const SizedBox(width: 5),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    data['nama'],
+                                    style: AppTheme.blackTextStyle
+                                        .copyWith(fontWeight: AppTheme.bold),
                                   ),
-                                ),
-                                const SizedBox(width: 5),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      data['nama'],
-                                      style: AppTheme.blackTextStyle
-                                          .copyWith(fontWeight: AppTheme.bold),
-                                    ),
-                                    Text(data['email'],
-                                        style: AppTheme.darkGreyTextStyle),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 5),
-                            Text(data['ulasan'], style: AppTheme.greyTextStyle),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
+                                  Text(data['email'],
+                                      style: AppTheme.darkGreyTextStyle),
+                                ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 5),
+                          Text(data['ulasan'], style: AppTheme.greyTextStyle),
+                        ],
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Jadilah yang pertama memberikan ulasan “Informasi Data Cuaca Khusus Untuk Kegiatan Olah Raga” ',
-                style: AppTheme.blackTextStyle.copyWith(
-                  fontWeight: AppTheme.bold,
+          const SizedBox(width: 30),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Jadilah yang pertama memberikan ulasan “Informasi Data Cuaca Khusus Untuk Kegiatan Olah Raga” ',
+                  style: AppTheme.blackTextStyle.copyWith(
+                    fontWeight: AppTheme.bold,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20),
-            ],
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                          'Alamat email Anda tidak akan dipublikasikan. Ruas yang wajib ditandai',
+                          style: AppTheme.greyTextStyle),
+                    ),
+                    Text(
+                      '*',
+                      style: AppTheme.greyTextStyle.copyWith(
+                        color: AppColors.dangerColor,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                CustomFormUser(
+                  title: 'Ulasan Anda',
+                  isMandatory: true,
+                  minLines: 6,
+                  maxLines: 7,
+                ),
+                const SizedBox(height: 15),
+                CustomFormUser(
+                  title: 'Nama',
+                  isMandatory: true,
+                ),
+                const SizedBox(height: 15),
+                CustomFormUser(
+                  title: 'Email',
+                  isMandatory: true,
+                ),
+                const SizedBox(height: 20),
+                PrimaryButton(
+                  onTap: () {},
+                  titleButton: 'KIRIM',
+                ),
+              ],
+            ),
           ),
         ],
       ),

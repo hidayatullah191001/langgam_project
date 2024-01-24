@@ -3,9 +3,13 @@ part of 'widgets.dart';
 class PrimaryButton extends StatelessWidget {
   final VoidCallback onTap;
   final String titleButton;
-  const PrimaryButton(
-      {Key? key, required this.onTap, required this.titleButton})
-      : super(key: key);
+  double fontSize;
+  PrimaryButton({
+    Key? key,
+    required this.onTap,
+    required this.titleButton,
+    this.fontSize = 14,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,9 +25,49 @@ class PrimaryButton extends StatelessWidget {
             vertical: 13,
           ),
           child: Text(
-            titleButton,
+            titleButton.toUpperCase(),
             style: AppTheme.whiteTextStyle.copyWith(
               fontWeight: AppTheme.medium,
+              fontSize: fontSize,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class SecondaryButton extends StatelessWidget {
+  final VoidCallback onTap;
+  final String titleButton;
+  double fontSize;
+  SecondaryButton({
+    Key? key,
+    required this.onTap,
+    required this.titleButton,
+    this.fontSize = 16,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.backgroundColor2,
+      borderRadius: BorderRadius.circular(8),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 18,
+            vertical: 13,
+          ),
+          child: Text(
+            titleButton.toUpperCase(),
+            style: AppTheme.whiteTextStyle.copyWith(
+              fontWeight: AppTheme.medium,
+              fontSize: fontSize,
+              color: AppColors.greyColor,
             ),
             textAlign: TextAlign.center,
           ),

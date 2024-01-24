@@ -87,6 +87,7 @@ class _IndexPageState extends State<IndexPage> {
             );
           } else {
             return CustomScrollView(
+              cacheExtent: 5000,
               slivers: [
                 SliverList(
                   delegate: SliverChildListDelegate([

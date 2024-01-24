@@ -1,8 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:langgam_project/controllers/controller.dart';
 import 'package:langgam_project/pages/pages.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    /// Providers are above [MyApp] instead of inside it, so that tests
+    /// can use [MyApp] while mocking the providers
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => MyAccountController()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -13,13 +24,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Langgam',
-      initialRoute: '/',
+      initialRoute: '/cart/checkout',
       routes: {
         '/': (context) => const IndexPage(),
-        '/login': (context) => const LoginPage(),
+        '/register': (context) => const RegisterPage(),
         '/my-account': (context) => const MyAccountPage(),
         '/layanan': (context) => const ProductLayananPage(),
         '/layanan/detail': (context) => const DetailProductLayananPage(),
+        '/cart': (context) => const CartPage(),
+        '/cart/checkout': (context) => const CheckoutPage(),
+        '/cart/checkout/finish': (context) => const CheckoutFinishPage(),
       },
     );
   }

@@ -185,7 +185,7 @@ class _LoginDrawerState extends State<LoginDrawer> {
                           const SizedBox(height: 20),
                           TextButtonHovered(
                             onTap: () {
-                              Navigator.pushNamed(context, '/my-account');
+                              Navigator.pushNamed(context, '/register');
                             },
                             text: 'BUAT AKUN',
                             styleHovered: AppTheme.blackTextStyle.copyWith(

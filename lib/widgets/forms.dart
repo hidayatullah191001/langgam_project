@@ -5,6 +5,9 @@ class CustomFormUser extends StatefulWidget {
   bool isMandatory;
   bool isObscure;
   TextEditingController? controller;
+  int minLines;
+  int maxLines;
+  String? hintText;
 
   CustomFormUser({
     Key? key,
@@ -12,6 +15,9 @@ class CustomFormUser extends StatefulWidget {
     this.isMandatory = false,
     this.isObscure = false,
     this.controller,
+    this.minLines = 1,
+    this.maxLines = 1,
+    this.hintText,
   }) : super(key: key);
 
   @override
@@ -49,7 +55,13 @@ class _CustomFormUserState extends State<CustomFormUser> {
         TextFormField(
           controller: widget.controller,
           obscureText: widget.isObscure ? _isPasswordHidden : false,
+          minLines: widget.minLines,
+          maxLines: widget.maxLines,
           decoration: InputDecoration(
+            hintText: widget.hintText,
+            hintStyle: AppTheme.greyTextStyle.copyWith(
+              fontSize: 12,
+            ),
             isDense: true,
             border: OutlineInputBorder(
               borderSide:
@@ -72,25 +84,3 @@ class _CustomFormUserState extends State<CustomFormUser> {
     );
   }
 }
-
-// class CustomFormUser extends StatelessWidget {
-//   final String title;
-//   bool isMandatory;
-//   bool isObscure;
-//   TextEditingController? controller;
-
-//   CustomFormUser({
-//     Key? key,
-//     required this.title,
-//     this.isMandatory = false,
-//     this.isObscure = false,
-//     this.controller,
-//   }) : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       child: TextFormField(),
-//     );
-//   }
-// }

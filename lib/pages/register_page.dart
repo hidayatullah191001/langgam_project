@@ -1,13 +1,13 @@
 part of 'pages.dart';
 
-class MyAccountPage extends StatefulWidget {
-  const MyAccountPage({Key? key}) : super(key: key);
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({Key? key}) : super(key: key);
 
   @override
-  State<MyAccountPage> createState() => _MyAccountPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _MyAccountPageState extends State<MyAccountPage> {
+class _RegisterPageState extends State<RegisterPage> {
   String stateLogin = 'MASUK';
 
   final TextEditingController usernameController = TextEditingController();
@@ -16,40 +16,66 @@ class _MyAccountPageState extends State<MyAccountPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverList(
-            delegate: SliverChildListDelegate([
-              const BannerTop(),
-            ]),
-          ),
-          const SliverAppBar(
-            pinned: true,
-            floating: false,
-            collapsedHeight: 101.0,
-            automaticallyImplyLeading: false,
-            flexibleSpace: Navbar(),
-            actions: [SizedBox()],
-          ),
-          SliverToBoxAdapter(
-            child: Column(
-              children: [
-                HeroSection(
-                  heroTitle: 'AKUN SAYA',
-                  heroPosition: 'RUMAH  ',
+      body: LayoutBuilder(
+        builder: (context, BoxConstraints constraints) {
+          if (constraints.maxWidth <= 1200) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Lottie.asset('lottie/maintenance.json'),
+                      Text(
+                        'Saat ini hanya tersedia untuk Website. Gunakan laptop untuk membuka',
+                        style: AppTheme.blackTextStyle.copyWith(
+                          fontSize: 18,
+                          fontWeight: AppTheme.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ]),
+              ),
+            );
+          } else {
+            return CustomScrollView(
+              slivers: [
+                SliverList(
+                  delegate: SliverChildListDelegate([
+                    const BannerTop(),
+                  ]),
                 ),
-                MyAccountSection(context),
-                const Footer(),
+                const SliverAppBar(
+                  pinned: true,
+                  floating: false,
+                  collapsedHeight: 101.0,
+                  automaticallyImplyLeading: false,
+                  flexibleSpace: Navbar(),
+                  actions: [SizedBox()],
+                ),
+                SliverToBoxAdapter(
+                  child: Column(
+                    children: [
+                      HeroSection(
+                        heroTitle: 'AKUN SAYA',
+                        heroPosition: 'RUMAH  ',
+                      ),
+                      ContentSection(context),
+                      const Footer(),
+                    ],
+                  ),
+                ),
               ],
-            ),
-          ),
-        ],
+            );
+          }
+        },
       ),
       endDrawer: const LoginDrawer(),
     );
   }
 
-  Widget MyAccountSection(BuildContext context) {
+  Widget ContentSection(BuildContext context) {
     return Container(
       width: double.infinity,
       color: AppColors.backgroundColor3,

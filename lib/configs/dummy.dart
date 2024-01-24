@@ -71,3 +71,14 @@ List<Map<String, dynamic>> ulasanUser = [
         'Integer quis eleifend diam. Fusce tincidunt, ligula ut blandit tempus, nulla elit blandit dui, vel fringilla nulla tortor sed enim. Proin lobortis malesuada porttitor. Nunc at magna vitae felis egestas maximus in eu metus.',
   },
 ];
+
+List<String> menuUser = [
+  'Dasbor',
+  'Pesanan',
+  'Messages',
+  'Unduhan',
+  'Alamat',
+  'Detail Akun',
+  'Attachments',
+  'Logout',
+];
