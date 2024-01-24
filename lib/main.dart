@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Langgam',
-      initialRoute: '/cart/checkout',
+      initialRoute: '/',
       routes: {
         '/': (context) => const IndexPage(),
         '/register': (context) => const RegisterPage(),
