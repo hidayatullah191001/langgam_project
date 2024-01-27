@@ -49,6 +49,9 @@ dependencies:
   font_awesome_flutter: ^10.4.0
   youtube_player_iframe: ^4.0.4
   lottie: ^1.4.3
+  graphql_flutter: ^5.1.0
+  hovering: ^1.0.4
+  fluro: ^2.0.3 
 
 dev_dependencies:
   flutter_test:
