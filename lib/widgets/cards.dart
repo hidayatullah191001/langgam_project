@@ -293,7 +293,13 @@ class UpdateCard extends StatelessWidget {
 }
 
 class ItemLayananCardList extends StatelessWidget {
-  const ItemLayananCardList({super.key});
+  final LayananModel data;
+  final String id;
+  const ItemLayananCardList({
+    super.key,
+    required this.data,
+    required this.id,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -312,9 +318,9 @@ class ItemLayananCardList extends StatelessWidget {
                 height: 200,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
-                  image: const DecorationImage(
-                    image: AssetImage(
-                      'images/product-1.jpg',
+                  image: DecorationImage(
+                    image: NetworkImage(
+                      '${Constant.host}${data.gambar}',
                     ),
                     fit: BoxFit.cover,
                   ),
@@ -327,10 +333,13 @@ class ItemLayananCardList extends StatelessWidget {
                   children: [
                     TextButtonHovered(
                       onTap: () {
-                        Navigator.pushNamed(context, '/layanan/detail');
+                        Navigator.pushNamed(
+                          context,
+                          '/layanan/detail',
+                          arguments: id,
+                        );
                       },
-                      text:
-                          'Tampilan cepat Analisis dan prakiraan Hujan Bulanan',
+                      text: data.judul.toString(),
                       styleBeforeHovered: AppTheme.blackTextStyle.copyWith(
                         fontWeight: AppTheme.bold,
                         fontSize: 18,
@@ -344,7 +353,7 @@ class ItemLayananCardList extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Rp.650000',
+                          AppMethods.currency(data.harga.toString()),
                           style: AppTheme.primaryTextStyle.copyWith(
                             fontWeight: AppTheme.bold,
                             fontSize: 18,
@@ -354,7 +363,9 @@ class ItemLayananCardList extends StatelessWidget {
                           width: 5,
                         ),
                         Text(
-                          '/ buku',
+                          data.satuan != null
+                              ? data.satuan.toString()
+                              : '/ hari',
                           style: AppTheme.greyTextStyle.copyWith(
                             fontWeight: AppTheme.medium,
                             fontSize: 18,
@@ -367,13 +378,12 @@ class ItemLayananCardList extends StatelessWidget {
                       height: 10,
                     ),
                     Text(
-                      'Analisis dan prakiraan hujan bulanan memberikan wawasan yang penting dalam berbagai aspek kehidupan dan lingkungan, memungkinkan pengambilan keputusan yang lebih baik, persiapan yang lebih tepat, dan langkah-langkah pencegahan untuk mengurangi dampak buruk dari perubahan cuaca',
+                      data.intro.toString(),
                       style: AppTheme.greyTextStyle.copyWith(
                         fontWeight: AppTheme.medium,
                         height: 1.5,
                       ),
                     ),
-                    const SizedBox(height: 15),
                     PrimaryButton(
                       onTap: () {},
                       titleButton: 'TAMBAH KE KERANJANG',

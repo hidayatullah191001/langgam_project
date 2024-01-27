@@ -119,13 +119,47 @@ class ProductLayananPage extends StatelessWidget {
                     height: 30,
                     color: AppColors.greyColor,
                   ),
-                  ListView.builder(
-                    padding: EdgeInsets.zero,
-                    itemCount: 10,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      return ItemLayananCardList();
+
+                  Query(
+                    options: QueryOptions(
+                      document: gql(LayananQuery.queryLayanans()),
+                    ),
+                    builder: (result, {fetchMore, refetch}) {
+                      if (result.isLoading) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                      if (result.data == null) {
+                        return const Center(
+                          child: Text('Data not found'),
+                        );
+                      }
+                      final layanans = result.data!['layanans']['data'];
+
+                      return ListView.builder(
+                        padding: EdgeInsets.zero,
+                        itemCount: layanans.length,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          print('id ${layanans[index]['id']}');
+                          final layanan = layanans[index]['attributes'];
+                          final model = LayananModel(
+                            judul: layanan['judul'],
+                            harga: layanan['harga'],
+                            slug: layanan['slug'],
+                            intro: layanan['intro'],
+                            satuan: layanan['satuan'],
+                            gambar: layanan['gambar']['data']['attributes']
+                                ['url'],
+                          );
+                          return ItemLayananCardList(
+                            data: model,
+                            id: layanans[index]['id'],
+                          );
+                        },
+                      );
                     },
                   ),
                 ],

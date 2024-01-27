@@ -5,6 +5,8 @@ class BannerTop extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = context.watch<NavbarController>();
+
     return Container(
       width: double.infinity,
       height: 40,
@@ -54,6 +56,7 @@ class BannerTop extends StatelessWidget {
               return InkWell(
                 onTap: () {
                   Scaffold.of(context).openEndDrawer();
+                  controller.pickDrawer('Login');
                 },
                 child: Row(
                   children: [

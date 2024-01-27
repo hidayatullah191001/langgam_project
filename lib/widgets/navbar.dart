@@ -5,6 +5,8 @@ class Navbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = context.watch<NavbarController>();
+
     return Container(
       width: double.infinity,
       height: 101,
@@ -67,8 +69,9 @@ class Navbar extends StatelessWidget {
             ),
             Row(
               children: [
-                InkWell(
-                  onTap: () {
+                ItemNavBar(
+                  title: 'LAYANAN',
+                  onHover: (event) {
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
@@ -79,24 +82,6 @@ class Navbar extends StatelessWidget {
                       },
                     );
                   },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Row(
-                      children: [
-                        Text(
-                          'LAYANAN',
-                          style: AppTheme.secondaryTextStyle.copyWith(
-                            fontWeight: AppTheme.semiBold,
-                          ),
-                        ),
-                        const Icon(
-                          Icons.keyboard_arrow_down_rounded,
-                          color: Color(0xffe4e4e4),
-                          size: 16,
-                        ),
-                      ],
-                    ),
-                  ),
                 ),
                 Container(
                   width: 1,
@@ -105,8 +90,9 @@ class Navbar extends StatelessWidget {
                     color: Color(0xffe4e4e4),
                   ),
                 ),
-                InkWell(
-                  onTap: () {
+                ItemNavBar(
+                  title: 'UPDATE',
+                  onHover: (event) {
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
@@ -117,24 +103,6 @@ class Navbar extends StatelessWidget {
                       },
                     );
                   },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Row(
-                      children: [
-                        Text(
-                          'UPDATE',
-                          style: AppTheme.secondaryTextStyle.copyWith(
-                            fontWeight: AppTheme.semiBold,
-                          ),
-                        ),
-                        const Icon(
-                          Icons.keyboard_arrow_down_rounded,
-                          color: Color(0xffe4e4e4),
-                          size: 16,
-                        ),
-                      ],
-                    ),
-                  ),
                 ),
                 Container(
                   width: 1,
@@ -143,8 +111,9 @@ class Navbar extends StatelessWidget {
                     color: Color(0xffe4e4e4),
                   ),
                 ),
-                InkWell(
-                  onTap: () {
+                ItemNavBar(
+                  title: 'BANTUAN',
+                  onHover: (event) {
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
@@ -155,24 +124,6 @@ class Navbar extends StatelessWidget {
                       },
                     );
                   },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Row(
-                      children: [
-                        Text(
-                          'BANTUAN',
-                          style: AppTheme.secondaryTextStyle.copyWith(
-                            fontWeight: AppTheme.semiBold,
-                          ),
-                        ),
-                        const Icon(
-                          Icons.keyboard_arrow_down_rounded,
-                          color: Color(0xffe4e4e4),
-                          size: 16,
-                        ),
-                      ],
-                    ),
-                  ),
                 ),
                 Container(
                   width: 1,
@@ -196,7 +147,10 @@ class Navbar extends StatelessWidget {
                       ),
                     ),
                     IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Scaffold.of(context).openEndDrawer();
+                        controller.pickDrawer('Cart');
+                      },
                       icon: const Icon(
                         Icons.shopping_cart_outlined,
                         size: 20,
@@ -406,6 +360,60 @@ class Navbar extends StatelessWidget {
             lottieJson: 'lottie/animate-1.json',
           ),
         ],
+      ),
+    );
+  }
+}
+
+class ItemNavBar extends StatelessWidget {
+  final String title;
+
+  final void Function(PointerEnterEvent event) onHover;
+  const ItemNavBar({
+    super.key,
+    required this.title,
+    required this.onHover,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return HoverWidget(
+      hoverChild: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: Row(
+          children: [
+            Text(
+              title,
+              style: AppTheme.secondaryTextStyle.copyWith(
+                fontWeight: AppTheme.semiBold,
+              ),
+            ),
+            const Icon(
+              Icons.keyboard_arrow_down_rounded,
+              color: Color(0xffe4e4e4),
+              size: 16,
+            ),
+          ],
+        ),
+      ),
+      onHover: onHover,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: Row(
+          children: [
+            Text(
+              title,
+              style: AppTheme.secondaryTextStyle.copyWith(
+                fontWeight: AppTheme.semiBold,
+              ),
+            ),
+            const Icon(
+              Icons.keyboard_arrow_down_rounded,
+              color: Color(0xffe4e4e4),
+              size: 16,
+            ),
+          ],
+        ),
       ),
     );
   }

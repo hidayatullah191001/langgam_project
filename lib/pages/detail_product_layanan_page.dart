@@ -13,6 +13,7 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
 
   @override
   Widget build(BuildContext context) {
+    final String id = ModalRoute.of(context)?.settings.arguments as String;
     return Scaffold(
       body: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
@@ -37,30 +38,50 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
             ),
           );
         } else {
-          return CustomScrollView(
-            slivers: [
-              SliverList(
-                delegate: SliverChildListDelegate([
-                  const BannerTop(),
-                ]),
+          return Query(
+            options: QueryOptions(
+              document: gql(
+                LayananQuery.queryLayanan(id),
               ),
-              const SliverAppBar(
-                pinned: true,
-                floating: false,
-                collapsedHeight: 101.0,
-                automaticallyImplyLeading: false,
-                flexibleSpace: Navbar(),
-                actions: [SizedBox()],
-              ),
-              SliverToBoxAdapter(
-                child: Column(
-                  children: [
-                    ContentSection(),
-                    const Footer(),
-                  ],
-                ),
-              ),
-            ],
+            ),
+            builder: (result, {fetchMore, refetch}) {
+              if (result.isLoading) {
+                return Center(child: CircularProgressIndicator());
+              }
+
+              if (result.data == null) {
+                return const Center(
+                  child: Text('Data not found'),
+                );
+              }
+
+              final layanan = result.data!['layanan']['data']['attributes'];
+              return CustomScrollView(
+                slivers: [
+                  SliverList(
+                    delegate: SliverChildListDelegate([
+                      const BannerTop(),
+                    ]),
+                  ),
+                  const SliverAppBar(
+                    pinned: true,
+                    floating: false,
+                    collapsedHeight: 101.0,
+                    automaticallyImplyLeading: false,
+                    flexibleSpace: Navbar(),
+                    actions: [SizedBox()],
+                  ),
+                  SliverToBoxAdapter(
+                    child: Column(
+                      children: [
+                        ContentSection(layanan),
+                        const Footer(),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
           );
         }
       }),
@@ -68,7 +89,7 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
     );
   }
 
-  Widget ContentSection() {
+  Widget ContentSection(dynamic layanan) {
     return Container(
       width: double.infinity,
       color: AppColors.whiteColor,
@@ -92,7 +113,8 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                 ),
                 Text(' / ', style: AppTheme.greyTextStyle),
                 TextButtonHovered(
-                  text: 'Informasi Meteorologi',
+                  text: layanan['bidang_layanan']['data']['attributes']
+                      ['judul'],
                   onTap: () {},
                   styleBeforeHovered: AppTheme.greyTextStyle,
                   styleHovered: AppTheme.blackTextStyle
@@ -100,7 +122,7 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                 ),
                 Text(' / ', style: AppTheme.greyTextStyle),
                 Text(
-                  'Informasi Data Cuaca Khusus Untuk Kegiatan Olah Raga',
+                  layanan['judul'],
                   style: AppTheme.blackTextStyle.copyWith(
                     fontWeight: AppTheme.bold,
                   ),
@@ -122,8 +144,9 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                   height: 360,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
-                    image: const DecorationImage(
-                      image: AssetImage('images/product-1.jpg'),
+                    image: DecorationImage(
+                      image: NetworkImage(
+                          '${Constant.host}${layanan['gambar']['data']['attributes']['url']}'),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -133,7 +156,7 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                   child: Column(
                     children: [
                       Text(
-                        'Informasi Data Cuaca Khusus Untuk Kegiatan Olah Raga',
+                        layanan['judul'],
                         style: AppTheme.blackTextStyle.copyWith(
                           fontSize: 50,
                           fontWeight: AppTheme.bold,
@@ -144,7 +167,7 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Rp. 100.000',
+                            AppMethods.currency(layanan['harga'].toString()),
                             style: AppTheme.primaryTextStyle.copyWith(
                               fontSize: 18,
                               fontWeight: AppTheme.bold,
@@ -152,7 +175,7 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                           ),
                           const SizedBox(width: 5),
                           Text(
-                            '/ lokasi / hari',
+                            layanan['satuan'],
                             style: AppTheme.greyTextStyle.copyWith(
                               fontSize: 18,
                             ),
@@ -163,7 +186,7 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                         height: 20,
                       ),
                       Text(
-                        'Informasi cuaca membantu dalam menjaga keselamatan, mengoptimalkan performa, serta menyesuaikan perencanaan acara olahraga untuk mendukung pengalaman yang aman dan positif bagi semua yang terlibat dalam kegiatan olahraga',
+                        layanan['intro'],
                         style: AppTheme.greyTextStyle.copyWith(
                           fontSize: 14,
                           height: 1.5,

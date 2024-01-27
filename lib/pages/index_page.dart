@@ -45,22 +45,7 @@ class _IndexPageState extends State<IndexPage> {
 
   @override
   Widget build(BuildContext context) {
-    // return Scaffold(
-    //   body: SingleChildScrollView(
-    //     child: Column(
-    //       children: [
-    //         const BannerTop(),
-    //         const Navbar(),
-    //         OpeningSection(context),
-    //         LayananBMKGSection(),
-    //         LayananPopulerSection(),
-    //         UpdateSection(),
-    //         const Footer(),
-    //       ],
-    //     ),
-    //   ),
-    //   endDrawer: const LoginDrawer(),
-    // );
+    final controller = context.watch<NavbarController>();
 
     return Scaffold(
       body: LayoutBuilder(
@@ -116,7 +101,11 @@ class _IndexPageState extends State<IndexPage> {
           }
         },
       ),
-      endDrawer: const LoginDrawer(),
+      endDrawer: controller.selectedDrawer == 'Login'
+          ? const LoginDrawer()
+          : (controller.selectedDrawer == 'Cart'
+              ? const CartDrawer()
+              : Container()),
     );
   }
 
