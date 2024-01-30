@@ -23,6 +23,28 @@ query Posts {
 }
 """;
 
+  static String queryBeritas2() => """
+query Posts {
+    posts {
+        data {
+            id
+            attributes {
+                judul
+                slug
+                gambar {
+                    data {
+                        attributes {
+                            url
+                        }
+                    }
+                }
+                intro
+            }
+        }
+    }
+}
+""";
+
   static String queryBerita(String id) => """
 query Post {
     post(id: $id) {
