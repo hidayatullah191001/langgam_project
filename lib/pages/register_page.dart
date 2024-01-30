@@ -10,9 +10,6 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   String stateLogin = 'MASUK';
 
-  final TextEditingController usernameController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -85,7 +82,11 @@ class _RegisterPageState extends State<RegisterPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            stateLogin == 'MASUK' ? LoginForm() : RegisterForm(),
+            stateLogin == 'MASUK'
+                ? LoginForm(
+                    contextPage: context,
+                  )
+                : RegisterForm(),
             const SizedBox(
               width: 20,
             ),
@@ -146,10 +147,42 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 }
 
-class LoginForm extends StatelessWidget {
-  const LoginForm({
+class LoginForm extends StatefulWidget {
+  final BuildContext contextPage;
+  LoginForm({
     super.key,
+    required this.contextPage,
   });
+
+  @override
+  State<LoginForm> createState() => _LoginFormState();
+}
+
+class _LoginFormState extends State<LoginForm> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  // void _handleLoginButtonPressed(
+  //     QueryResult result, BuildContext context) async {
+  //   if (!EmailValidator.validate(emailController.text)) {
+  //     CoolAlert.show(
+  //       context: context,
+  //       width: MediaQuery.of(context).size.width * 0.3,
+  //       type: CoolAlertType.error,
+  //       text: 'Email yang kamu masukkan tidak valid',
+  //     );
+  //   } else if (emailController.text.isEmpty ||
+  //       passwordController.text.isEmpty) {
+  //     CoolAlert.show(
+  //       context: context,
+  //       width: MediaQuery.of(context).size.width * 0.3,
+  //       type: CoolAlertType.error,
+  //       text: 'Email dan password tidak boleh kosong',
+  //     );
+  //   } else {
+  //     print('data = ${result.data}');
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -166,6 +199,7 @@ class LoginForm extends StatelessWidget {
             height: 20,
           ),
           CustomFormUser(
+            controller: emailController,
             title: 'Nama pengguna atau alamat email ',
             isMandatory: true,
           ),
@@ -173,19 +207,80 @@ class LoginForm extends StatelessWidget {
             height: 20,
           ),
           CustomFormUser(
-            title: 'Passwod',
+            controller: passwordController,
+            title: 'Password',
             isObscure: true,
             isMandatory: true,
           ),
           const SizedBox(
             height: 20,
           ),
-          SizedBox(
-            width: double.infinity,
-            child: PrimaryButton(
-              onTap: () {},
-              titleButton: 'MASUK',
+          Mutation(
+            options: MutationOptions(
+              document: gql(
+                  // AuthQuery.login(emailController.text, passwordController.text),
+                  AuthQuery.login),
             ),
+            builder: (runMutation, result) {
+              if (result!.isLoading) {
+                return Center(child: CircularProgressIndicator());
+              }
+              if (result.hasException) {
+                return Text("Error: ${result.exception}");
+              }
+              if (result.data != null) {
+                Map user = {
+                  'id': result.data?['login']['user']['id'],
+                  'username': result.data?['login']['user']['username'],
+                  'email': result.data?['login']['user']['email'],
+                };
+                AppSession.saveUserInformation(
+                    user, result.data?['login']['jwt']);
+                Navigator.pushNamedAndRemoveUntil(
+                  widget.contextPage,
+                  '/',
+                  (route) => false,
+                );
+              }
+              return SizedBox(
+                width: double.infinity,
+                child: PrimaryButton(
+                  onTap: () async {
+                    if (!EmailValidator.validate(emailController.text)) {
+                      CoolAlert.show(
+                        context: context,
+                        width: MediaQuery.of(context).size.width * 0.3,
+                        type: CoolAlertType.error,
+                        text: 'Email yang kamu masukkan tidak valid',
+                      );
+                    } else if (emailController.text.isEmpty ||
+                        passwordController.text.isEmpty) {
+                      CoolAlert.show(
+                        context: context,
+                        width: MediaQuery.of(context).size.width * 0.3,
+                        type: CoolAlertType.error,
+                        text: 'Email dan password tidak boleh kosong',
+                      );
+                    } else {
+                      runMutation({
+                        'identifier': emailController.text,
+                        'password': passwordController.text,
+                      });
+                      Future.delayed(Duration(seconds: 3), () {
+                        if (!result.hasException) {
+                          Navigator.pushNamedAndRemoveUntil(
+                            context,
+                            '/',
+                            (route) => true,
+                          );
+                        }
+                      });
+                    }
+                  },
+                  titleButton: 'MASUK',
+                ),
+              );
+            },
           ),
           const SizedBox(
             height: 30,
@@ -271,8 +366,17 @@ class LoginForm extends StatelessWidget {
   }
 }
 
-class RegisterForm extends StatelessWidget {
+class RegisterForm extends StatefulWidget {
   const RegisterForm({Key? key}) : super(key: key);
+
+  @override
+  State<RegisterForm> createState() => _RegisterFormState();
+}
+
+class _RegisterFormState extends State<RegisterForm> {
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -289,8 +393,22 @@ class RegisterForm extends StatelessWidget {
             height: 20,
           ),
           CustomFormUser(
+            controller: usernameController,
+            title: 'Nama Pengguna ',
+            isMandatory: true,
+          ),
+          const SizedBox(height: 10),
+          CustomFormUser(
+            controller: emailController,
             title: 'Alamat email ',
             isMandatory: true,
+          ),
+          const SizedBox(height: 10),
+          CustomFormUser(
+            controller: passwordController,
+            title: 'Password ',
+            isMandatory: true,
+            isObscure: true,
           ),
           const SizedBox(
             height: 5,

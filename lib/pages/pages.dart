@@ -1,3 +1,6 @@
+import 'package:cool_alert/cool_alert.dart';
+import 'package:email_validator/email_validator.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
@@ -9,6 +12,7 @@ import 'package:langgam_project/widgets/widgets.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
+import 'package:sidebar_with_animation/animated_side_bar.dart';
 
 part 'index_page.dart';
 part 'register_page.dart';
@@ -31,3 +35,6 @@ part 'users/attachment_section.dart';
 
 part 'admin/login_admin_page.dart';
 part 'admin/app_admin_page.dart';
+part 'admin/dashboard_admin_section.dart';
+part 'admin/pelayanan_masuk_section.dart';
+part 'admin/tahapan_pelayanan_section.dart';

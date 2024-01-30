@@ -21,7 +21,9 @@ class _IndexPageState extends State<IndexPage> {
         showFullscreenButton: true,
       ),
     );
-
+    // final Map data = await AppSession.getUserInformation();
+    // print(data['email']);
+    setState(() {});
     super.initState();
   }
 
@@ -225,18 +227,44 @@ class _IndexPageState extends State<IndexPage> {
                 ),
                 Expanded(
                   child: SizedBox(
-                    height: 300,
-                    child: ListView.builder(
-                      padding: EdgeInsets.zero,
-                      controller: _scrollController,
-                      scrollDirection: Axis.horizontal,
-                      itemCount: 100,
-                      shrinkWrap: true,
-                      itemBuilder: (context, index) {
-                        return LayananPopulerCard();
-                      },
-                    ),
-                  ),
+                      height: 300,
+                      child: Query(
+                        options: QueryOptions(
+                          document: gql(
+                            LayananQuery.queryLayanans(),
+                          ),
+                        ),
+                        builder: (result, {fetchMore, refetch}) {
+                          if (result.isLoading) {
+                            return Center(child: CircularProgressIndicator());
+                          }
+
+                          if (result.data == null) {
+                            return Center(
+                              child: Text(
+                                'Data not found',
+                                style: AppTheme.greyTextStyle,
+                              ),
+                            );
+                          }
+
+                          final layanans = result.data!['layanans']['data'];
+
+                          return ListView.builder(
+                            padding: EdgeInsets.zero,
+                            controller: _scrollController,
+                            scrollDirection: Axis.horizontal,
+                            itemCount: 5,
+                            shrinkWrap: true,
+                            itemBuilder: (context, index) {
+                              print('id ${layanans[index]['id']}');
+                              final layanan = layanans[index]['attributes'];
+
+                              return LayananPopulerCard(data: layanan);
+                            },
+                          );
+                        },
+                      )),
                 ),
                 const SizedBox(
                   width: 20,

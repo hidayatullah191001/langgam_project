@@ -165,18 +165,6 @@ class _MyAccountPageState extends State<MyAccountPage> {
   Widget buildConditionalWidget(dynamic condition, Widget widget) {
     return condition
         ? Expanded(
-            // child: Container(
-            //   margin: const EdgeInsets.symmetric(horizontal: 20),
-            //   decoration: BoxDecoration(
-            //     border: Border(
-            //       left: BorderSide(
-            //         width: 2,
-            //         color: AppColors.softgreyColor.withOpacity(0.2),
-            //       ),
-            //     ),
-            //   ),
-            //   child: widget,
-            // ),
             child: widget,
           )
         : Container();

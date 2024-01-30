@@ -109,7 +109,8 @@ class _LayananCardState extends State<LayananCard> {
 }
 
 class LayananPopulerCard extends StatefulWidget {
-  const LayananPopulerCard({Key? key}) : super(key: key);
+  final dynamic data;
+  const LayananPopulerCard({Key? key, this.data}) : super(key: key);
 
   @override
   State<LayananPopulerCard> createState() => _LayananPopulerCardState();
@@ -145,7 +146,8 @@ class _LayananPopulerCardState extends State<LayananPopulerCard> {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(14),
                   child: Image.network(
-                    'https://media.istockphoto.com/id/1444475661/vector/world-map-very-simple-contour-vector-illustration.jpg?b=1&s=612x612&w=0&k=20&c=naZe0MzYqjR6KtjDaGkZFOH3_rpPmy-G9proneKj5M8=',
+                    widget.data['gambar']['data']['attributes']['url']
+                        .toString(),
                     fit: BoxFit.cover,
                     height: 150,
                   ),
@@ -168,7 +170,17 @@ class _LayananPopulerCardState extends State<LayananPopulerCard> {
                     opacity: isHovered ? 1.0 : 0.0,
                     child: Center(
                       child: InkWell(
-                        onTap: () {}, // Button add item to cart
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Dialog(
+                                child:
+                                    ModalInformationCart(context, widget.data),
+                              );
+                            },
+                          );
+                        }, // Button add item to cart
                         child: Container(
                           width: 50,
                           height: 35,
@@ -195,7 +207,7 @@ class _LayananPopulerCardState extends State<LayananPopulerCard> {
             ),
             Expanded(
               child: Text(
-                'Atlas Curah Hujan di Indonesia Rata-rata',
+                widget.data['judul'],
                 style: AppTheme.blackTextStyle.copyWith(
                   fontWeight: AppTheme.semiBold,
                 ),
@@ -207,7 +219,7 @@ class _LayananPopulerCardState extends State<LayananPopulerCard> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Rp.1.500.000',
+                  AppMethods.currency(widget.data['harga'].toString()),
                   style: AppTheme.primaryTextStyle.copyWith(
                     fontWeight: AppTheme.semiBold,
                   ),
@@ -216,7 +228,7 @@ class _LayananPopulerCardState extends State<LayananPopulerCard> {
                   width: 5,
                 ),
                 Text(
-                  '/ buku',
+                  widget.data['satuan'].toString(),
                   style: AppTheme.greyTextStyle.copyWith(
                     fontWeight: AppTheme.medium,
                   ),
@@ -225,6 +237,166 @@ class _LayananPopulerCardState extends State<LayananPopulerCard> {
             )
           ],
         ),
+      ),
+    );
+  }
+
+  Widget ModalInformationCart(BuildContext context, dynamic data) {
+    final controller = context.watch<CartController>();
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.5,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 20,
+        vertical: 15,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Container(
+                width: 80,
+                height: 60,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  image: DecorationImage(
+                    image: NetworkImage(
+                        '${Constant.host}${data['gambar']['data']['attributes']['url']}'),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 15),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    data['judul'],
+                    style: AppTheme.blackTextStyle.copyWith(
+                      fontSize: 14,
+                      fontWeight: AppTheme.medium,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          controller.remover();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.withOpacity(0.1),
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(6),
+                              bottomLeft: Radius.circular(6),
+                            ),
+                          ),
+                          child: const Icon(
+                            Icons.remove,
+                            color: AppColors.primaryColor,
+                            size: 16,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(5),
+                        color: Colors.blue.withOpacity(0.1),
+                        child: Text(
+                          controller.itemsCount.toString(),
+                          style: AppTheme.blackTextStyle.copyWith(
+                            fontSize: 12,
+                            fontWeight: AppTheme.medium,
+                          ),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          controller.add();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.withOpacity(0.1),
+                            borderRadius: const BorderRadius.only(
+                              topRight: Radius.circular(6),
+                              bottomRight: Radius.circular(6),
+                            ),
+                          ),
+                          child: const Icon(
+                            Icons.add,
+                            color: AppColors.primaryColor,
+                            size: 16,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              )
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Total Harga', style: AppTheme.blackTextStyle),
+              Text(
+                AppMethods.currency(controller.total(data['harga']).toString()),
+                style: AppTheme.primaryTextStyle.copyWith(
+                  fontWeight: AppTheme.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          CustomFormUser(title: 'Provinsi'),
+          const SizedBox(
+            height: 10,
+          ),
+          CustomFormUser(title: 'Kota'),
+          const SizedBox(
+            height: 10,
+          ),
+          CustomFormUser(title: 'Kecamatan'),
+          const SizedBox(
+            height: 12,
+          ),
+          PrimaryButton(
+            onTap: () {
+              final productItem = {
+                'product': {
+                  'judul': data['judul'],
+                  'harga': data['harga'],
+                  'satuan': data['satuan'],
+                  'gambar': data['gambar']['data']['attributes']['url'],
+                },
+                'provinsi': 'Jakarta',
+                'Kota': 'Jakarta Timur',
+                'Kecamatan': 'Pulo Gadung',
+                'item': controller.itemsCount.toString(),
+                'totalHarga': controller.totalHarga.toString(),
+              };
+              print(productItem);
+              controller.addToCart(productItem);
+              CoolAlert.show(
+                context: context,
+                width: MediaQuery.of(context).size.width * 0.3,
+                type: CoolAlertType.success,
+                text: 'Product berhadil ditambahkan kedalam keranjang',
+              );
+
+              print(controller.carts);
+            },
+            titleButton: 'Tambahkan Ke Keranjang',
+          ),
+        ],
       ),
     );
   }
