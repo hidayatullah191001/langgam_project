@@ -6,6 +6,7 @@ class Navbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<NavbarController>();
+    final cartcontroller = context.watch<CartController>();
 
     return Container(
       width: double.infinity,
@@ -141,7 +142,7 @@ class Navbar extends StatelessWidget {
                         backgroundColor: AppColors.primaryColor,
                         radius: 8,
                         child: Text(
-                          '10',
+                          cartcontroller.carts.length.toString(),
                           style: AppTheme.whiteTextStyle.copyWith(fontSize: 10),
                         ),
                       ),

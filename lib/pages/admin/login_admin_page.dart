@@ -8,7 +8,7 @@ class LoginAdminPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.primaryColor,
       body: Container(
-        width: double.infinity * 0.4,
+        width: MediaQuery.of(context).size.width * 0.4,
         padding: const EdgeInsets.all(20),
         alignment: Alignment.center,
         decoration: BoxDecoration(
@@ -18,7 +18,7 @@ class LoginAdminPage extends StatelessWidget {
         child: Column(
           children: [
             Image.asset(
-              'images/logo.png,',
+              'images/logo.png',
               width: 30,
               height: 30,
               fit: BoxFit.cover,

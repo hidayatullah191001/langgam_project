@@ -16,6 +16,9 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => MyAccountController()),
         ChangeNotifierProvider(create: (_) => NavbarController()),
+        ChangeNotifierProvider(create: (_) => AdminController()),
+        ChangeNotifierProvider(create: (_) => CartController()),
+        ChangeNotifierProvider(create: (_) => AuthController()),
       ],
       child: const MyApp(),
     ),
@@ -132,7 +135,7 @@ class MyApp extends StatelessWidget {
       uri: Constant.apigpl,
       child: MaterialApp(
         title: 'Langgam',
-        initialRoute: '/admin/auth',
+        initialRoute: '/',
         routes: {
           '/': (context) => const IndexPage(),
           '/register': (context) => const RegisterPage(),
@@ -145,7 +148,7 @@ class MyApp extends StatelessWidget {
           '/berita': (context) => const BeritaPage(),
           '/berita/detail': (context) => const DetailBeritaPage(),
           '/admin/auth': (context) => const LoginAdminPage(),
-          '/admin': (context) => const LoginAdminPage(),
+          '/admin': (context) => const AppAdminPage(),
         },
       ),
     );

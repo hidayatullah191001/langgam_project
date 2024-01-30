@@ -3,16 +3,28 @@ part of 'configs.dart';
 class AppSession {
   static Future<bool> saveUserInformation(Map user, String token) async {
     final pref = await SharedPreferences.getInstance();
+    await pref.setString('username', user['username']);
+    await pref.setString('id', user['id']);
     await pref.setString('email', user['email']);
-    await pref.setString('password', user['password']);
     return await pref.setString('token', token);
   }
+
+  static Future<bool> saveDataCartUser(Map data) async {
+    final pref = await SharedPreferences.getInstance();
+    return await pref.setString('data', data.toString());
+  }
+
+  // static Future<Map<String, dynamic>> getDataCartUser()async{
+  //   final pref = await SharedPreferences.getInstance();
+  //   return pref.getString('data');
+  // }
 
   static Future<Map<String, dynamic>> getUserInformation() async {
     final pref = await SharedPreferences.getInstance();
     return {
+      'id': pref.getString('id'),
+      'username': pref.getString('username'),
       'email': pref.getString('email'),
-      'password': pref.getString('password'),
       'token': pref.getString('token'),
     };
   }

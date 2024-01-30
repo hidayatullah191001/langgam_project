@@ -15,14 +15,15 @@ class AppMethods {
     ).format(double.parse(number));
   }
 
-  static void dangerFlushbar(BuildContext context, String title) {
-    Flushbar(
-      backgroundColor: AppColors.dangerColor,
-      title: 'Failed',
-      titleColor: AppColors.warningColor,
-      message: title,
-      duration: const Duration(seconds: 3),
-      isDismissible: false,
-    ).show(context);
-  }
+  // static void dangerFlushbar(BuildContext context, String title) {
+  //   Flushbar(
+  //     backgroundColor: AppColors.dangerColor,
+  //     title: 'Failed',
+  //     titleColor: AppColors.warningColor,
+  //     message: title,
+  //     duration: const Duration(seconds: 3),
+  //     isDismissible: false,
+  //     borderRadius: const BorderRadius.all(Radius.circular(5)),
+  //   ).show(context);
+  // }
 }
