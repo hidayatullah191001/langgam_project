@@ -6,18 +6,20 @@ class AppSession {
     await pref.setString('username', user['username']);
     await pref.setString('id', user['id']);
     await pref.setString('email', user['email']);
-    return await pref.setString('token', token);
+    await pref.setString('token', token);
+    return true;
   }
 
-  static Future<bool> saveDataCartUser(Map data) async {
+  static Future<bool> saveDataCartUser(List cartUser) async {
     final pref = await SharedPreferences.getInstance();
-    return await pref.setString('data', data.toString());
+    String cartString = json.encode(cartUser);
+    return await pref.setString('carts', cartString);
   }
 
-  // static Future<Map<String, dynamic>> getDataCartUser()async{
-  //   final pref = await SharedPreferences.getInstance();
-  //   return pref.getString('data');
-  // }
+  static Future<String?> getDataCartUser()async{
+    final pref = await SharedPreferences.getInstance();
+    return pref.getString('carts');
+  }
 
   static Future<Map<String, dynamic>> getUserInformation() async {
     final pref = await SharedPreferences.getInstance();
@@ -36,8 +38,9 @@ class AppSession {
 
   static Future<bool> removeUserInformation() async {
     final pref = await SharedPreferences.getInstance();
+    pref.remove('id');
+    pref.remove('username');
     pref.remove('email');
-    pref.remove('password');
     pref.remove('token');
     return true;
   }

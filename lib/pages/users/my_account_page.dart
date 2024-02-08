@@ -70,6 +70,7 @@ class _MyAccountPageState extends State<MyAccountPage> {
 
   Widget MyAccountSection(BuildContext context) {
     final controller = context.watch<MyAccountController>();
+    final authController = context.watch<AuthController>();
     return Container(
       width: double.infinity,
       color: AppColors.backgroundColor3,
@@ -101,6 +102,11 @@ class _MyAccountPageState extends State<MyAccountPage> {
                     return GestureDetector(
                       onTap: () {
                         controller.pickMenu(menuUser[index], index);
+                        if (menuUser[index] == 'Logout') {
+                          authController.logout();
+                          Navigator.pushNamedAndRemoveUntil(
+                              context, '/', (route) => false);
+                        }
                       },
                       child: Container(
                         width: double.infinity,

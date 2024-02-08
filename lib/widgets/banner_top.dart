@@ -1,12 +1,33 @@
 part of 'widgets.dart';
 
-class BannerTop extends StatelessWidget {
+class BannerTop extends StatefulWidget {
   const BannerTop({Key? key}) : super(key: key);
+
+  @override
+  State<BannerTop> createState() => _BannerTopState();
+}
+
+class _BannerTopState extends State<BannerTop> {
+  Map<String, dynamic> user = {};
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    // user = context.watch<NavbarController>().getUser();
+    getDataUser();
+  }
+
+  getDataUser() async {
+    final Map<String, dynamic> data = await AppSession.getUserInformation();
+    print('data = $data');
+    setState(() {
+      user = data;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<NavbarController>();
-
     return Container(
       width: double.infinity,
       height: 40,
@@ -55,8 +76,14 @@ class BannerTop extends StatelessWidget {
             Builder(builder: (context) {
               return InkWell(
                 onTap: () {
-                  Scaffold.of(context).openEndDrawer();
-                  controller.pickDrawer('Login');
+                  if (user['username'] == null &&
+                      user['email'] == null &&
+                      user['token'] == null) {
+                    Scaffold.of(context).openEndDrawer();
+                    controller.pickDrawer('Login');
+                  } else {
+                    Navigator.pushNamed(context, '/my-account');
+                  }
                 },
                 child: Row(
                   children: [
@@ -73,7 +100,11 @@ class BannerTop extends StatelessWidget {
                       width: 8,
                     ),
                     Text(
-                      'LOGIN / DAFTAR',
+                      user['username'] == null &&
+                              user['email'] == null &&
+                              user['password'] == null
+                          ? 'LOGIN / DAFTAR'
+                          : 'HALO, ${user['username']}'.toUpperCase(),
                       style: AppTheme.whiteTextStyle.copyWith(
                         fontSize: 12,
                       ),

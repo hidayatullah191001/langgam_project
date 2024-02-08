@@ -3,10 +3,14 @@ part of 'widgets.dart';
 class HeroSection extends StatelessWidget {
   final String heroTitle;
   String? heroPosition;
+  bool? isLayanan;
+  String? urlBackground;
   HeroSection({
     super.key,
     required this.heroTitle,
     this.heroPosition,
+    this.isLayanan = false,
+    this.urlBackground = '',
   });
 
   @override
@@ -14,7 +18,16 @@ class HeroSection extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 20),
-      color: AppColors.primaryColor,
+      decoration: BoxDecoration(
+        color: isLayanan! ? Colors.transparent : AppColors.primaryColor,
+        image: isLayanan!
+            ? DecorationImage(
+                image: NetworkImage(
+                  '${Constant.host}$urlBackground',
+                ),
+              )
+            : null,
+      ),
       child: Column(
         children: [
           Text(
@@ -42,10 +55,8 @@ class HeroSection extends StatelessWidget {
 
 class HeroSectionCart extends StatelessWidget {
   String? heroPosition;
-  HeroSectionCart({
-    super.key,
-    this.heroPosition,
-  });
+  bool? isSuccess;
+  HeroSectionCart({super.key, this.heroPosition, this.isSuccess = false});
 
   @override
   Widget build(BuildContext context) {
@@ -91,10 +102,12 @@ class HeroSectionCart extends StatelessWidget {
           TextButtonHovered(
             text: 'PEMESANAN',
             onTap: () {
-              if (currentRoute == '/cart') {
-                Navigator.pushNamed(context, '/cart/checkout');
-              } else {
-                Navigator.pop(context);
+              if (isSuccess == false) {
+                if (currentRoute == '/cart') {
+                  Navigator.pushNamed(context, '/cart/checkout');
+                } else {
+                  Navigator.pop(context);
+                }
               }
             },
             styleBeforeHovered: heroPosition == 'PEMESANAN'

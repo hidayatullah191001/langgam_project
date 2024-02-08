@@ -15,6 +15,14 @@ class AppMethods {
     ).format(double.parse(number));
   }
 
+  static String convertToTitleCase(String inputString) {
+    List<String> words = inputString.toLowerCase().split(' ');
+    for (int i = 0; i < words.length; i++) {
+      words[i] = words[i][0].toUpperCase() + words[i].substring(1);
+    }
+    return words.join(' ');
+  }
+
   // static void dangerFlushbar(BuildContext context, String title) {
   //   Flushbar(
   //     backgroundColor: AppColors.dangerColor,

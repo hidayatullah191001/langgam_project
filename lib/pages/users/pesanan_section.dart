@@ -5,6 +5,7 @@ class PesananSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final permintaanController = context.watch<PermintaanController>();
     return Column(
       children: [
         Row(
@@ -54,19 +55,66 @@ class PesananSection extends StatelessWidget {
         const Divider(),
 
         // Disini List Item Pesanan
-        const ItemPesanan(),
-        const ItemPesanan(),
+
+        FutureBuilder(
+          future: PermintaanService.getAllPermintaanCustomer(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (!snapshot.hasData) {
+              return Center(
+                child: Column(
+                  children: [
+                    Lottie.asset(
+                      'lottie/empty_cart.json',
+                      width: 150,
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Kamu belum ada memiliki pesanan',
+                      style: AppTheme.greyTextStyle.copyWith(
+                        fontSize: 14,
+                        fontWeight: AppTheme.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+            if (snapshot.hasData) {
+              // permintaanController
+              //     .setPermintaanFromFutureBuilder(snapshot.data);
+              // final permintaan = permintaanController.permintaan;
+
+              ListPermintaanModel model = snapshot.data as ListPermintaanModel;
+
+              return ListView.builder(
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                itemCount: model.data!.length,
+                itemBuilder: (context, index) {
+                  print(model.data![index]);
+                  return ItemPesanan(pesananUser: model.data![index]);
+                },
+              );
+            }
+            return Container();
+          },
+        ),
       ],
     );
   }
 }
 
 class ItemPesanan extends StatelessWidget {
-  const ItemPesanan({super.key});
+  final Data pesananUser;
+  const ItemPesanan({super.key, required this.pesananUser});
 
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<MyAccountController>();
+    final permintaanController = context.watch<PermintaanController>();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -78,7 +126,7 @@ class ItemPesanan extends StatelessWidget {
               width: 90,
               child: InkWell(
                 child: Text(
-                  '#16533',
+                  '#${pesananUser.attributes!.nomorPermintaan ?? " ---"}',
                   style: AppTheme.primaryTextStyle.copyWith(
                     fontWeight: AppTheme.bold,
                   ),
@@ -88,7 +136,7 @@ class ItemPesanan extends StatelessWidget {
             SizedBox(
               width: 120,
               child: Text(
-                'Januari 23,2024',
+                AppMethods.date(pesananUser.attributes!.createdAt.toString()),
                 style: AppTheme.softgreyTextStyle,
                 textAlign: TextAlign.center,
               ),
@@ -96,7 +144,7 @@ class ItemPesanan extends StatelessWidget {
             SizedBox(
               width: 100,
               child: Text(
-                'Menunggu persetujuan',
+                pesananUser.attributes!.status.toString(),
                 style: AppTheme.softgreyTextStyle,
                 textAlign: TextAlign.center,
               ),
@@ -106,13 +154,15 @@ class ItemPesanan extends StatelessWidget {
               child: RichText(
                 textAlign: TextAlign.center,
                 text: TextSpan(
-                  text: 'Rp166500',
+                  text:
+                      'Rp ${AppMethods.currency(pesananUser.attributes!.harga.toString())}',
                   style: AppTheme.primaryTextStyle.copyWith(
                     fontWeight: AppTheme.bold,
                   ),
                   children: [
                     TextSpan(
-                        text: ' untuk 1 item',
+                        text:
+                            ' untuk ${pesananUser.attributes!.kuantitas.toString()} item',
                         style: AppTheme.softgreyTextStyle),
                   ],
                 ),
@@ -122,6 +172,7 @@ class ItemPesanan extends StatelessWidget {
               titleButton: 'LIHAT',
               onTap: () {
                 controller.pickMenu('Detail pesanan', 1);
+                permintaanController.setDataPermintaan(pesananUser);
               },
               fontSize: 12,
             ),
@@ -138,6 +189,9 @@ class DetailPesananSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final permintaanController = context.watch<PermintaanController>();
+    String status =
+        permintaanController.dataPermintaan.attributes!.status.toString();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -147,7 +201,8 @@ class DetailPesananSection extends StatelessWidget {
             style: AppTheme.greyTextStyle,
             children: [
               TextSpan(
-                text: '16533',
+                text:
+                    '${permintaanController.dataPermintaan.attributes!.nomorPermintaan ?? ' ---'}',
                 style: AppTheme.blackTextStyle,
               ),
               TextSpan(
@@ -155,7 +210,9 @@ class DetailPesananSection extends StatelessWidget {
                 style: AppTheme.greyTextStyle,
               ),
               TextSpan(
-                text: 'Januari 23, 2024',
+                text: AppMethods.date(permintaanController
+                    .dataPermintaan.attributes!.createdAt
+                    .toString()),
                 style: AppTheme.blackTextStyle,
               ),
               TextSpan(
@@ -163,7 +220,8 @@ class DetailPesananSection extends StatelessWidget {
                 style: AppTheme.greyTextStyle,
               ),
               TextSpan(
-                text: 'Menunggu persetujuan',
+                text:
+                    '${permintaanController.dataPermintaan.attributes!.status}',
                 style: AppTheme.blackTextStyle,
               ),
               TextSpan(
@@ -212,25 +270,33 @@ class DetailPesananSection extends StatelessWidget {
                     size: 15,
                   ),
                   const SizedBox(width: 25),
+                  // Expanded(
+                  //   child: Column(
+                  //     crossAxisAlignment: CrossAxisAlignment.start,
+                  //     children: [
+                  //       Text(
+                  //         '23 Jan, 2024 | 1:37 AM',
+                  //         style: AppTheme.greyTextStyle.copyWith(
+                  //           fontWeight: AppTheme.medium,
+                  //           fontSize: 12,
+                  //         ),
+                  //       ),
+                  //       const SizedBox(height: 10),
+                  //       Text(
+                  //         'menunggu persetujuan admin Status pesanan berubah dari Pembayaran tertunda menjadi Menuggu persetujuan',
+                  //         style: AppTheme.greyTextStyle.copyWith(
+                  //           fontWeight: AppTheme.bold,
+                  //         ),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '23 Jan, 2024 | 1:37 AM',
-                          style: AppTheme.greyTextStyle.copyWith(
-                            fontWeight: AppTheme.medium,
-                            fontSize: 12,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          'menunggu persetujuan admin Status pesanan berubah dari Pembayaran tertunda menjadi Menuggu persetujuan',
-                          style: AppTheme.greyTextStyle.copyWith(
-                            fontWeight: AppTheme.bold,
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      'menunggu persetujuan admin Status pesanan berubah dari Pembayaran tertunda menjadi Menuggu persetujuan',
+                      style: AppTheme.greyTextStyle.copyWith(
+                        fontWeight: AppTheme.bold,
+                      ),
                     ),
                   ),
                 ],

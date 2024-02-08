@@ -1,7 +1,59 @@
 part of 'pages.dart';
 
-class CheckoutPage extends StatelessWidget {
+class CheckoutPage extends StatefulWidget {
   const CheckoutPage({Key? key}) : super(key: key);
+
+  @override
+  State<CheckoutPage> createState() => _CheckoutPageState();
+}
+
+class _CheckoutPageState extends State<CheckoutPage> {
+  Uint8List? _selectedFile;
+  String? _selectedFileName;
+  Map<String, dynamic> user = {};
+  bool isDataCartLoaded = false;
+
+  void pickAndUploadFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+    if (result != null) {
+      Uint8List fileBytes = result.files.single.bytes!;
+      String fileName = result.files.single.name;
+
+      setState(() {
+        _selectedFile = fileBytes;
+        _selectedFileName = fileName;
+      });
+
+      // Tambahkan logika untuk upload file ke API di sini
+      // uploadFileToApi(fileBytes);
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    context.read<WilayahController>().getAllDataProvinces();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      getDataUser();
+      loadDataCart();
+    });
+  }
+
+  loadDataCart() {
+    context.read<CartController>().getDataCart();
+    setState(() {
+      isDataCartLoaded = true;
+    });
+  }
+
+  getDataUser() async {
+    final Map<String, dynamic> data = await AppSession.getUserInformation();
+    setState(() {
+      user = data;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,19 +83,6 @@ class CheckoutPage extends StatelessWidget {
           } else {
             return CustomScrollView(
               slivers: [
-                // SliverList(
-                //   delegate: SliverChildListDelegate([
-                //     const BannerTop(),
-                //   ]),
-                // ),
-                // const SliverAppBar(
-                //   pinned: true,
-                //   floating: false,
-                //   collapsedHeight: 101.0,
-                //   automaticallyImplyLeading: false,
-                //   flexibleSpace: Navbar(),
-                //   actions: [SizedBox()],
-                // ),
                 SliverList(
                   delegate: SliverChildListDelegate([
                     HeroSectionCart(
@@ -70,21 +109,21 @@ class CheckoutPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                'Pelanggan lama?',
-                style: AppTheme.blackTextStyle.copyWith(
-                  fontWeight: AppTheme.bold,
-                ),
-              ),
-              const SizedBox(width: 5),
-              Text('Klik di sini untuk login',
-                  style: AppTheme.primaryTextStyle
-                      .copyWith(fontWeight: AppTheme.bold)),
-            ],
-          ),
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.start,
+          //   children: [
+          //     Text(
+          //       'Pelanggan lama?',
+          //       style: AppTheme.blackTextStyle.copyWith(
+          //         fontWeight: AppTheme.bold,
+          //       ),
+          //     ),
+          //     const SizedBox(width: 5),
+          //     Text('Klik di sini untuk login',
+          //         style: AppTheme.primaryTextStyle
+          //             .copyWith(fontWeight: AppTheme.bold)),
+          //   ],
+          // ),
           const SizedBox(height: 30),
           Row(
             children: [
@@ -106,9 +145,30 @@ class CheckoutPage extends StatelessWidget {
           const SizedBox(height: 15),
           const Divider(),
           const SizedBox(height: 15),
-          SecondaryButton(
-            onTap: () {},
-            titleButton: 'Pilih File',
+          Row(
+            children: [
+              SecondaryButton(
+                onTap: () {
+                  pickAndUploadFile();
+                },
+                titleButton: 'PILIH & UPLOAD FILE',
+              ),
+              const SizedBox(width: 15),
+              if (_selectedFile != null) ...[
+                if (_selectedFileName!.toLowerCase().endsWith('.pdf') ||
+                    _selectedFileName!.toLowerCase().endsWith('.doc'))
+                  Text(
+                    'Nama File: $_selectedFileName',
+                    style: AppTheme.primaryTextStyle.copyWith(
+                      fontWeight: AppTheme.medium,
+                    ),
+                  )
+                else
+                  Image.memory(_selectedFile!,
+                      width: 80, height: 80, fit: BoxFit.cover),
+              ] else
+                Text('Belum ada file dipilih'),
+            ],
           ),
           const SizedBox(height: 15),
           const Divider(),
@@ -128,6 +188,14 @@ class CheckoutPage extends StatelessWidget {
   }
 
   Widget DetailPesananContent(BuildContext context) {
+    final cartController = context.watch<CartController>();
+    final carts = cartController.carts
+        .where((cart) =>
+            cart['user']['id'] == user['id'] &&
+            cart['user']['email'] == user['email'])
+        .toList();
+    final checkoutController = context.watch<CheckoutController>();
+    final wilayahController = context.watch<WilayahController>();
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -183,10 +251,13 @@ class CheckoutPage extends StatelessWidget {
                 ),
                 const Divider(),
                 const SizedBox(height: 20),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
+                ListView.builder(
+                  shrinkWrap: true,
+                  padding: EdgeInsets.zero,
+                  itemCount: carts.length,
+                  itemBuilder: (context, index) {
+                    final productCart = carts[index];
+                    return Padding(
                       padding: const EdgeInsets.symmetric(
                         vertical: 6,
                         horizontal: 10,
@@ -194,25 +265,16 @@ class CheckoutPage extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          // Widget List Item Produk di sidebox pesanan
                           Expanded(
                             child: Row(
                               children: [
-                                InkWell(
-                                  onTap: () {},
-                                  child: const Icon(
-                                    Icons.close,
-                                    color: AppColors.greyColor,
-                                    size: 14,
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
                                 Container(
                                   width: 60,
                                   height: 50,
                                   decoration: BoxDecoration(
-                                    image: const DecorationImage(
-                                      image: AssetImage('images/product-1.jpg'),
+                                    image: DecorationImage(
+                                      image: NetworkImage(
+                                          '${Constant.host}${productCart['product']['gambar']}'),
                                       fit: BoxFit.cover,
                                     ),
                                     borderRadius: BorderRadius.circular(7),
@@ -220,84 +282,11 @@ class CheckoutPage extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 10),
                                 Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Analisis dan Prakiraan Hujan Bulanan',
-                                        style:
-                                            AppTheme.primaryTextStyle.copyWith(
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 5),
-                                      SizedBox(
-                                        width: 80,
-                                        child: Row(
-                                          children: [
-                                            InkWell(
-                                              onTap: () {},
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(4),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.blue
-                                                      .withOpacity(0.1),
-                                                  borderRadius:
-                                                      const BorderRadius.only(
-                                                    topLeft: Radius.circular(6),
-                                                    bottomLeft:
-                                                        Radius.circular(6),
-                                                  ),
-                                                ),
-                                                child: const Icon(
-                                                  Icons.remove,
-                                                  color: AppColors.primaryColor,
-                                                  size: 16,
-                                                ),
-                                              ),
-                                            ),
-                                            Container(
-                                              padding: const EdgeInsets.all(5),
-                                              color:
-                                                  Colors.blue.withOpacity(0.1),
-                                              child: Text(
-                                                1.toString(),
-                                                style: AppTheme.blackTextStyle
-                                                    .copyWith(
-                                                  fontSize: 12,
-                                                  fontWeight: AppTheme.medium,
-                                                ),
-                                              ),
-                                            ),
-                                            InkWell(
-                                              onTap: () {},
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(4),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.blue
-                                                      .withOpacity(0.1),
-                                                  borderRadius:
-                                                      const BorderRadius.only(
-                                                    topRight:
-                                                        Radius.circular(6),
-                                                    bottomRight:
-                                                        Radius.circular(6),
-                                                  ),
-                                                ),
-                                                child: const Icon(
-                                                  Icons.add,
-                                                  color: AppColors.primaryColor,
-                                                  size: 16,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
+                                  child: Text(
+                                    '${productCart['product']['judul']} x ${productCart['item']}',
+                                    style: AppTheme.primaryTextStyle.copyWith(
+                                      fontSize: 14,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -305,68 +294,71 @@ class CheckoutPage extends StatelessWidget {
                           ),
                           const SizedBox(width: 30),
                           Text(
-                            'RP.65000',
+                            AppMethods.currency(productCart['totalHarga'])
+                                .toString(),
                             style: AppTheme.greyTextStyle,
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                    const Divider(),
-                  ],
+                    );
+                    // return CartItemWidget(data: productCart, index: index);
+                  },
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 6,
-                        horizontal: 10,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Subtotal',
-                            style: AppTheme.blackTextStyle.copyWith(
-                              fontWeight: AppTheme.bold,
-                            ),
-                          ),
-                          Text('Rp65.000', style: AppTheme.greyTextStyle),
-                        ],
-                      ),
-                    ),
-                    const Divider(),
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 6,
-                        horizontal: 10,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Pajak',
-                            style: AppTheme.blackTextStyle.copyWith(
-                              fontWeight: AppTheme.bold,
-                            ),
-                          ),
-                          Text(
-                            'Rp7.150',
-                            style: AppTheme.primaryTextStyle
-                                .copyWith(fontWeight: AppTheme.bold),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Divider(),
-                  ],
-                ),
+
+                const SizedBox(height: 20),
+                const Divider(),
+                // Column(
+                //   crossAxisAlignment: CrossAxisAlignment.start,
+                //   children: [
+                //     Padding(
+                //       padding: const EdgeInsets.symmetric(
+                //         vertical: 6,
+                //         horizontal: 10,
+                //       ),
+                //       child: Row(
+                //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //         children: [
+                //           Text(
+                //             'Subtotal',
+                //             style: AppTheme.blackTextStyle.copyWith(
+                //               fontWeight: AppTheme.bold,
+                //             ),
+                //           ),
+                //           Text('Rp65.000', style: AppTheme.greyTextStyle),
+                //         ],
+                //       ),
+                //     ),
+                //     const Divider(),
+                //   ],
+                // ),
+                // Column(
+                //   crossAxisAlignment: CrossAxisAlignment.start,
+                //   children: [
+                //     Padding(
+                //       padding: const EdgeInsets.symmetric(
+                //         vertical: 6,
+                //         horizontal: 10,
+                //       ),
+                //       child: Row(
+                //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //         children: [
+                //           Text(
+                //             'Pajak',
+                //             style: AppTheme.blackTextStyle.copyWith(
+                //               fontWeight: AppTheme.bold,
+                //             ),
+                //           ),
+                //           Text(
+                //             'Rp7.150',
+                //             style: AppTheme.primaryTextStyle
+                //                 .copyWith(fontWeight: AppTheme.bold),
+                //           ),
+                //         ],
+                //       ),
+                //     ),
+                //     const Divider(),
+                //   ],
+                // ),
                 const SizedBox(height: 20),
                 Padding(
                   padding: const EdgeInsets.symmetric(
@@ -382,22 +374,16 @@ class CheckoutPage extends StatelessWidget {
                             .copyWith(fontWeight: AppTheme.bold, fontSize: 18),
                       ),
                       Text(
-                        'Rp72.150',
+                        AppMethods.currency(cartController
+                                .getTotalHargaAllItem()
+                                .toString())
+                            .toString(),
                         style: AppTheme.primaryTextStyle.copyWith(
                           fontSize: 20,
                           fontWeight: AppTheme.bold,
                         ),
                       ),
                     ],
-                  ),
-                ),
-                const SizedBox(height: 30),
-                SizedBox(
-                  width: double.infinity,
-                  child: PrimaryButton(
-                    onTap: () {},
-                    titleButton: 'LANJUTKAN KE CHECKOUT',
-                    fontSize: 14,
                   ),
                 ),
               ],
@@ -442,7 +428,13 @@ class CheckoutPage extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: PrimaryButton(
-              onTap: () {},
+              onTap: () {
+                checkoutController.prosesCheckout(context,
+                    provinsi: wilayahController.selectedProvince.toString(),
+                    kota: wilayahController.selectedCity.toString(),
+                    kecamatan: wilayahController.selectedDistrict.toString(),
+                    cart: carts);
+              },
               titleButton: "BUAT PESANAN",
             ),
           ),
@@ -452,6 +444,9 @@ class CheckoutPage extends StatelessWidget {
   }
 
   Expanded DetailTagihanContent() {
+    final wilayahController = context.watch<WilayahController>();
+    final checkoutController = context.watch<CheckoutController>();
+    final cartController = context.watch<CartController>();
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -467,6 +462,7 @@ class CheckoutPage extends StatelessWidget {
             children: [
               Flexible(
                 child: CustomFormUser(
+                  controller: checkoutController.namaDepanController,
                   title: 'Nama depan',
                   isMandatory: true,
                 ),
@@ -474,6 +470,7 @@ class CheckoutPage extends StatelessWidget {
               const SizedBox(width: 15),
               Flexible(
                 child: CustomFormUser(
+                  controller: checkoutController.namaBelakangController,
                   title: 'Nama belakang',
                   isMandatory: true,
                 ),
@@ -482,25 +479,168 @@ class CheckoutPage extends StatelessWidget {
           ),
           const SizedBox(height: 15),
           CustomFormUser(
+            controller: checkoutController.namaPerusahaanController,
             title: 'Nama perusahaan',
           ),
           const SizedBox(height: 15),
+          Row(
+            children: [
+              Text('Provinsi ', style: AppTheme.blackTextStyle),
+              Text(
+                '*',
+                style: AppTheme.blackTextStyle.copyWith(
+                  color: AppColors.dangerColor,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 5),
+          DropdownButtonFormField<String>(
+            value: wilayahController.selectedProvince,
+            onChanged: (String? value) {
+              setState(() {
+                wilayahController.setSelectedProvince(value);
+                wilayahController.setSelectedCity(null);
+                wilayahController.setSelectedDistrict(null);
+              });
+              if (wilayahController.selectedProvince!.isNotEmpty) {
+                wilayahController
+                    .getAllDataCities(wilayahController.selectedProvince!);
+              }
+            },
+            decoration: InputDecoration(
+              hintStyle: AppTheme.greyTextStyle.copyWith(
+                fontSize: 12,
+              ),
+              isDense: true,
+              border: OutlineInputBorder(
+                borderSide:
+                    const BorderSide(color: AppColors.greyColor, width: 2),
+                borderRadius: BorderRadius.circular(7),
+              ),
+            ),
+            items: wilayahController.provinces.map((data) {
+              return DropdownMenuItem<String>(
+                value: data.attributes!.namaProvinsi,
+                child: Text(data.attributes!.namaProvinsi.toString()),
+              );
+            }).toList(),
+          ),
+          // END PROVINSI
+          const SizedBox(
+            height: 10,
+          ),
+          // START OF KOTAS
+          Row(
+            children: [
+              Text('Kota ', style: AppTheme.blackTextStyle),
+              Text(
+                '*',
+                style: AppTheme.blackTextStyle.copyWith(
+                  color: AppColors.dangerColor,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 5),
+          DropdownButtonFormField<String>(
+            value: wilayahController.selectedCity,
+            onChanged: (String? value) {
+              setState(() {
+                wilayahController.setSelectedCity(value);
+                wilayahController.setSelectedDistrict(null);
+              });
+              if (wilayahController.selectedCity!.isNotEmpty) {
+                wilayahController
+                    .getAllDataKecamatan(wilayahController.selectedCity!);
+              }
+            },
+            decoration: InputDecoration(
+              hintStyle: AppTheme.greyTextStyle.copyWith(
+                fontSize: 12,
+              ),
+              isDense: true,
+              border: OutlineInputBorder(
+                borderSide:
+                    const BorderSide(color: AppColors.greyColor, width: 2),
+                borderRadius: BorderRadius.circular(7),
+              ),
+            ),
+            items: wilayahController
+                .getCitiesByProvince(wilayahController.selectedProvince ?? "")
+                .map((city) {
+              return DropdownMenuItem<String>(
+                value: city.attributes!.namaKota,
+                child: Text(city.attributes!.namaKota.toString()),
+              );
+            }).toList(),
+          ),
+          // END OF KOTAS
+          const SizedBox(
+            height: 10,
+          ),
+          // START DISTRICT
+          Row(
+            children: [
+              Text('Kecamatan ', style: AppTheme.blackTextStyle),
+              Text(
+                '*',
+                style: AppTheme.blackTextStyle.copyWith(
+                  color: AppColors.dangerColor,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 5),
+          DropdownButtonFormField<String>(
+            value: wilayahController.selectedDistrict,
+            onChanged: (String? value) {
+              setState(() {
+                wilayahController.setSelectedDistrict(value);
+              });
+            },
+            decoration: InputDecoration(
+              hintStyle: AppTheme.greyTextStyle.copyWith(
+                fontSize: 12,
+              ),
+              isDense: true,
+              border: OutlineInputBorder(
+                borderSide:
+                    const BorderSide(color: AppColors.greyColor, width: 2),
+                borderRadius: BorderRadius.circular(7),
+              ),
+            ),
+            items: wilayahController
+                .getDistrictsByCity(wilayahController.selectedCity ?? "")
+                .map((district) {
+              return DropdownMenuItem<String>(
+                value: district.attributes!.namaKecamatan,
+                child: Text(district.attributes!.namaKecamatan.toString()),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 15),
+          // END KECAMATAN
           CustomFormUser(
+            controller: checkoutController.alamatJalanController,
             title: 'Alamat jalan',
             isMandatory: true,
           ),
+          // const SizedBox(height: 15),
+          // CustomFormUser(
+          //   controller: checkoutController.kodePosController,
+          //   title: 'Kode pos',
+          //   isMandatory: true,
+          // ),
           const SizedBox(height: 15),
           CustomFormUser(
-            title: 'Kode pos',
-            isMandatory: true,
-          ),
-          const SizedBox(height: 15),
-          CustomFormUser(
+            controller: checkoutController.teleponController,
             title: 'Telepon',
             isMandatory: true,
           ),
           const SizedBox(height: 15),
           CustomFormUser(
+            controller: checkoutController.alamatEmailController,
             title: 'Alamat email',
             isMandatory: true,
           ),
@@ -511,7 +651,53 @@ class CheckoutPage extends StatelessWidget {
                 fontSize: 20, fontWeight: AppTheme.bold, letterSpacing: 1.2),
           ),
           const SizedBox(height: 15),
+          // START OF KOTAS
+          Row(
+            children: [
+              Text('Keperluan ', style: AppTheme.blackTextStyle),
+              Text(
+                '*',
+                style: AppTheme.blackTextStyle.copyWith(
+                  color: AppColors.dangerColor,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 5),
+          DropdownButtonFormField<String>(
+            value: checkoutController.selectedKeperluan,
+            onChanged: (String? value) {
+              setState(() {
+                checkoutController.setSelectedKeperluan(value!);
+              });
+              if (checkoutController.selectedKeperluan == 'Penelitian' ||
+                  checkoutController.selectedKeperluan == 'Riset') {
+                cartController.setItemToFree();
+              } else if (checkoutController.selectedKeperluan == 'Komersial') {
+                cartController.setItemToKomersial();
+              }
+            },
+            decoration: InputDecoration(
+              hintStyle: AppTheme.greyTextStyle.copyWith(
+                fontSize: 12,
+              ),
+              isDense: true,
+              border: OutlineInputBorder(
+                borderSide:
+                    const BorderSide(color: AppColors.greyColor, width: 2),
+                borderRadius: BorderRadius.circular(7),
+              ),
+            ),
+            items: checkoutController.keperluans.map((keperluan) {
+              return DropdownMenuItem<String>(
+                value: keperluan,
+                child: Text(keperluan.toString()),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 15),
           CustomFormUser(
+            controller: checkoutController.catatanPesananController,
             title: 'Catatan Pesananan',
             minLines: 5,
             maxLines: 7,

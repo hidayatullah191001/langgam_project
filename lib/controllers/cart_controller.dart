@@ -6,40 +6,58 @@ class CartController extends ChangeNotifier {
   // Bentuk Map
 
   /*
-  {
-    "product" : {
-      "judul" : "JIJIJJI",
-      "harga" : 2500000 
-    },
-    "totalItem" : [
-      {
-        "lokasi" : "Jawa Barat",
-        "hari" : 2,
-        "totalHarga" : "500000"
-      },
-      {
-        "lokasi" : "Jakarta",
-        "hari" : 1,
-        "totalHarga" : "250000"
-      }
-    ],
-  }
+  final productItem = {
+                    'user': user,
+                    'product': {
+                      'id' : data.id
+                      'judul': data.judul,
+                      'harga': data.harga,
+                      'satuan': data.satuan,
+                      'gambar': data.gambar?.data?.attributes?.url,
+                    },
+                    'provinsi': wilayahController.selectedProvince,
+                    'kota': wilayahController.selectedCity,
+                    'kecamatan': wilayahController.selectedDistrict,
+                    'item': controller.itemsCount.toString(),
+                    'totalHarga': controller.totalHarga.toString(),
+                  };
   */
 
   int _totalHarga = 0;
 
-  List<Map<String, dynamic>> _cartList = [];
-  List<Map<String, dynamic>> get carts => _cartList;
+  List _cartList = [];
+  List get carts => _cartList;
+
+  // List _datacartList = [];
+  // List get dataCarts => _datacartList;
+
   int get itemsCount => _itemsCount;
   int get totalHarga => _totalHarga;
 
+  void setCartEmpty() {
+    _cartList = [];
+    AppSession.saveDataCartUser(_cartList);
+    notifyListeners();
+  }
+
+  void setItemsCount(int count) {
+    _itemsCount = count;
+  }
+
+  void setTotalHarga(int totalHarga) {
+    _totalHarga = totalHarga;
+  }
+
   void addToCart(Map<String, dynamic> product) {
     _cartList.add(product);
+    AppSession.saveDataCartUser(_cartList);
     notifyListeners();
   }
 
   void removeCart(index) {
     _cartList.removeAt(index);
+    AppSession.saveDataCartUser(_cartList);
+    notifyListeners();
   }
 
   void add() {
@@ -54,10 +72,73 @@ class CartController extends ChangeNotifier {
     }
   }
 
+  void addinCartPage(int index) {
+    int item = (int.parse(_cartList[index]['item']) + 1);
+    _cartList[index]['item'] = item.toString();
+
+    int total = _cartList[index]['product']['harga'] *
+        int.parse(_cartList[index]['item']);
+    _cartList[index]['totalHarga'] = total.toString();
+    AppSession.saveDataCartUser(_cartList);
+    notifyListeners();
+  }
+
+  void removerinCartPage(int index) {
+    if (_itemsCount > 1) {
+      int item = (int.parse(_cartList[index]['item']) - 1);
+      _cartList[index]['item'] = item.toString();
+
+      int total = _cartList[index]['product']['harga'] *
+          int.parse(_cartList[index]['item']);
+      _cartList[index]['totalHarga'] = total.toString();
+      AppSession.saveDataCartUser(_cartList);
+      notifyListeners();
+    }
+  }
+
+  int getTotalHargaAllItem() {
+    int totalHarga = 0;
+    for (var cart in _cartList) {
+      totalHarga += int.parse(cart['totalHarga']);
+    }
+    return totalHarga;
+  }
+
+  void setItemToFree() {
+    for (var cart in _cartList) {
+      cart['totalHarga'] = 0.toString();
+    }
+    print('set to free = $_cartList');
+    AppSession.saveDataCartUser(_cartList);
+    notifyListeners();
+  }
+
+  void setItemToKomersial() {
+    for (var cart in _cartList) {
+      int hargaProduk = cart['product']['harga'];
+      int itemCountProduct = int.parse(cart['item']);
+      int total = hargaProduk * itemCountProduct;
+      print('total Harga = $total');
+      cart['totalHarga'] = total.toString();
+    }
+
+    print('set to komersil = $_cartList');
+    AppSession.saveDataCartUser(_cartList);
+    notifyListeners();
+  }
+
   total(int harga) {
     int total = harga * _itemsCount;
     _totalHarga = total;
     notifyListeners();
     return total;
+  }
+
+  void getDataCart() async {
+    final String? stringDataCart = await AppSession.getDataCartUser();
+    // print('dataCart = $dataCart');
+    List dataCart = json.decode(stringDataCart.toString());
+    _cartList = dataCart;
+    // print('dataCart = $_datacartList');
   }
 }

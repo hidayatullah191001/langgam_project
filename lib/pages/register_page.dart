@@ -162,30 +162,9 @@ class _LoginFormState extends State<LoginForm> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  // void _handleLoginButtonPressed(
-  //     QueryResult result, BuildContext context) async {
-  //   if (!EmailValidator.validate(emailController.text)) {
-  //     CoolAlert.show(
-  //       context: context,
-  //       width: MediaQuery.of(context).size.width * 0.3,
-  //       type: CoolAlertType.error,
-  //       text: 'Email yang kamu masukkan tidak valid',
-  //     );
-  //   } else if (emailController.text.isEmpty ||
-  //       passwordController.text.isEmpty) {
-  //     CoolAlert.show(
-  //       context: context,
-  //       width: MediaQuery.of(context).size.width * 0.3,
-  //       type: CoolAlertType.error,
-  //       text: 'Email dan password tidak boleh kosong',
-  //     );
-  //   } else {
-  //     print('data = ${result.data}');
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
+    final controller = context.watch<AuthController>();
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -215,72 +194,35 @@ class _LoginFormState extends State<LoginForm> {
           const SizedBox(
             height: 20,
           ),
-          Mutation(
-            options: MutationOptions(
-              document: gql(
-                  // AuthQuery.login(emailController.text, passwordController.text),
-                  AuthQuery.login),
+          SizedBox(
+            width: double.infinity,
+            child: PrimaryButton(
+              onTap: () async {
+                if (!EmailValidator.validate(emailController.text)) {
+                  CoolAlert.show(
+                    context: context,
+                    width: MediaQuery.of(context).size.width * 0.3,
+                    type: CoolAlertType.error,
+                    text: 'Email yang kamu masukkan tidak valid',
+                  );
+                } else if (emailController.text.isEmpty ||
+                    passwordController.text.isEmpty) {
+                  CoolAlert.show(
+                    context: context,
+                    width: MediaQuery.of(context).size.width * 0.3,
+                    type: CoolAlertType.error,
+                    text: 'Email dan password tidak boleh kosong',
+                  );
+                } else {
+                  final model = SignInFormModel(
+                    identifier: emailController.text,
+                    password: passwordController.text,
+                  );
+                  controller.loginUser(model).then((value) => Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false));
+                }
+              },
+              titleButton: 'MASUK',
             ),
-            builder: (runMutation, result) {
-              if (result!.isLoading) {
-                return Center(child: CircularProgressIndicator());
-              }
-              if (result.hasException) {
-                return Text("Error: ${result.exception}");
-              }
-              if (result.data != null) {
-                Map user = {
-                  'id': result.data?['login']['user']['id'],
-                  'username': result.data?['login']['user']['username'],
-                  'email': result.data?['login']['user']['email'],
-                };
-                AppSession.saveUserInformation(
-                    user, result.data?['login']['jwt']);
-                Navigator.pushNamedAndRemoveUntil(
-                  widget.contextPage,
-                  '/',
-                  (route) => false,
-                );
-              }
-              return SizedBox(
-                width: double.infinity,
-                child: PrimaryButton(
-                  onTap: () async {
-                    if (!EmailValidator.validate(emailController.text)) {
-                      CoolAlert.show(
-                        context: context,
-                        width: MediaQuery.of(context).size.width * 0.3,
-                        type: CoolAlertType.error,
-                        text: 'Email yang kamu masukkan tidak valid',
-                      );
-                    } else if (emailController.text.isEmpty ||
-                        passwordController.text.isEmpty) {
-                      CoolAlert.show(
-                        context: context,
-                        width: MediaQuery.of(context).size.width * 0.3,
-                        type: CoolAlertType.error,
-                        text: 'Email dan password tidak boleh kosong',
-                      );
-                    } else {
-                      runMutation({
-                        'identifier': emailController.text,
-                        'password': passwordController.text,
-                      });
-                      Future.delayed(Duration(seconds: 3), () {
-                        if (!result.hasException) {
-                          Navigator.pushNamedAndRemoveUntil(
-                            context,
-                            '/',
-                            (route) => true,
-                          );
-                        }
-                      });
-                    }
-                  },
-                  titleButton: 'MASUK',
-                ),
-              );
-            },
           ),
           const SizedBox(
             height: 30,

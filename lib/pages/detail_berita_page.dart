@@ -31,44 +31,68 @@ class DetailBeritaPage extends StatelessWidget {
               ),
             );
           } else {
-            return Query(
-              options: QueryOptions(document: gql(BeritaQuery.queryBerita(id))),
-              builder: (result, {fetchMore, refetch}) {
-                if (result.isLoading) {
-                  return Center(child: CircularProgressIndicator());
-                }
+            // return Query(
+            //   options: QueryOptions(document: gql(BeritaQuery.queryBerita(id))),
+            //   builder: (result, {fetchMore, refetch}) {
+            //     if (result.isLoading) {
+            //       return Center(child: CircularProgressIndicator());
+            //     }
 
-                if (result.data == null) {
-                  return const Center(
-                    child: Text('Data not found'),
-                  );
-                }
-                final berita = result.data!['post']['data']['attributes'];
-                return CustomScrollView(
-                  cacheExtent: 5000,
-                  slivers: [
-                    SliverList(
-                      delegate: SliverChildListDelegate([
-                        const BannerTop(),
-                      ]),
-                    ),
-                    const SliverAppBar(
-                      pinned: true,
-                      floating: false,
-                      collapsedHeight: 101.0,
-                      automaticallyImplyLeading: false,
-                      flexibleSpace: Navbar(),
-                      actions: [SizedBox()],
-                    ),
-                    SliverList(
-                      delegate: SliverChildListDelegate([
-                        ContentSection(berita),
-                        const Footer(),
-                      ]),
-                    ),
-                  ],
-                );
-              },
+            //     if (result.data == null) {
+            //       return const Center(
+            //         child: Text('Data not found'),
+            //       );
+            //     }
+            //     final berita = result.data!['post']['data']['attributes'];
+            //     return CustomScrollView(
+            //       cacheExtent: 5000,
+            //       slivers: [
+            //         SliverList(
+            //           delegate: SliverChildListDelegate([
+            //             const BannerTop(),
+            //           ]),
+            //         ),
+            //         const SliverAppBar(
+            //           pinned: true,
+            //           floating: false,
+            //           collapsedHeight: 101.0,
+            //           automaticallyImplyLeading: false,
+            //           flexibleSpace: Navbar(),
+            //           actions: [SizedBox()],
+            //         ),
+            //         SliverList(
+            //           delegate: SliverChildListDelegate([
+            //             ContentSection(berita),
+            //             const Footer(),
+            //           ]),
+            //         ),
+            //       ],
+            //     );
+            //   },
+            // );
+            return CustomScrollView(
+              cacheExtent: 5000,
+              slivers: [
+                SliverList(
+                  delegate: SliverChildListDelegate([
+                    const BannerTop(),
+                  ]),
+                ),
+                const SliverAppBar(
+                  pinned: true,
+                  floating: false,
+                  collapsedHeight: 101.0,
+                  automaticallyImplyLeading: false,
+                  flexibleSpace: Navbar(),
+                  actions: [SizedBox()],
+                ),
+                SliverList(
+                  delegate: SliverChildListDelegate([
+                    // ContentSection(berita),
+                    const Footer(),
+                  ]),
+                ),
+              ],
             );
           }
         },

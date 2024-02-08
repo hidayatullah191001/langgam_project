@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter_flushbar/flutter_flushbar.dart';
 import 'package:intl/intl.dart';
@@ -14,3 +15,4 @@ part 'app_session.dart';
 part 'constant.dart';
 part 'app_theme.dart';
 part 'dummy.dart';
+part 'application.dart';

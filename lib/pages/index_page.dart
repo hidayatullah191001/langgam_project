@@ -103,11 +103,12 @@ class _IndexPageState extends State<IndexPage> {
           }
         },
       ),
-      endDrawer: controller.selectedDrawer == 'Login'
-          ? const LoginDrawer()
-          : (controller.selectedDrawer == 'Cart'
-              ? const CartDrawer()
-              : Container()),
+      // endDrawer: controller.selectedDrawer == 'Login'
+      //     ? const LoginDrawer()
+      //     : (controller.selectedDrawer == 'Cart'
+      //         ? const CartDrawer()
+      //         : Container()),
+      endDrawer: const LoginDrawer(),
     );
   }
 
@@ -225,31 +226,67 @@ class _IndexPageState extends State<IndexPage> {
                 const SizedBox(
                   width: 20,
                 ),
+                // Expanded(
+                //   child: SizedBox(
+                //       height: 300,
+                //       child: Query(
+                //         options: QueryOptions(
+                //           document: gql(
+                //             LayananQuery.queryLayanans(),
+                //           ),
+                //         ),
+                //         builder: (result, {fetchMore, refetch}) {
+                //           if (result.isLoading) {
+                //             return Center(child: CircularProgressIndicator());
+                //           }
+
+                //           if (result.data == null) {
+                //             return Center(
+                //               child: Text(
+                //                 'Data not found',
+                //                 style: AppTheme.greyTextStyle,
+                //               ),
+                //             );
+                //           }
+
+                //           final layanans = result.data!['layanans']['data'];
+
+                //           return ListView.builder(
+                //             padding: EdgeInsets.zero,
+                //             controller: _scrollController,
+                //             scrollDirection: Axis.horizontal,
+                //             itemCount: 5,
+                //             shrinkWrap: true,
+                //             itemBuilder: (context, index) {
+                //               print('id ${layanans[index]['id']}');
+                //               final layanan = layanans[index]['attributes'];
+
+                //               return LayananPopulerCard(data: layanan);
+                //             },
+                //           );
+                //         },
+                //       )),
+                // ),
                 Expanded(
                   child: SizedBox(
-                      height: 300,
-                      child: Query(
-                        options: QueryOptions(
-                          document: gql(
-                            LayananQuery.queryLayanans(),
-                          ),
-                        ),
-                        builder: (result, {fetchMore, refetch}) {
-                          if (result.isLoading) {
-                            return Center(child: CircularProgressIndicator());
-                          }
+                    height: 300,
+                    child: FutureBuilder(
+                      initialData: [],
+                      future: LayananServices.getAllLayanans(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Center(child: CircularProgressIndicator());
+                        }
 
-                          if (result.data == null) {
-                            return Center(
-                              child: Text(
-                                'Data not found',
-                                style: AppTheme.greyTextStyle,
-                              ),
-                            );
-                          }
+                        if (!snapshot.hasData) {
+                          return Center(
+                              child: Text(snapshot.error.toString(),
+                                  style: AppTheme.blackTextStyle));
+                        }
 
-                          final layanans = result.data!['layanans']['data'];
-
+                        if (snapshot.hasData) {
+                          List data = snapshot.data as List;
                           return ListView.builder(
                             padding: EdgeInsets.zero,
                             controller: _scrollController,
@@ -257,14 +294,18 @@ class _IndexPageState extends State<IndexPage> {
                             itemCount: 5,
                             shrinkWrap: true,
                             itemBuilder: (context, index) {
-                              print('id ${layanans[index]['id']}');
-                              final layanan = layanans[index]['attributes'];
-
-                              return LayananPopulerCard(data: layanan);
+                              final Layanan layanan = data[index];
+                              return LayananPopulerCard(
+                                data: layanan.attributes,
+                                idProduct: layanan.id.toString(),
+                              );
                             },
                           );
-                        },
-                      )),
+                        }
+                        return Container();
+                      },
+                    ),
+                  ),
                 ),
                 const SizedBox(
                   width: 20,
@@ -347,7 +388,9 @@ class _IndexPageState extends State<IndexPage> {
                     height: 20,
                   ),
                   PrimaryButton(
-                    onTap: () {},
+                    onTap: () {
+                      Application.router.navigateTo(context, Routes.layanan);
+                    },
                     titleButton: 'LIHAT SEMUA LAYANAN',
                   ),
                 ],

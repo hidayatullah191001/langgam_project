@@ -1,12 +1,35 @@
 part of 'widgets.dart';
 
-class Navbar extends StatelessWidget {
+class Navbar extends StatefulWidget {
   const Navbar({Key? key}) : super(key: key);
+
+  @override
+  State<Navbar> createState() => _NavbarState();
+}
+
+class _NavbarState extends State<Navbar> {
+  Map<String, dynamic> user = {};
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    // context.watch<CartController>().getDataCart();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      getDataUser();
+    });
+  }
+
+  getDataUser() async {
+    final Map<String, dynamic> data = await AppSession.getUserInformation();
+    setState(() {
+      user = data;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<NavbarController>();
-    final cartcontroller = context.watch<CartController>();
+    final cartController = context.watch<CartController>();
 
     return Container(
       width: double.infinity,
@@ -18,28 +41,33 @@ class Navbar extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 150),
         child: Row(
           children: [
-            Row(
-              children: [
-                Container(
-                  width: 50,
-                  height: 50,
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage(
-                        'images/logo.png',
+            InkWell(
+              onTap: () {
+                Navigator.pushReplacementNamed(context, '/');
+              },
+              child: Row(
+                children: [
+                  Container(
+                    width: 50,
+                    height: 50,
+                    decoration: const BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage(
+                          'images/logo.png',
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(
-                  width: 24,
-                ),
-                Text(
-                  'LANGGAM',
-                  style: AppTheme.greyTextStyle
-                      .copyWith(fontSize: 18, fontWeight: AppTheme.bold),
-                ),
-              ],
+                  const SizedBox(
+                    width: 24,
+                  ),
+                  Text(
+                    'LANGGAM',
+                    style: AppTheme.greyTextStyle
+                        .copyWith(fontSize: 18, fontWeight: AppTheme.bold),
+                  ),
+                ],
+              ),
             ),
             Flexible(
               child: Padding(
@@ -142,15 +170,21 @@ class Navbar extends StatelessWidget {
                         backgroundColor: AppColors.primaryColor,
                         radius: 8,
                         child: Text(
-                          cartcontroller.carts.length.toString(),
+                          cartController.carts
+                              .where((cart) =>
+                                  cart['user']['id'] == user['id'] &&
+                                  cart['user']['email'] == user['email'])
+                              .length
+                              .toString(),
                           style: AppTheme.whiteTextStyle.copyWith(fontSize: 10),
                         ),
                       ),
                     ),
                     IconButton(
                       onPressed: () {
-                        Scaffold.of(context).openEndDrawer();
-                        controller.pickDrawer('Cart');
+                        // Scaffold.of(context).openEndDrawer();
+                        // controller.pickDrawer('Cart');
+                        Navigator.pushNamed(context, '/cart');
                       },
                       icon: const Icon(
                         Icons.shopping_cart_outlined,
@@ -340,26 +374,59 @@ class Navbar extends StatelessWidget {
           const SizedBox(
             height: 12,
           ),
-          ItemNavBarDropDown(
-            text: 'Informasi Meteorologi',
-            onTap: () {},
-            lottieJson: 'lottie/animate-2.json',
+          FutureBuilder(
+            future: LayananServices.getAllBidangLayanans(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              if (snapshot.hasData) {
+                final List data = snapshot.data as List;
+                return ListView.builder(
+                  shrinkWrap: true,
+                  padding: EdgeInsets.zero,
+                  itemCount: data.length,
+                  itemBuilder: (context, index) {
+                    // BidangLayanan bidangLayanan = data[index];
+                    print(data[index].attributes.judul);
+                    return ItemNavBarDropDown(
+                      text: data[index].attributes.judul.toString(),
+                      onTap: () {
+                        Navigator.pushNamed(context,
+                            '/layanan?bidang_layanan=${data[index].attributes.slug}');
+                      },
+                    );
+                    // return ListTile(
+                    //   title: Text(data[index].attributes.judul.toString()),
+                    // );
+                  },
+                );
+              }
+              return Container();
+            },
           ),
-          ItemNavBarDropDown(
-            text: 'Informasi Klimatologi',
-            onTap: () {},
-            lottieJson: 'lottie/animate-4.json',
-          ),
-          ItemNavBarDropDown(
-            text: 'Informasi Geofisika',
-            onTap: () {},
-            lottieJson: 'lottie/animate-3.json',
-          ),
-          ItemNavBarDropDown(
-            text: 'Jasa Konsultasi',
-            onTap: () {},
-            lottieJson: 'lottie/animate-1.json',
-          ),
+          // ItemNavBarDropDown(
+          //   text: 'Informasi Meteorologi',
+          //   onTap: () {},
+          //   lottieJson: 'lottie/animate-2.json',
+          // ),
+          // ItemNavBarDropDown(
+          //   text: 'Informasi Klimatologi',
+          //   onTap: () {},
+          //   lottieJson: 'lottie/animate-4.json',
+          // ),
+          // ItemNavBarDropDown(
+          //   text: 'Informasi Geofisika',
+          //   onTap: () {},
+          //   lottieJson: 'lottie/animate-3.json',
+          // ),
+          // ItemNavBarDropDown(
+          //   text: 'Jasa Konsultasi',
+          //   onTap: () {},
+          //   lottieJson: 'lottie/animate-1.json',
+          // ),
         ],
       ),
     );
@@ -453,15 +520,15 @@ class _ItemNavBarDropDownState extends State<ItemNavBarDropDown> {
         onExit: (_) => setState(() => isHovered = false),
         child: Row(
           children: [
-            Center(
-              child: Lottie.asset(
-                widget.lottieJson!,
-                fit: BoxFit.cover,
-                width: 30,
-                height: 30,
-              ),
-            ),
-            const SizedBox(width: 15),
+            // Center(
+            //   child: Lottie.asset(
+            //     widget.lottieJson ?? '',
+            //     fit: BoxFit.cover,
+            //     width: 30,
+            //     height: 30,
+            //   ),
+            // ),
+            // const SizedBox(width: 15),
             AnimatedDefaultTextStyle(
               duration: const Duration(milliseconds: 200),
               style: isHovered

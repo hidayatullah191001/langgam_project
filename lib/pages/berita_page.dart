@@ -49,7 +49,7 @@ class BeritaPage extends StatelessWidget {
                 ),
                 SliverList(
                   delegate: SliverChildListDelegate([
-                    ContentSection(context),
+                    // ContentSection(context),
                     const Footer(),
                   ]),
                 ),
@@ -66,47 +66,47 @@ class BeritaPage extends StatelessWidget {
     );
   }
 
-  Widget ContentSection(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        vertical: 50,
-        horizontal: 150,
-      ),
-      child: Query(
-        options: QueryOptions(
-          document: gql(
-            BeritaQuery.queryBeritas(),
-          ),
-        ),
-        builder: (result, {fetchMore, refetch}) {
-          if (result.isLoading) {
-            return Center(child: CircularProgressIndicator());
-          }
+//   Widget ContentSection(BuildContext context) {
+//     return Container(
+//       padding: const EdgeInsets.symmetric(
+//         vertical: 50,
+//         horizontal: 150,
+//       ),
+//       child: Query(
+//         options: QueryOptions(
+//           document: gql(
+//             BeritaQuery.queryBeritas(),
+//           ),
+//         ),
+//         builder: (result, {fetchMore, refetch}) {
+//           if (result.isLoading) {
+//             return Center(child: CircularProgressIndicator());
+//           }
 
-          if (result.data == null) {
-            return const Center(
-              child: Text('Data not found'),
-            );
-          }
-          final posts = result.data!['posts']['data'];
+//           if (result.data == null) {
+//             return const Center(
+//               child: Text('Data not found'),
+//             );
+//           }
+//           final posts = result.data!['posts']['data'];
 
-          return ListView.builder(
-            padding: EdgeInsets.zero,
-            itemCount: posts.length,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemBuilder: (context, index) {
-              final post = posts[index]['attributes'];
-              return ItemBerita(
-                data: post,
-                id: posts[index]['id'],
-              );
-            },
-          );
-        },
-      ),
-    );
-  }
+//           return ListView.builder(
+//             padding: EdgeInsets.zero,
+//             itemCount: posts.length,
+//             shrinkWrap: true,
+//             physics: const NeverScrollableScrollPhysics(),
+//             itemBuilder: (context, index) {
+//               final post = posts[index]['attributes'];
+//               return ItemBerita(
+//                 data: post,
+//                 id: posts[index]['id'],
+//               );
+//             },
+//           );
+//         },
+//       ),
+//     );
+//   }
 }
 
 class ItemBerita extends StatefulWidget {

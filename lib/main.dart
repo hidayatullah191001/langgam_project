@@ -1,10 +1,11 @@
 import 'package:d_method/d_method.dart';
+import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:hovering/hovering.dart';
 import 'package:langgam_project/configs/configs.dart';
 import 'package:langgam_project/controllers/controller.dart';
-import 'package:langgam_project/graphql/client_provider.dart';
 import 'package:langgam_project/pages/pages.dart';
+import 'package:langgam_project/routes/route.dart';
 import 'package:provider/provider.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
@@ -19,10 +20,43 @@ void main() {
         ChangeNotifierProvider(create: (_) => AdminController()),
         ChangeNotifierProvider(create: (_) => CartController()),
         ChangeNotifierProvider(create: (_) => AuthController()),
+        ChangeNotifierProvider(create: (_) => WilayahController()),
+        ChangeNotifierProvider(create: (_) => LayananController()),
+        ChangeNotifierProvider(create: (_) => CheckoutController()),
+        ChangeNotifierProvider(create: (_) => PermintaanController()),
       ],
-      child: const MyApp(),
+      child: MyApp(),
     ),
   );
+}
+
+class MyApp extends StatefulWidget {
+  @override
+  State createState() {
+    return MyAppState();
+  }
+}
+
+class MyAppState extends State<MyApp> {
+  MyAppState() {
+    final router = FluroRouter();
+    Routes.configureRoutes(router);
+    Application.router = router;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final app = MaterialApp(
+      title: 'Langgam',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      onGenerateRoute: Application.router.generator,
+    );
+//    print("initial route = ${app.initialRoute}");
+    return app;
+  }
 }
 
 // class MyApp extends StatelessWidget {
@@ -125,35 +159,54 @@ void main() {
 //   }
 // }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+// class MyApp extends StatelessWidget {
+//   const MyApp({super.key});
 
-  // This widget is the root of your application.,
-  @override
-  Widget build(BuildContext context) {
-    return ClientProvider(
-      uri: Constant.apigpl,
-      child: MaterialApp(
-        title: 'Langgam',
-        initialRoute: '/',
-        routes: {
-          '/': (context) => const IndexPage(),
-          '/register': (context) => const RegisterPage(),
-          '/my-account': (context) => const MyAccountPage(),
-          '/layanan': (context) => const ProductLayananPage(),
-          '/layanan/detail': (context) => DetailProductLayananPage(),
-          '/cart': (context) => const CartPage(),
-          '/cart/checkout': (context) => const CheckoutPage(),
-          '/cart/checkout/finish': (context) => const CheckoutFinishPage(),
-          '/berita': (context) => const BeritaPage(),
-          '/berita/detail': (context) => const DetailBeritaPage(),
-          '/admin/auth': (context) => const LoginAdminPage(),
-          '/admin': (context) => const AppAdminPage(),
-        },
-      ),
-    );
-  }
-}
+//   // This widget is the root of your application.,
+//   @override
+//   Widget build(BuildContext context) {
+//     // return ClientProvider(
+//     //   uri: Constant.apigpl,
+//     //   child: MaterialApp(
+//     //     title: 'Langgam',
+//     //     initialRoute: '/',
+//     //     routes: {
+//     //       '/': (context) => const IndexPage(),
+//     //       '/register': (context) => const RegisterPage(),
+//     //       '/my-account': (context) => const MyAccountPage(),
+//     //       '/layanan': (context) => const ProductLayananPage(),
+//     //       '/layanan/detail': (context) => DetailProductLayananPage(),
+//     //       '/cart': (context) => const CartPage(),
+//     //       '/cart/checkout': (context) => const CheckoutPage(),
+//     //       '/cart/checkout/finish': (context) => const CheckoutFinishPage(),
+//     //       '/berita': (context) => const BeritaPage(),
+//     //       '/berita/detail': (context) => const DetailBeritaPage(),
+//     //       '/admin/auth': (context) => const LoginAdminPage(),
+//     //       '/admin': (context) => const AppAdminPage(),
+//     //     },
+//     //   ),
+//     // );
+
+//     return MaterialApp(
+//       title: 'Langgam',
+//       initialRoute: '/',
+//       routes: {
+//         '/': (context) => const IndexPage(),
+//         '/register': (context) => const RegisterPage(),
+//         '/my-account': (context) => const MyAccountPage(),
+//         '/layanan': (context) => const ProductLayananPage(),
+//         '/layanan/detail': (context) => DetailProductLayananPage(),
+//         '/cart': (context) => const CartPage(),
+//         '/cart/checkout': (context) => const CheckoutPage(),
+//         '/cart/checkout/finish': (context) => const CheckoutFinishPage(),
+//         '/berita': (context) => const BeritaPage(),
+//         '/berita/detail': (context) => const DetailBeritaPage(),
+//         '/admin/auth': (context) => const LoginAdminPage(),
+//         '/admin': (context) => const AppAdminPage(),
+//       },
+//     );
+//   }
+// }
 
 // import 'package:flutter/material.dart';
 

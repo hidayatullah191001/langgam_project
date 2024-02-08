@@ -1,7 +1,16 @@
 part of 'pages.dart';
 
-class ProductLayananPage extends StatelessWidget {
-  const ProductLayananPage({Key? key}) : super(key: key);
+class ProductLayananPage extends StatefulWidget {
+  String? slugBidangLayanan;
+  ProductLayananPage({Key? key, this.slugBidangLayanan = null})
+      : super(key: key);
+
+  @override
+  State<ProductLayananPage> createState() => _ProductLayananPageState();
+}
+
+class _ProductLayananPageState extends State<ProductLayananPage> {
+  String? title = "Semua Layanan";
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +57,7 @@ class ProductLayananPage extends StatelessWidget {
                   child: Column(
                     children: [
                       HeroSection(
-                        heroTitle: 'LAYANAN',
+                        heroTitle: title!,
                       ),
                       ContentSection(),
                       const Footer(),
@@ -80,25 +89,60 @@ class ProductLayananPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'LAYANAN',
+                    title.toString(),
                     style: AppTheme.blackTextStyle.copyWith(
                       fontWeight: AppTheme.bold,
                       fontSize: 18,
                     ),
                   ),
                   const SizedBox(height: 15),
-                  ListView.builder(
-                    padding: EdgeInsets.zero,
-                    shrinkWrap: true,
-                    itemCount: layanans.length,
-                    itemBuilder: (context, index) {
-                      final layanan = layanans[index];
-                      return TextButtonHovered(
-                        text: layanan['title'],
-                        onTap: () {},
-                        styleHovered: AppTheme.blackTextStyle
-                            .copyWith(fontWeight: AppTheme.semiBold),
-                      );
+                  FutureBuilder(
+                    future: LayananServices.getAllBidangLayanans(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                      if (snapshot.hasData) {
+                        final List data = snapshot.data as List;
+
+                        bidang_layanan_model.BidangLayanan newData =
+                            bidang_layanan_model.BidangLayanan(
+                          id: 0,
+                          attributes: bidang_layanan_model.Attributes(
+                            judul: 'Semua Layanan',
+                            intro: null,
+                            slug: null,
+                            createdAt: null,
+                            updatedAt: null,
+                          ),
+                        );
+                        data.insert(0, newData);
+
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          padding: EdgeInsets.zero,
+                          itemCount: data.length,
+                          itemBuilder: (context, index) {
+                            return TextButtonHovered(
+                              text: data[index].attributes.judul.toString(),
+                              onTap: () {
+                                if (data[index].attributes.judul ==
+                                    'Semua Layanan') {
+                                  Navigator.pushNamed(context, '/layanan');
+                                } else {
+                                  Navigator.pushNamed(context,
+                                      '/layanan?bidang_layanan=${data[index].attributes.slug}');
+                                }
+                              },
+                              styleHovered: AppTheme.blackTextStyle
+                                  .copyWith(fontWeight: AppTheme.semiBold),
+                            );
+                          },
+                        );
+                      }
+                      return Container();
                     },
                   ),
                   const SizedBox(height: 20),
@@ -113,53 +157,47 @@ class ProductLayananPage extends StatelessWidget {
                 children: [
                   //Container untuk membuat Filtering Nantinya
                   //Kemungkinan nanti pakai API
-                  Container(
-                    alignment: Alignment.centerLeft,
-                    margin: const EdgeInsets.only(bottom: 20),
-                    height: 30,
-                    color: AppColors.greyColor,
-                  ),
+                  // Container(
+                  //   alignment: Alignment.centerLeft,
+                  //   margin: const EdgeInsets.only(bottom: 20),
+                  //   height: 30,
+                  //   color: AppColors.greyColor,
+                  // ),
+                  FutureBuilder(
+                    initialData: [],
+                    future: widget.slugBidangLayanan == null
+                        ? LayananServices.getAllLayanans()
+                        : LayananServices.getAllLayanans(
+                            filter: true,
+                            slugBidangLayanan: widget.slugBidangLayanan,
+                          ),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      }
 
-                  Query(
-                    options: QueryOptions(
-                      document: gql(LayananQuery.queryLayanans()),
-                    ),
-                    builder: (result, {fetchMore, refetch}) {
-                      if (result.isLoading) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
+                      if (!snapshot.hasData) {
+                        return Center(
+                            child: Text(snapshot.error.toString(),
+                                style: AppTheme.blackTextStyle));
+                      }
+
+                      if (snapshot.hasData) {
+                        List data = snapshot.data as List;
+                        return ListView.builder(
+                          padding: EdgeInsets.zero,
+                          itemCount: data.length,
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            final Layanan layanan = data[index];
+                            return ItemLayananCardList(
+                              data: layanan,
+                              id: layanan.id!,
+                            );
+                          },
                         );
                       }
-                      if (result.data == null) {
-                        return const Center(
-                          child: Text('Data not found'),
-                        );
-                      }
-                      final layanans = result.data!['layanans']['data'];
-
-                      return ListView.builder(
-                        padding: EdgeInsets.zero,
-                        itemCount: layanans.length,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          print('id ${layanans[index]['id']}');
-                          final layanan = layanans[index]['attributes'];
-                          final model = LayananModel(
-                            judul: layanan['judul'],
-                            harga: layanan['harga'],
-                            slug: layanan['slug'],
-                            intro: layanan['intro'],
-                            satuan: layanan['satuan'],
-                            gambar: layanan['gambar']['data']['attributes']
-                                ['url'],
-                          );
-                          return ItemLayananCardList(
-                            data: model,
-                            id: layanans[index]['id'],
-                          );
-                        },
-                      );
+                      return Container();
                     },
                   ),
                 ],
