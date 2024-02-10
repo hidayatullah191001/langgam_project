@@ -199,7 +199,8 @@ class _LoginFormState extends State<LoginForm> {
             child: PrimaryButton(
               onTap: () async {
                 if (!EmailValidator.validate(emailController.text)) {
-                  AppMethods.dangerFlushbar(context, 'Email yang kamu masukkan tidak valid');
+                  AppMethods.dangerToast(
+                      context, 'Email yang kamu masukkan tidak valid');
 
                   // CoolAlert.show(
                   //   context: context,
@@ -209,8 +210,9 @@ class _LoginFormState extends State<LoginForm> {
                   // );
                 } else if (emailController.text.isEmpty ||
                     passwordController.text.isEmpty) {
-                  AppMethods.dangerFlushbar(context, 'Email dan password tidak boleh kosong');
-                  
+                  AppMethods.dangerToast(
+                      context, 'Email dan password tidak boleh kosong');
+
                   // CoolAlert.show(
                   //   context: context,
                   //   width: MediaQuery.of(context).size.width * 0.3,
@@ -228,8 +230,7 @@ class _LoginFormState extends State<LoginForm> {
                     Navigator.pushNamedAndRemoveUntil(
                         context, '/', (route) => false);
                   } else {
-                  AppMethods.dangerFlushbar(context, result['message']);
-                    
+                    AppMethods.dangerToast(context, result['message']);
                   }
                 }
               },
@@ -419,7 +420,8 @@ class _RegisterFormState extends State<RegisterForm> {
             child: PrimaryButton(
               onTap: () async {
                 if (!EmailValidator.validate(emailController.text)) {
-                  AppMethods.dangerFlushbar(context, 'Email yang kamu masukkan tidak valid');
+                  AppMethods.dangerToast(
+                      context, 'Email yang kamu masukkan tidak valid');
                   // CoolAlert.show(
                   //   context: context,
                   //   width: MediaQuery.of(context).size.width * 0.3,
@@ -431,7 +433,8 @@ class _RegisterFormState extends State<RegisterForm> {
                     usernameController.text.isEmpty ||
                     emailController.text.isEmpty ||
                     passwordController.text.isEmpty) {
-                  AppMethods.dangerFlushbar(context, 'Field mandatory harus diisi');
+                  AppMethods.dangerToast(
+                      context, 'Field mandatory harus diisi');
 
                   // CoolAlert.show(
                   //   context: context,
@@ -449,8 +452,7 @@ class _RegisterFormState extends State<RegisterForm> {
                   //     Navigator.pop(context);
                   //   },
                   // );
-                  AppMethods.dangerFlushbar(context, 'Password min 8 Char');
-
+                  AppMethods.dangerToast(context, 'Password min 8 Char');
                 } else if (passwordController.text !=
                     repeatPasswordController.text) {
                   // CoolAlert.show(
@@ -462,8 +464,8 @@ class _RegisterFormState extends State<RegisterForm> {
                   //     Navigator.pop(context);
                   //   },
                   // );
-                  AppMethods.dangerFlushbar(context, 'Password tidak sama, coba lagi!');
-
+                  AppMethods.dangerToast(
+                      context, 'Password tidak sama, coba lagi!');
                 } else {
                   final model = SignUpFormModel(
                     blocked: "false",
@@ -490,8 +492,7 @@ class _RegisterFormState extends State<RegisterForm> {
                     //     Navigator.pop(context);
                     //   },
                     // );
-                  AppMethods.dangerFlushbar(context, result['message']);
-
+                    AppMethods.dangerToast(context, result['message']);
                   }
                 }
               },

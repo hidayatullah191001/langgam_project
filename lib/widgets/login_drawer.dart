@@ -93,20 +93,25 @@ class _LoginDrawerState extends State<LoginDrawer> {
                     child: PrimaryButton(
                       onTap: () async {
                         if (!EmailValidator.validate(emailController.text)) {
-                          CoolAlert.show(
-                            context: context,
-                            width: MediaQuery.of(context).size.width * 0.3,
-                            type: CoolAlertType.error,
-                            text: 'Email yang kamu masukkan tidak valid',
-                          );
+                          AppMethods.dangerToast(
+                              context, 'Email yang kamu masukkan tidak valid');
+                          // CoolAlert.show(
+                          //   context: context,
+                          //   width: MediaQuery.of(context).size.width * 0.3,
+                          //   type: CoolAlertType.error,
+                          //   text: 'Email yang kamu masukkan tidak valid',
+                          // );
                         } else if (emailController.text.isEmpty ||
                             passwordController.text.isEmpty) {
-                          CoolAlert.show(
-                            context: context,
-                            width: MediaQuery.of(context).size.width * 0.3,
-                            type: CoolAlertType.error,
-                            text: 'Email dan password tidak boleh kosong',
-                          );
+                          AppMethods.dangerToast(
+                              context, 'Email dan password tidak boleh kosong');
+
+                          // CoolAlert.show(
+                          //   context: context,
+                          //   width: MediaQuery.of(context).size.width * 0.3,
+                          //   type: CoolAlertType.error,
+                          //   text: 'Email dan password tidak boleh kosong',
+                          // );
                         } else {
                           final model = SignInFormModel(
                             identifier: emailController.text,
@@ -129,8 +134,7 @@ class _LoginDrawerState extends State<LoginDrawer> {
                             //     });
 
                             // ignore: use_build_context_synchronously
-                            AppMethods.dangerFlushbar(
-                                context, result['message']);
+                            AppMethods.dangerToast(context, result['message']);
                           }
                         }
                       },

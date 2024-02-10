@@ -46,7 +46,7 @@ class AuthServices {
       } else {
         return {
           "success": false,
-          "message": "Unauthorized",
+          "message": "Email atau password salah, coba lagi",
         };
       }
     }

@@ -617,7 +617,7 @@ class ItemLayananCardList extends StatelessWidget {
                       onTap: () {
                         Navigator.pushNamed(
                           context,
-                          '/layanan/detail?slug=${data.attributes!.slug}&id=$id',
+                          '/layanan/detail/${data.attributes!.slug}',
                         );
                       },
                       text: data.attributes!.judul.toString(),

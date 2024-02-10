@@ -29,15 +29,45 @@ class AppMethods {
         .join();
   }
 
-  static void dangerFlushbar(BuildContext context, String title) {
-    Flushbar(
+  // static void dangerFlushbar(BuildContext context, String title) {
+  //   Flushbar(
+  //     backgroundColor: AppColors.dangerColor,
+  //     title: 'Failed',
+  //     titleColor: AppColors.whiteColor,
+  //     message: title,
+  //     duration: const Duration(seconds: 3),
+  //     isDismissible: false,
+  //     borderRadius: BorderRadius.circular(12),
+  //   ).show(context);
+  // }
+
+  static void dangerToast(BuildContext context, String title) async {
+    toastification.show(
+      context: context,
+      title: title,
+      primaryColor: AppColors.whiteColor,
       backgroundColor: AppColors.dangerColor,
-      title: 'Failed',
-      titleColor: AppColors.whiteColor,
-      message: title,
-      duration: const Duration(seconds: 3),
-      isDismissible: false,
-      borderRadius: const BorderRadius.all(Radius.circular(5)),
-    ).show(context);
+      autoCloseDuration: const Duration(seconds: 5),
+      type: ToastificationType.error,
+      style: ToastificationStyle.fillColored,
+    );
+  }
+
+  static void successToast(BuildContext context, String title) async {
+    toastification.show(
+      context: context,
+      title: title,
+      autoCloseDuration: const Duration(seconds: 5),
+      type: ToastificationType.success,
+    );
+  }
+
+  static void coolAlertDanger(BuildContext context, String text) {
+    CoolAlert.show(
+      context: context,
+      width: MediaQuery.of(context).size.width * 0.3,
+      type: CoolAlertType.error,
+      text: text,
+    );
   }
 }

@@ -48,7 +48,7 @@ class LayananServices {
     try {
       String filters = "\$eq";
       Map? responseBody = await APIRequest.gets(
-        '${Constant.apirest}/layanans?populate=*&filters["slug"][$filters]=$slug',
+        '${Constant.apirest}/layanans?populate=*&filters[slug][$filters]=$slug',
       );
       if (responseBody!['data'] != null) {
         return Layanan.fromJson(responseBody['data'][0]);

@@ -19,6 +19,10 @@ part of 'route.dart';
 //       },
 //     );
 class HandlerRoute {
+  static Future<String> getRole() async {
+    return await AppSession.getRoleLogin();
+  }
+
   static final index = Handler(
     handlerFunc: (BuildContext? context, Map<String, List<String>> params) =>
         const IndexPage(),
@@ -80,8 +84,14 @@ class HandlerRoute {
   );
 
   static final admin = Handler(
-    handlerFunc: (BuildContext? context, Map<String, List<String>> params) =>
-        const AppAdminPage(),
+    handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
+      final role = getRole();
+      if (role == 'admin' || role == null) {
+        return const AppAdminPage();
+      } else {
+        return ErrorPage();
+      }
+    },
   );
 }
 
