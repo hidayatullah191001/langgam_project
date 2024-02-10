@@ -6,13 +6,24 @@ class AppAdminPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<AdminController>();
-    List<String> menuAdmin = ['Dashboard', 'Permintaan Data Masuk', 'Tahapan Pelayanan'];
+    final authController = context.watch<AuthController>();
+    List<String> menuAdmin = [
+      'Dashboard',
+      'Permintaan Data Masuk',
+      'Tahapan Pelayanan',
+      'Logout'
+    ];
     return Scaffold(
       body: Row(
         children: [
           SideBarAnimated(
             onTap: (s) {
               controller.pickMenu(menuAdmin[s].toString(), s);
+              if (menuAdmin[s] == 'Logout') {
+                authController.logout();
+                Navigator.pushNamedAndRemoveUntil(
+                    context, '/admin/auth', (route) => false);
+              }
             },
             // sideBarColor: Colors.white,
             // animatedContainerColor: Colors.white,
@@ -34,6 +45,11 @@ class AppAdminPage extends StatelessWidget {
                 iconUnselected: CupertinoIcons.chart_bar_square,
                 text: menuAdmin[2].toString(),
               ),
+              SideBarItem(
+                iconSelected: CupertinoIcons.arrow_left_circle,
+                iconUnselected: CupertinoIcons.arrow_left_circle,
+                text: menuAdmin[3].toString(),
+              ),
               // SideBarItem(
               //   iconSelected: Icons.credit_card_rounded,
               //   text: 'Payouts',
@@ -47,11 +63,13 @@ class AppAdminPage extends StatelessWidget {
           ),
           buildConditionalWidget(controller.selectedMenu == 'Dashboard',
               const DashboardAdminSection()),
-          buildConditionalWidget(controller.selectedMenu == 'Permintaan Data Masuk',
-              const DashboardAdminSection()),
+          buildConditionalWidget(
+              controller.selectedMenu == 'Permintaan Data Masuk',
+              const PelayananMasukSection()),
           buildConditionalWidget(controller.selectedMenu == 'Tahapan Pelayanan',
               const DashboardAdminSection()),
-
+          buildConditionalWidget(controller.selectedMenu == 'Detail Permintaan',
+              const DetailPermintaanSection()),
         ],
       ),
     );

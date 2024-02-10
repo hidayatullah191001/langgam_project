@@ -1,28 +1,100 @@
 part of 'services.dart';
 
 class AuthServices {
-  static Future signIn(SignInFormModel value) async {
+  static Future<Map<String, dynamic>> signIn(SignInFormModel value) async {
     Map? responseBody = await APIRequest.post(
-      '${Constant.apirest}/auth/local',
+      '${Constant.apirest}/auth/local?populate=*',
       body: value.toJson(),
     );
-    if (responseBody == null) return false;
-    if (responseBody.isNotEmpty) {
-      // print(responseBody);
-      String token = responseBody['jwt'].toString();
-      String email = responseBody['user']['email'].toString();
-      String id = responseBody['user']['id'].toString();
-      String username = responseBody['user']['username'].toString();
-      print(token);
-      Map user = {
-        'username': username,
-        'email': email,
-        'id': id,
-      };
-      AppSession.saveUserInformation(user, token);
-      return true;
+    if (responseBody!.isNotEmpty) {
+      if (responseBody['jwt'] != null) {
+        String token = responseBody['jwt'].toString();
+        String email = responseBody['user']['email'].toString();
+        String id = responseBody['user']['id'].toString();
+        String username = responseBody['user']['username'].toString();
+        String role = "";
+
+        Map? responseDetailUser = await APIRequest.gets(
+            "${Constant.apirest}/users/me?populate=*",
+            headers: {
+              'Authorization': 'Bearer $token',
+            });
+
+        if (responseDetailUser!.isNotEmpty) {
+          role = responseDetailUser['role']['type'];
+        }
+
+        Map user = {
+          'username': username,
+          'email': email,
+          'id': id,
+          'role': role,
+        };
+
+        if (responseBody['blocked'] == true) {
+          return {
+            "success": false,
+            "message": "Akun anda belum diaktivasi, silahkan hubungi admin",
+          };
+        } else {
+          AppSession.saveUserInformation(user, token);
+          return {
+            "success": true,
+            "message": "Berhasil login",
+          };
+        }
+      } else {
+        return {
+          "success": false,
+          "message": "Unauthorized",
+        };
+      }
     }
-    return false;
+
+    return {
+      "success": false,
+      "message": "Something went wrong",
+    };
+  }
+
+  static Future<Map<String, dynamic>> register(SignUpFormModel value) async {
+    Map? responseBody = await APIRequest.post(
+      '${Constant.apirest}/auth/local/register',
+      body: value.toJson(),
+    );
+    if (responseBody!.isNotEmpty) {
+      print(responseBody);
+      if (responseBody['jwt'] != null) {
+        String token = responseBody['jwt'].toString();
+        String email = responseBody['user']['email'].toString();
+        String id = responseBody['user']['id'].toString();
+        String username = responseBody['user']['username'].toString();
+        String role = responseBody['role']['type'].toString();
+        print(token);
+        Map user = {
+          'username': username,
+          'email': email,
+          'id': id,
+          'role': role,
+        };
+        AppSession.saveUserInformation(user, token);
+        return {
+          "success": true,
+          "message":
+              "Akun berhasil didaftarkan, silahkan cek email untuk aktivasi",
+        };
+      } else {
+        return {
+          "success": false,
+          "message": "Ada kesalahan di server, coba lagi!.",
+        };
+      }
+    }
+
+    return {
+      "success": false,
+      "message": "Something went wrong",
+    };
   }
 
   // static Future logout()async{

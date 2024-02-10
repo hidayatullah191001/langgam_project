@@ -199,26 +199,38 @@ class _LoginFormState extends State<LoginForm> {
             child: PrimaryButton(
               onTap: () async {
                 if (!EmailValidator.validate(emailController.text)) {
-                  CoolAlert.show(
-                    context: context,
-                    width: MediaQuery.of(context).size.width * 0.3,
-                    type: CoolAlertType.error,
-                    text: 'Email yang kamu masukkan tidak valid',
-                  );
+                  AppMethods.dangerFlushbar(context, 'Email yang kamu masukkan tidak valid');
+
+                  // CoolAlert.show(
+                  //   context: context,
+                  //   width: MediaQuery.of(context).size.width * 0.3,
+                  //   type: CoolAlertType.error,
+                  //   text: 'Email yang kamu masukkan tidak valid',
+                  // );
                 } else if (emailController.text.isEmpty ||
                     passwordController.text.isEmpty) {
-                  CoolAlert.show(
-                    context: context,
-                    width: MediaQuery.of(context).size.width * 0.3,
-                    type: CoolAlertType.error,
-                    text: 'Email dan password tidak boleh kosong',
-                  );
+                  AppMethods.dangerFlushbar(context, 'Email dan password tidak boleh kosong');
+                  
+                  // CoolAlert.show(
+                  //   context: context,
+                  //   width: MediaQuery.of(context).size.width * 0.3,
+                  //   type: CoolAlertType.error,
+                  //   text: 'Email dan password tidak boleh kosong',
+                  // );
                 } else {
                   final model = SignInFormModel(
                     identifier: emailController.text,
                     password: passwordController.text,
                   );
-                  controller.loginUser(model).then((value) => Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false));
+                  final result = await controller.loginUser(model);
+
+                  if (result['success'] == true) {
+                    Navigator.pushNamedAndRemoveUntil(
+                        context, '/', (route) => false);
+                  } else {
+                  AppMethods.dangerFlushbar(context, result['message']);
+                    
+                  }
                 }
               },
               titleButton: 'MASUK',
@@ -316,12 +328,17 @@ class RegisterForm extends StatefulWidget {
 }
 
 class _RegisterFormState extends State<RegisterForm> {
+  final TextEditingController firstNameController = TextEditingController();
+  final TextEditingController lastNameController = TextEditingController();
   final TextEditingController usernameController = TextEditingController();
+  final TextEditingController repeatPasswordController =
+      TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    final controller = context.watch<AuthController>();
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -334,23 +351,58 @@ class _RegisterFormState extends State<RegisterForm> {
           const SizedBox(
             height: 20,
           ),
+          Row(
+            children: [
+              Flexible(
+                child: CustomFormUser(
+                  controller: firstNameController,
+                  title: 'First Name ',
+                  isMandatory: true,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Flexible(
+                child: CustomFormUser(
+                  controller: lastNameController,
+                  title: 'Last Name ',
+                  isMandatory: true,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
           CustomFormUser(
             controller: usernameController,
-            title: 'Nama Pengguna ',
+            title: 'Username ',
             isMandatory: true,
           ),
           const SizedBox(height: 10),
           CustomFormUser(
             controller: emailController,
-            title: 'Alamat email ',
+            title: 'Email ',
             isMandatory: true,
           ),
           const SizedBox(height: 10),
-          CustomFormUser(
-            controller: passwordController,
-            title: 'Password ',
-            isMandatory: true,
-            isObscure: true,
+          Row(
+            children: [
+              Flexible(
+                child: CustomFormUser(
+                  controller: passwordController,
+                  title: 'Password ',
+                  isMandatory: true,
+                  isObscure: true,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Flexible(
+                child: CustomFormUser(
+                  controller: repeatPasswordController,
+                  title: 'Repeat Password ',
+                  isMandatory: true,
+                  isObscure: true,
+                ),
+              ),
+            ],
           ),
           const SizedBox(
             height: 5,
@@ -365,7 +417,84 @@ class _RegisterFormState extends State<RegisterForm> {
           SizedBox(
             width: double.infinity,
             child: PrimaryButton(
-              onTap: () {},
+              onTap: () async {
+                if (!EmailValidator.validate(emailController.text)) {
+                  AppMethods.dangerFlushbar(context, 'Email yang kamu masukkan tidak valid');
+                  // CoolAlert.show(
+                  //   context: context,
+                  //   width: MediaQuery.of(context).size.width * 0.3,
+                  //   type: CoolAlertType.error,
+                  //   text: 'Email yang kamu masukkan tidak valid',
+                  // );
+                } else if (firstNameController.text.isEmpty ||
+                    lastNameController.text.isEmpty ||
+                    usernameController.text.isEmpty ||
+                    emailController.text.isEmpty ||
+                    passwordController.text.isEmpty) {
+                  AppMethods.dangerFlushbar(context, 'Field mandatory harus diisi');
+
+                  // CoolAlert.show(
+                  //   context: context,
+                  //   width: MediaQuery.of(context).size.width * 0.3,
+                  //   type: CoolAlertType.error,
+                  //   text: 'Field mandatory harus diisi',
+                  // );
+                } else if (passwordController.text.length < 8) {
+                  // CoolAlert.show(
+                  //   context: context,
+                  //   width: MediaQuery.of(context).size.width * 0.3,
+                  //   type: CoolAlertType.error,
+                  //   text: 'Password min 8 Char',
+                  //   onConfirmBtnTap: () {
+                  //     Navigator.pop(context);
+                  //   },
+                  // );
+                  AppMethods.dangerFlushbar(context, 'Password min 8 Char');
+
+                } else if (passwordController.text !=
+                    repeatPasswordController.text) {
+                  // CoolAlert.show(
+                  //   context: context,
+                  //   width: MediaQuery.of(context).size.width * 0.3,
+                  //   type: CoolAlertType.error,
+                  //   text: 'Password tidak sama, coba lagi',
+                  //   onConfirmBtnTap: () {
+                  //     Navigator.pop(context);
+                  //   },
+                  // );
+                  AppMethods.dangerFlushbar(context, 'Password tidak sama, coba lagi!');
+
+                } else {
+                  final model = SignUpFormModel(
+                    blocked: "false",
+                    email: emailController.text,
+                    firstName: firstNameController.text,
+                    lastName: lastNameController.text,
+                    password: passwordController.text,
+                    username: usernameController.text,
+                  );
+                  final result = await controller.registerUser(model);
+
+                  if (result['success'] == true) {
+                    // ignore: use_build_context_synchronously
+                    Navigator.pushNamedAndRemoveUntil(
+                        context, '/', (route) => false);
+                  } else {
+                    // ignore: use_build_context_synchronously
+                    // CoolAlert.show(
+                    //   context: context,
+                    //   width: MediaQuery.of(context).size.width * 0.3,
+                    //   type: CoolAlertType.error,
+                    //   text: 'Something went wrong, please try again',
+                    //   onConfirmBtnTap: () {
+                    //     Navigator.pop(context);
+                    //   },
+                    // );
+                  AppMethods.dangerFlushbar(context, result['message']);
+
+                  }
+                }
+              },
               titleButton: 'DAFTAR',
             ),
           ),

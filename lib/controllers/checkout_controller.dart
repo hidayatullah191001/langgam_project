@@ -98,6 +98,7 @@ class CheckoutController extends ChangeNotifier {
             kuantitas: int.parse(data['item']),
             layanan: data['product']['id'].toString(),
             total: cartController.getTotalHargaAllItem(),
+            nomorPermintaan: AppMethods.generateOrderString(14),
           ),
         );
         response = await CheckoutService.createPermintaanUser(model);

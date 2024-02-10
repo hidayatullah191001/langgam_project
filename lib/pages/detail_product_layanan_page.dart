@@ -2,11 +2,9 @@ part of 'pages.dart';
 
 class DetailProductLayananPage extends StatefulWidget {
   final String slug;
-  final String id;
   const DetailProductLayananPage({
     Key? key,
     required this.slug,
-    required this.id,
   }) : super(key: key);
 
   @override
@@ -24,7 +22,7 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
     super.initState();
     getDataUser();
     context.read<WilayahController>().getAllDataProvinces();
-    context.read<LayananController>().getLayananById(widget.id);
+    context.read<LayananController>().getLayananBySlug(widget.slug);
   }
 
   getDataUser() async {

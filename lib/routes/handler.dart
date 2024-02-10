@@ -36,7 +36,7 @@ class HandlerRoute {
 
   static final layanan = Handler(
       handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
-    String? slugBidangLayanan = params["bidang_layanan"]?.first;
+    String? slugBidangLayanan = params['slug']?.first;
 
     return ProductLayananPage(slugBidangLayanan: slugBidangLayanan);
   });
@@ -44,9 +44,8 @@ class HandlerRoute {
   static final layananDetail = Handler(
       handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
     String? slug = params["slug"]?.first;
-    String? id = params['id']?.first;
 
-    return DetailProductLayananPage(slug: slug!, id: id!);
+    return DetailProductLayananPage(slug: slug!);
   });
 
   static final cart = Handler(

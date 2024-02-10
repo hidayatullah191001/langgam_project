@@ -65,6 +65,12 @@ class LayananController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void getLayananBySlug(String slug) async {
+    final Layanan data = await LayananServices.getLayananBySlug(slug);
+    _layanan = data;
+    notifyListeners();
+  }
+
   void setLayananFromApi(Layanan? data) {
     _layanan = data;
     notifyListeners();

@@ -33,6 +33,7 @@ class Data {
   int? harga;
   int? kuantitas;
   int? total;
+  String? nomorPermintaan;
 
   Data(
       {this.nama,
@@ -50,7 +51,8 @@ class Data {
       this.layanan,
       this.harga,
       this.kuantitas,
-      this.total});
+      this.total,
+      this.nomorPermintaan});
 
   Data.fromJson(Map<String, dynamic> json) {
     nama = json['nama'];
@@ -74,6 +76,7 @@ class Data {
     harga = json['harga'];
     kuantitas = json['kuantitas'];
     total = json['total'];
+    nomorPermintaan = json['nomor_permintaan'];
   }
 
   Map<String, dynamic> toJson() {
@@ -96,6 +99,7 @@ class Data {
     data['harga'] = this.harga;
     data['kuantitas'] = this.kuantitas;
     data['total'] = this.total;
+    data['nomor_permintaan'] = this.nomorPermintaan;
     return data;
   }
 }

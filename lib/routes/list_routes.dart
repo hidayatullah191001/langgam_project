@@ -24,12 +24,12 @@ class Routes {
   static String register = "/register";
   static String myAccount = "/my-account";
   static String layanan = "/layanan";
-  static String layananDetail = "/layanan/detail";
+  static String layananDetail = "/layanan/detail/:slug";
   static String cart = "/cart";
   static String checkout = "/cart/checkout";
   static String checkoutSuccess = "/cart/checkout/success";
   static String berita = "/berita";
-  static String beritaDetail = "/berita/detail";
+  static String beritaDetail = "/berita/detail/:slug";
   static String adminAuth = "/admin/auth";
   static String admin = "/admin";
 

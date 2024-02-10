@@ -91,7 +91,7 @@ class _LoginDrawerState extends State<LoginDrawer> {
                   SizedBox(
                     width: double.infinity,
                     child: PrimaryButton(
-                      onTap: () {
+                      onTap: () async {
                         if (!EmailValidator.validate(emailController.text)) {
                           CoolAlert.show(
                             context: context,
@@ -112,9 +112,26 @@ class _LoginDrawerState extends State<LoginDrawer> {
                             identifier: emailController.text,
                             password: passwordController.text,
                           );
-                          controller.loginUser(model).then((value) =>
-                              Navigator.pushNamedAndRemoveUntil(
-                                  context, '/', (route) => false));
+                          final result = await controller.loginUser(model);
+
+                          if (result['success'] == true) {
+                            Navigator.pushNamedAndRemoveUntil(
+                                context, '/', (route) => false);
+                          } else {
+                            // CoolAlert.show(
+                            //     context: context,
+                            //     width: MediaQuery.of(context).size.width * 0.3,
+                            //     type: CoolAlertType.error,
+                            //     text:
+                            //         'Gagal login, pastikan email dan password benar',
+                            //     onConfirmBtnTap: () {
+                            //       Navigator.pop(context);
+                            //     });
+
+                            // ignore: use_build_context_synchronously
+                            AppMethods.dangerFlushbar(
+                                context, result['message']);
+                          }
                         }
                       },
                       titleButton: 'MASUK',

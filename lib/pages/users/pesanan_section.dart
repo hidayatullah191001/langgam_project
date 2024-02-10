@@ -126,7 +126,7 @@ class ItemPesanan extends StatelessWidget {
               width: 90,
               child: InkWell(
                 child: Text(
-                  '#${pesananUser.attributes!.nomorPermintaan ?? " ---"}',
+                  '#${pesananUser.id ?? " ---"}',
                   style: AppTheme.primaryTextStyle.copyWith(
                     fontWeight: AppTheme.bold,
                   ),
@@ -155,7 +155,7 @@ class ItemPesanan extends StatelessWidget {
                 textAlign: TextAlign.center,
                 text: TextSpan(
                   text:
-                      'Rp ${AppMethods.currency(pesananUser.attributes!.harga.toString())}',
+                      'Rp ${AppMethods.currency(pesananUser.attributes!.total.toString())}',
                   style: AppTheme.primaryTextStyle.copyWith(
                     fontWeight: AppTheme.bold,
                   ),
@@ -184,14 +184,37 @@ class ItemPesanan extends StatelessWidget {
   }
 }
 
-class DetailPesananSection extends StatelessWidget {
+class DetailPesananSection extends StatefulWidget {
   const DetailPesananSection({super.key});
+
+  @override
+  State<DetailPesananSection> createState() => _DetailPesananSectionState();
+}
+
+class _DetailPesananSectionState extends State<DetailPesananSection> {
+  Map<String, dynamic> user = {};
+  bool isDataCartLoaded = false;
+  // File? _selectedDocument;
+
+  html.File? _selectedDocument;
+
+  void openURLInNewTab(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url, forceWebView: true);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final permintaanController = context.watch<PermintaanController>();
+    final accountcontroller = context.watch<MyAccountController>();
+
     String status =
         permintaanController.dataPermintaan.attributes!.status.toString();
+    String id = permintaanController.dataPermintaan.id.toString();
+    print(id);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -261,46 +284,69 @@ class DetailPesananSection extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  const Icon(
-                    Icons.circle,
-                    color: AppColors.greyColor,
-                    size: 15,
-                  ),
-                  const SizedBox(width: 25),
-                  // Expanded(
-                  //   child: Column(
-                  //     crossAxisAlignment: CrossAxisAlignment.start,
-                  //     children: [
-                  //       Text(
-                  //         '23 Jan, 2024 | 1:37 AM',
-                  //         style: AppTheme.greyTextStyle.copyWith(
-                  //           fontWeight: AppTheme.medium,
-                  //           fontSize: 12,
-                  //         ),
-                  //       ),
-                  //       const SizedBox(height: 10),
-                  //       Text(
-                  //         'menunggu persetujuan admin Status pesanan berubah dari Pembayaran tertunda menjadi Menuggu persetujuan',
-                  //         style: AppTheme.greyTextStyle.copyWith(
-                  //           fontWeight: AppTheme.bold,
-                  //         ),
-                  //       ),
-                  //     ],
-                  //   ),
-                  // ),
-                  Expanded(
-                    child: Text(
-                      'menunggu persetujuan admin Status pesanan berubah dari Pembayaran tertunda menjadi Menuggu persetujuan',
-                      style: AppTheme.greyTextStyle.copyWith(
-                        fontWeight: AppTheme.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              if (status == "Menunggu Persetujuan") ...[
+                StatusWidget(
+                    message:
+                        'Saat ini pesanan berstatus $status. Harap upload surat permintaan terlebih dahulu untuk melanjutkan proses menunggu persetujuan'),
+              ] else if (status == "Verifikasi Persyaratan") ...[
+                const StatusWidget(
+                    message:
+                        'Saat ini pesanan berstatus Menunggu Persetujuan. Harap upload surat permintaan terlebih dahulu untuk melanjutkan proses menunggu persetujuan'),
+                StatusWidget(
+                    message: 'Pesanan memasuki tahapan $status oleh admin'),
+              ] else if (status == "Menunggu Pembayaran") ...[
+                const StatusWidget(
+                    message:
+                        'Saat ini pesanan berstatus Menunggu Persetujuan. Harap upload surat permintaan terlebih dahulu untuk melanjutkan proses menunggu persetujuan'),
+                const StatusWidget(
+                    message:
+                        'Pesanan memasuki tahapan Verifikasi Persyaratan oleh admin'),
+                StatusWidget(
+                    message:
+                        'Pesanan sekarang berstatus $status. Silahkan upload bukti pembayaran dengan kode billing yang telah diberikan'),
+              ] else if (status == "Verifikasi Pembayaran") ...[
+                const StatusWidget(
+                    message:
+                        'Saat ini pesanan berstatus Menunggu Persetujuan. Harap upload surat permintaan terlebih dahulu untuk melanjutkan proses menunggu persetujuan'),
+                const StatusWidget(
+                    message:
+                        'Pesanan memasuki tahapan Verifikasi Persyartan oleh admin'),
+                const StatusWidget(
+                    message:
+                        'Pesanan sekarang berstatus Menuggu Pembayaran. Silahkan upload bukti pembayaran dengan kode billing yang telah diberikan'),
+                StatusWidget(
+                    message: 'Pesanan memasuk tahapan $status oleh admin'),
+              ] else if (status == "Sedang Diproses") ...[
+                const StatusWidget(
+                    message:
+                        'Saat ini pesanan berstatus Menunggu Persetujuan. Harap upload surat permintaan terlebih dahulu untuk melanjutkan proses menunggu persetujuan'),
+                const StatusWidget(
+                    message:
+                        'Pesanan memasuki tahapan Verifikasi Persyaratan oleh admin'),
+                const StatusWidget(
+                    message:
+                        'Pesanan sekarang berstatus Menuggu Pembayaran. Silahkan upload bukti pembayaran dengan kode billing yang telah diberikan'),
+                const StatusWidget(
+                    message:
+                        'Pesanan memasuki tahapan Verifikasi Pembayaran oleh admin'),
+                StatusWidget(message: 'Pesanan $status oleh admin'),
+              ] else if (status == "Selesai") ...[
+                const StatusWidget(
+                    message:
+                        'Saat ini pesanan berstatus Menunggu Persetujuan. Harap upload surat permintaan terlebih dahulu untuk melanjutkan proses menunggu persetujuan'),
+                const StatusWidget(
+                    message:
+                        'Pesanan memasuki tahapan Verifikasi Persyaratan oleh admin'),
+                const StatusWidget(
+                    message:
+                        'Pesanan sekarang berstatus Menuggu Pembayaran. Silahkan upload bukti pembayaran dengan kode billing yang telah diberikan'),
+                const StatusWidget(
+                    message:
+                        'Pesanan memasuki tahapan Verifikasi Pembayaran oleh admin'),
+                const StatusWidget(
+                    message: 'Pesanan Sedang Diproses oleh admin'),
+                StatusWidget(message: 'Pesanan telah $status'),
+              ]
             ],
           ),
         ),
@@ -348,16 +394,20 @@ class DetailPesananSection extends StatelessWidget {
           ],
         ),
         ItemDetailPesanan(
-          title: 'Buku Peta Ketinggian Hilal x 1',
-          price: 'Rp150.000',
+          title:
+              '${permintaanController.dataPermintaan.attributes!.layanan!.attributes!.judul} x ${permintaanController.dataPermintaan.attributes!.kuantitas}',
+          price: AppMethods.currency(
+              permintaanController.dataPermintaan.attributes!.total.toString()),
         ),
         ItemDetailPesanan(
-          title: 'Subtotal:',
-          price: 'Rp150.000',
+          title: 'Lokasi Pesanan:',
+          price:
+              '${permintaanController.dataPermintaan.attributes!.metadata![0].data}',
         ),
         ItemDetailPesanan(
-          title: 'Pajak:',
-          price: 'Rp16.500',
+          title: 'Catatan User:',
+          price:
+              '${permintaanController.dataPermintaan.attributes!.metadata![1].data}',
         ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -379,7 +429,9 @@ class DetailPesananSection extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'Rp166.500',
+                    AppMethods.currency(permintaanController
+                        .dataPermintaan.attributes!.total
+                        .toString()),
                     style: AppTheme.primaryTextStyle.copyWith(
                       fontWeight: AppTheme.bold,
                       letterSpacing: 1.1,
@@ -404,19 +456,22 @@ class DetailPesananSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 30),
-        Text('Nama depan nama belakang',
+        Text(permintaanController.dataPermintaan.attributes!.nama.toString(),
             style: AppTheme.greyTextStyle.copyWith(height: 1.5)),
-        Text('Alamat pulomas',
+        Text('Alamat ${permintaanController.dataPermintaan.attributes!.alamat}',
             style: AppTheme.greyTextStyle.copyWith(height: 1.5)),
-        Text('Kecamatan', style: AppTheme.greyTextStyle.copyWith(height: 1.5)),
-        Text('Kota Jakarta Timur',
+        Text(
+            'Kecamatan ${permintaanController.dataPermintaan.attributes!.kecamatan}',
             style: AppTheme.greyTextStyle.copyWith(height: 1.5)),
-        Text('Provinsi DKI Jakarta',
+        Text('Kota ${permintaanController.dataPermintaan.attributes!.kota}',
             style: AppTheme.greyTextStyle.copyWith(height: 1.5)),
-        Text('Pos 46467', style: AppTheme.greyTextStyle.copyWith(height: 1.5)),
-        Text('No Telephone 08973473847',
+        Text(
+            'Provinsi ${permintaanController.dataPermintaan.attributes!.provinsi}',
             style: AppTheme.greyTextStyle.copyWith(height: 1.5)),
-        Text('Email dayat@gmail.com',
+        Text(
+            'No Telephone ${permintaanController.dataPermintaan.attributes!.telepon}',
+            style: AppTheme.greyTextStyle.copyWith(height: 1.5)),
+        Text('Email ${permintaanController.dataPermintaan.attributes!.email}',
             style: AppTheme.greyTextStyle.copyWith(height: 1.5)),
         const SizedBox(height: 30),
         Row(
@@ -439,50 +494,263 @@ class DetailPesananSection extends StatelessWidget {
         const SizedBox(height: 15),
         const Divider(),
         const SizedBox(height: 15),
-        Row(
-          children: [
-            const FaIcon(
-              FontAwesomeIcons.file,
-              size: 38,
-              color: AppColors.softgreyColor,
-            ),
-            const SizedBox(width: 20),
-            InkWell(
-              onTap: () {},
-              child: Text(
-                'coba.pdf',
-                style: AppTheme.primaryTextStyle,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 15),
-        const Divider(),
+        permintaanController.dataPermintaan.attributes!.suratPermintaan!.data !=
+                null
+            ? Row(
+                children: [
+                  const FaIcon(
+                    FontAwesomeIcons.file,
+                    size: 38,
+                    color: AppColors.softgreyColor,
+                  ),
+                  const SizedBox(width: 20),
+                  InkWell(
+                    onTap: () {
+                      openURLInNewTab(
+                          '${Constant.host}${permintaanController.dataPermintaan.attributes!.suratPermintaan!.data!.attributes!.url}');
+                    },
+                    child: Text(
+                      permintaanController.dataPermintaan.attributes!
+                          .suratPermintaan!.data!.attributes!.name
+                          .toString(),
+                      style: AppTheme.primaryTextStyle,
+                    ),
+                  ),
+                ],
+              )
+            : SecondaryButton(
+                onTap: () async {
+                  FilePickerResult? result =
+                      await FilePicker.platform.pickFiles(
+                    type: FileType.custom,
+                    allowMultiple: false,
+                    onFileLoading: (FilePickerStatus status) => print(status),
+                    allowedExtensions: [
+                      'pdf',
+                      'doc',
+                      'docx',
+                      'txt',
+                      'jpg',
+                      'png',
+                      'jpeg'
+                    ],
+                  );
+
+                  final resultUploadFile = await CheckoutService.uploadFile(
+                      result!.files.first.bytes,
+                      result.files.first.name,
+                      permintaanController
+                          .dataPermintaan.attributes!.layanan!.id
+                          .toString(),
+                      'surat_permintaan');
+
+                  if (resultUploadFile['success'] == true) {
+                    int? idFileUpload = resultUploadFile['idFileUpload'];
+                    final data = {
+                      "data": {
+                        "surat_permintaan": idFileUpload,
+                      }
+                    };
+                    final update = await PermintaanService.updatePermintaan(
+                        permintaanController.dataPermintaan.id.toString(),
+                        data);
+                    if (update) {
+                      CoolAlert.show(
+                        context: context,
+                        width: MediaQuery.of(context).size.width * 0.3,
+                        type: CoolAlertType.success,
+                        text: 'Surat permintaan berhasil diupload',
+                      ).then((value) {
+                        Navigator.pushNamedAndRemoveUntil(
+                            context, '/my-account', (route) => false);
+                        accountcontroller.pickMenu('Pesanan', 1);
+                      });
+                    } else {
+                      CoolAlert.show(
+                        context: context,
+                        width: MediaQuery.of(context).size.width * 0.3,
+                        type: CoolAlertType.error,
+                        text: 'Gagal update permintaan',
+                      );
+                    }
+                  } else {
+                    CoolAlert.show(
+                      context: context,
+                      width: MediaQuery.of(context).size.width * 0.3,
+                      type: CoolAlertType.error,
+                      text: 'Ada masalah pada saat upload, coba lagi',
+                    );
+                  }
+                },
+                titleButton: 'PILIH & UPLOAD FILE'),
         const SizedBox(height: 30),
         Row(
           children: [
             Text(
-              'Bukti Pembayaran',
+              'Billing Pembayaran',
               style: AppTheme.blackTextStyle.copyWith(
                 fontSize: 18,
                 fontWeight: AppTheme.bold,
               ),
             ),
-            Text(
-              '*',
-              style: AppTheme.blackTextStyle.copyWith(
-                color: AppColors.dangerColor,
-              ),
-            )
           ],
         ),
         const SizedBox(height: 15),
         const Divider(),
+        permintaanController
+                    .dataPermintaan.attributes!.billingPembayaran!.data !=
+                null
+            ? Padding(
+                padding: const EdgeInsets.symmetric(vertical: 15),
+                child: Row(
+                  children: [
+                    const FaIcon(
+                      FontAwesomeIcons.file,
+                      size: 38,
+                      color: AppColors.softgreyColor,
+                    ),
+                    const SizedBox(width: 20),
+                    InkWell(
+                      onTap: () {
+                        openURLInNewTab(
+                            '${Constant.host}${permintaanController.dataPermintaan.attributes!.billingPembayaran!.data!.attributes!.url}');
+                      },
+                      child: Text(
+                        permintaanController.dataPermintaan.attributes!
+                            .billingPembayaran!.data!.attributes!.name
+                            .toString(),
+                        style: AppTheme.primaryTextStyle,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            : Text(
+                'Belum ada Billing Pembayaran!',
+                style: AppTheme.blackTextStyle.copyWith(
+                  fontWeight: AppTheme.bold,
+                ),
+              ),
+        const Divider(),
+        const SizedBox(height: 30),
+        permintaanController
+                    .dataPermintaan.attributes!.billingPembayaran!.data !=
+                null
+            ? Row(
+                children: [
+                  Text(
+                    'Bukti Pembayaran',
+                    style: AppTheme.blackTextStyle.copyWith(
+                      fontSize: 18,
+                      fontWeight: AppTheme.bold,
+                    ),
+                  ),
+                  Text(
+                    '*',
+                    style: AppTheme.blackTextStyle.copyWith(
+                      color: AppColors.dangerColor,
+                    ),
+                  )
+                ],
+              )
+            : Container(),
         const SizedBox(height: 15),
-        SecondaryButton(
-          onTap: () {},
-          titleButton: 'CHOOSE FILE',
-        ),
+        const Divider(),
+        const SizedBox(height: 15),
+        permintaanController
+                    .dataPermintaan.attributes!.billingPembayaran!.data !=
+                null
+            ? Row(
+                children: [
+                  const FaIcon(
+                    FontAwesomeIcons.file,
+                    size: 38,
+                    color: AppColors.softgreyColor,
+                  ),
+                  const SizedBox(width: 20),
+                  InkWell(
+                    onTap: () {
+                      openURLInNewTab(
+                          '${Constant.host}${permintaanController.dataPermintaan.attributes!.billingPembayaran!.data!.attributes!.url}');
+                    },
+                    child: Text(
+                      permintaanController.dataPermintaan.attributes!
+                          .billingPembayaran!.data!.attributes!.name
+                          .toString(),
+                      style: AppTheme.primaryTextStyle,
+                    ),
+                  ),
+                ],
+              )
+            : SecondaryButton(
+                onTap: () async {
+                  FilePickerResult? result =
+                      await FilePicker.platform.pickFiles(
+                    type: FileType.custom,
+                    allowMultiple: false,
+                    onFileLoading: (FilePickerStatus status) => print(status),
+                    allowedExtensions: [
+                      'pdf',
+                      'doc',
+                      'docx',
+                      'txt',
+                      'jpg',
+                      'png',
+                      'jpeg'
+                    ],
+                  );
+
+                  final resultUploadFile = await CheckoutService.uploadFile(
+                      result!.files.first.bytes,
+                      result.files.first.name,
+                      permintaanController
+                          .dataPermintaan.attributes!.layanan!.id
+                          .toString(),
+                      'bukti_pembayaran');
+
+                  if (resultUploadFile['success'] == true) {
+                    int? idFileUpload = resultUploadFile['idFileUpload'];
+                    final data = {
+                      "data": {
+                        "bukti_pembayaran": idFileUpload,
+                      }
+                    };
+                    final update = await PermintaanService.updatePermintaan(
+                        permintaanController.dataPermintaan.id.toString(),
+                        data);
+                    if (update) {
+                      // ignore: use_build_context_synchronously
+                      CoolAlert.show(
+                        context: context,
+                        width: MediaQuery.of(context).size.width * 0.3,
+                        type: CoolAlertType.success,
+                        text: 'Bukti pembayaran berhasil diupload',
+                      ).then((value) {
+                        Navigator.pushNamedAndRemoveUntil(
+                            context, '/my-account', (route) => false);
+                        accountcontroller.pickMenu('Pesanan', 1);
+                      });
+                    } else {
+                      // ignore: use_build_context_synchronously
+                      CoolAlert.show(
+                        context: context,
+                        width: MediaQuery.of(context).size.width * 0.3,
+                        type: CoolAlertType.error,
+                        text: 'Gagal update permintaan',
+                      );
+                    }
+                  } else {
+                    // ignore: use_build_context_synchronously
+                    CoolAlert.show(
+                      context: context,
+                      width: MediaQuery.of(context).size.width * 0.3,
+                      type: CoolAlertType.error,
+                      text: 'Ada masalah pada saat upload, coba lagi',
+                    );
+                  }
+                },
+                titleButton: 'PILIH DAN UPLOAD FILE',
+              ),
         const SizedBox(height: 15),
       ],
     );
@@ -518,6 +786,37 @@ class DetailPesananSection extends StatelessWidget {
           ),
         ),
         const Divider(),
+      ],
+    );
+  }
+}
+
+class StatusWidget extends StatelessWidget {
+  final String message;
+  const StatusWidget({
+    super.key,
+    required this.message,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        const Icon(
+          Icons.circle,
+          color: AppColors.greyColor,
+          size: 15,
+        ),
+        const SizedBox(width: 25),
+        Expanded(
+          child: Text(
+            message,
+            style: AppTheme.greyTextStyle.copyWith(
+              fontWeight: AppTheme.bold,
+            ),
+          ),
+        ),
       ],
     );
   }

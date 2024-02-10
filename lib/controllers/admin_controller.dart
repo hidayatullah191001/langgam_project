@@ -1,7 +1,7 @@
 part of 'controller.dart';
 
 class AdminController extends ChangeNotifier {
-  String _selectedMenu = "Dasbor";
+  String _selectedMenu = "Dashboard";
   int _selectedIndex = 0;
 
   String get selectedMenu => _selectedMenu;

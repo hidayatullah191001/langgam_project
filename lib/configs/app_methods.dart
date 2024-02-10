@@ -4,7 +4,7 @@ class AppMethods {
   static String date(String stringDate) {
     //2022-02-05
     DateTime dateTime = DateTime.parse(stringDate);
-    return DateFormat('d MMM yyyy').format(dateTime);
+    return DateFormat('d MMM yyyy HH:mm').format(dateTime);
   }
 
   static String currency(String number) {
@@ -23,15 +23,21 @@ class AppMethods {
     return words.join(' ');
   }
 
-  // static void dangerFlushbar(BuildContext context, String title) {
-  //   Flushbar(
-  //     backgroundColor: AppColors.dangerColor,
-  //     title: 'Failed',
-  //     titleColor: AppColors.warningColor,
-  //     message: title,
-  //     duration: const Duration(seconds: 3),
-  //     isDismissible: false,
-  //     borderRadius: const BorderRadius.all(Radius.circular(5)),
-  //   ).show(context);
-  // }
+  static String generateOrderString(int length) {
+    final random = Random();
+    return List.generate(length, (index) => random.nextInt(10).toString())
+        .join();
+  }
+
+  static void dangerFlushbar(BuildContext context, String title) {
+    Flushbar(
+      backgroundColor: AppColors.dangerColor,
+      title: 'Failed',
+      titleColor: AppColors.whiteColor,
+      message: title,
+      duration: const Duration(seconds: 3),
+      isDismissible: false,
+      borderRadius: const BorderRadius.all(Radius.circular(5)),
+    ).show(context);
+  }
 }

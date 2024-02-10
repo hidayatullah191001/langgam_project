@@ -44,6 +44,22 @@ class LayananServices {
     }
   }
 
+  static Future<Layanan> getLayananBySlug(String slug) async {
+    try {
+      String filters = "\$eq";
+      Map? responseBody = await APIRequest.gets(
+        '${Constant.apirest}/layanans?populate=*&filters["slug"][$filters]=$slug',
+      );
+      if (responseBody!['data'] != null) {
+        return Layanan.fromJson(responseBody['data'][0]);
+      } else {
+        throw "Error Get Data";
+      }
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
   static Future<List<BidangLayanan>> getAllBidangLayanans() async {
     // String token = await AppSession.getToken();
     Map? responseBody = await APIRequest.gets(

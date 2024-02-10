@@ -7,6 +7,7 @@ class AppSession {
     await pref.setString('id', user['id']);
     await pref.setString('email', user['email']);
     await pref.setString('token', token);
+    await pref.setString('role', user['role']);
     return true;
   }
 
@@ -16,7 +17,7 @@ class AppSession {
     return await pref.setString('carts', cartString);
   }
 
-  static Future<String?> getDataCartUser()async{
+  static Future<String?> getDataCartUser() async {
     final pref = await SharedPreferences.getInstance();
     return pref.getString('carts');
   }
@@ -28,12 +29,18 @@ class AppSession {
       'username': pref.getString('username'),
       'email': pref.getString('email'),
       'token': pref.getString('token'),
+      'role': pref.getString('role'),
     };
   }
 
   static Future<String> getToken() async {
     final pref = await SharedPreferences.getInstance();
     return pref.getString('token').toString();
+  }
+
+  static Future<String> getRoleLogin() async {
+    final pref = await SharedPreferences.getInstance();
+    return pref.getString('role').toString();
   }
 
   static Future<bool> removeUserInformation() async {

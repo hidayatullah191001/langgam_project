@@ -1,13 +1,14 @@
 part of 'controller.dart';
 
 class AuthController extends ChangeNotifier {
-  Future loginUser(SignInFormModel model) async {
+  Future<Map<String, dynamic>> loginUser(SignInFormModel model) async {
     final result = await AuthServices.signIn(model);
-    if (result) {
-      return true;
-    } else {
-      return false;
-    }
+    return result;
+  }
+
+  Future<Map<String, dynamic>> registerUser(SignUpFormModel model) async {
+    final result = await AuthServices.register(model);
+    return result;
   }
 
   logout() async {

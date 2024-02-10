@@ -6,24 +6,24 @@ import 'package:langgam_project/models/layanan_model.dart';
 import 'package:langgam_project/models/operator_user_model.dart';
 import 'package:langgam_project/models/surat_permintaan_model.dart';
 
-class ListPermintaanModel {
+class ListPermintaanModelAdmin {
   List<Data>? data;
   Meta? meta;
 
-  ListPermintaanModel({this.data, this.meta});
+  ListPermintaanModelAdmin({this.data, this.meta});
 
-  ListPermintaanModel.fromJson(Map<String, dynamic> json) {
+  ListPermintaanModelAdmin.fromJson(Map<String, dynamic> json) {
     if (json['data'] != null) {
       data = <Data>[];
       json['data'].forEach((v) {
-        data!.add(new Data.fromJson(v));
+        data!.add(Data.fromJson(v));
       });
     }
-    meta = json['meta'] != null ? new Meta.fromJson(json['meta']) : null;
+    meta = json['meta'] != null ? Meta.fromJson(json['meta']) : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
