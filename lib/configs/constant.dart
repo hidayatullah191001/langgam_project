@@ -6,3 +6,5 @@ class Constant {
   static const String host = "http://182.16.248.102:1337";
   static const String apirest = "http://182.16.248.102:1337/api";
 }
+
+enum DataState { loading, filled, error }

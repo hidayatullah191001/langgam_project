@@ -49,6 +49,7 @@ class AppSession {
     pref.remove('username');
     pref.remove('email');
     pref.remove('token');
+    pref.remove('role');
     return true;
   }
 }

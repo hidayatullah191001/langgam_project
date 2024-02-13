@@ -19,7 +19,6 @@ class _BannerTopState extends State<BannerTop> {
 
   getDataUser() async {
     final Map<String, dynamic> data = await AppSession.getUserInformation();
-    print('data = $data');
     setState(() {
       user = data;
     });
@@ -82,7 +81,7 @@ class _BannerTopState extends State<BannerTop> {
                     Scaffold.of(context).openEndDrawer();
                     controller.pickDrawer('Login');
                   } else {
-                    Navigator.pushNamed(context, '/my-account');
+                    context.go('/my-account');
                   }
                 },
                 child: Row(

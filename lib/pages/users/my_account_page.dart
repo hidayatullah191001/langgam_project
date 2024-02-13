@@ -103,9 +103,25 @@ class _MyAccountPageState extends State<MyAccountPage> {
                       onTap: () {
                         controller.pickMenu(menuUser[index], index);
                         if (menuUser[index] == 'Logout') {
-                          authController.logout();
-                          Navigator.pushNamedAndRemoveUntil(
-                              context, '/', (route) => false);
+                          CoolAlert.show(
+                              context: context,
+                              type: CoolAlertType.warning,
+                              width: MediaQuery.of(context).size.width * 0.3,
+                              confirmBtnText: 'Logout',
+                              confirmBtnColor: AppColors.dangerColor,
+                              cancelBtnText: 'Batal',
+                              confirmBtnTextStyle: AppTheme.whiteTextStyle,
+                              cancelBtnTextStyle: AppTheme.darkGreyTextStyle,
+                              text: 'Kamu yakin ingin keluar dari aplikasi?',
+                              showCancelBtn: true,
+                              onConfirmBtnTap: () {
+                                authController.logout();
+                                context.replace('/');
+                                context.pop();
+                              },
+                              onCancelBtnTap: () {
+                                context.pop();
+                              }).then((value) => context.pop());
                         }
                       },
                       child: Container(
@@ -143,16 +159,16 @@ class _MyAccountPageState extends State<MyAccountPage> {
               controller.selectedMenu == 'Dasbor', const DashboardSection()),
           buildConditionalWidget(
               controller.selectedMenu == 'Pesanan', const PesananSection()),
-          buildConditionalWidget(
-              controller.selectedMenu == 'Messages', const MessageSection()),
+          // buildConditionalWidget(
+          //     controller.selectedMenu == 'Messages', const MessageSection()),
           buildConditionalWidget(
               controller.selectedMenu == 'Unduhan', const DownloadSection()),
           buildConditionalWidget(
               controller.selectedMenu == 'Alamat', const AddressSection()),
           buildConditionalWidget(controller.selectedMenu == 'Detail Akun',
               const AccountSettingsSection()),
-          buildConditionalWidget(controller.selectedMenu == 'Attachments',
-              const AttachmentSection()),
+          // buildConditionalWidget(controller.selectedMenu == 'Attachments',
+          //     const AttachmentSection()),
 
           // Ini ada di halaman address_section.dart
           buildConditionalWidget(controller.selectedMenu == 'Alamat pengiriman',

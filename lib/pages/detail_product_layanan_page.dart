@@ -14,7 +14,6 @@ class DetailProductLayananPage extends StatefulWidget {
 
 class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
   String stateDesk = 'DESKRIPSI';
-
   Map<String, dynamic> user = {};
   @override
   void initState() {
@@ -27,7 +26,6 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
 
   getDataUser() async {
     final Map<String, dynamic> data = await AppSession.getUserInformation();
-    print('data = $data');
     setState(() {
       user = data;
     });
@@ -117,8 +115,7 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                 TextButtonHovered(
                   text: 'Beranda',
                   onTap: () {
-                    Navigator.pushNamedAndRemoveUntil(
-                        context, '/', (route) => false);
+                    context.go('/');
                   },
                   styleBeforeHovered: AppTheme.greyTextStyle,
                   styleHovered: AppTheme.blackTextStyle
@@ -129,8 +126,9 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                   text: controller
                       .layanan!.attributes!.bidangLayanan!.attributes!.judul!,
                   onTap: () {
-                    Navigator.pushNamed(context,
-                        '/layanan?bidang_layanan=${controller.layanan!.attributes!.bidangLayanan!.attributes!.slug!}');
+                    context.go(
+                        '/layanan/${controller.layanan!.attributes!.bidangLayanan!.attributes!.slug!}');
+                    ;
                   },
                   styleBeforeHovered: AppTheme.greyTextStyle,
                   styleHovered: AppTheme.blackTextStyle
@@ -382,8 +380,8 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
           stateDesk == 'DESKRIPSI'
               ? ContentDeskripsi()
               : ContentSyaratKetentuan(),
-          Divider(),
-          UlasanSection(),
+          // Divider(),
+          // UlasanSection(),
           Divider(),
           ProdukTerkaitSection(),
         ],
@@ -526,7 +524,6 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                     text: 'Product berhasil ditambahkan kedalam keranjang',
                   );
                 }
-                print(controller.carts);
               },
               titleButton: 'Tambahkan Ke Keranjang',
             ),
@@ -537,6 +534,9 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
   }
 
   Widget ProdukTerkaitSection() {
+    final controller = context.watch<LayananController>();
+    final String bidangLayananId =
+        controller.layanan!.attributes!.bidangLayanan!.id.toString();
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 150, vertical: 50.0),
       child: Column(
@@ -561,66 +561,155 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
             width: double.infinity,
             // height: MediaQuery.of(context).size.height * 0.5,
             height: 300,
-            child: ListView.builder(
-              padding: EdgeInsets.zero,
-              physics: NeverScrollableScrollPhysics(),
-              scrollDirection: Axis.horizontal,
-              shrinkWrap: true,
-              itemCount: 4,
-              itemBuilder: (context, index) {
-                return Container(
-                  width: MediaQuery.of(context).size.width * 0.19,
-                  padding: EdgeInsets.only(
-                    left: index == 0 ? 0 : 8,
-                    right: index == 3 ? 0 : 8,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        height: 150,
-                        decoration: BoxDecoration(
-                          image: const DecorationImage(
-                            image: AssetImage('images/product-1.jpg'),
-                            fit: BoxFit.cover,
-                          ),
-                          borderRadius: BorderRadius.circular(12),
+            child: FutureBuilder(
+              future:
+                  LayananServices.getLayananByBidangLayananId(bidangLayananId),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+
+                if (!snapshot.hasData) {
+                  return Center(
+                    child: Text('Data tidak ditemukan',
+                        style: AppTheme.blackTextStyle),
+                  );
+                }
+
+                if (snapshot.hasData) {
+                  List<Layanan> data = snapshot.data!;
+
+                  return ListView.builder(
+                    padding: EdgeInsets.zero,
+                    physics: NeverScrollableScrollPhysics(),
+                    scrollDirection: Axis.horizontal,
+                    shrinkWrap: true,
+                    itemCount: 4,
+                    itemBuilder: (context, index) {
+                      final layanan = data[index];
+                      return Container(
+                        width: MediaQuery.of(context).size.width * 0.19,
+                        padding: EdgeInsets.only(
+                          left: index == 0 ? 0 : 8,
+                          right: index == 3 ? 0 : 8,
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        'Informasi Data Cuaca Untuk Pelbuhan',
-                        style: AppTheme.blackTextStyle
-                            .copyWith(fontWeight: AppTheme.bold),
-                      ),
-                      const SizedBox(height: 20),
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'Rp 225.000',
-                              style: AppTheme.primaryTextStyle.copyWith(
-                                fontWeight: AppTheme.bold,
+                            Container(
+                              height: 150,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: NetworkImage(
+                                      '${Constant.host}${layanan.attributes!.gambar!.data!.attributes!.url ?? ''}'),
+                                  fit: BoxFit.cover,
+                                ),
+                                borderRadius: BorderRadius.circular(12),
                               ),
                             ),
-                            const SizedBox(width: 5),
+                            const SizedBox(height: 10),
                             Text(
-                              '/ lokasi / hari',
-                              style: AppTheme.greyTextStyle,
+                              layanan.attributes!.judul.toString(),
+                              style: AppTheme.blackTextStyle
+                                  .copyWith(fontWeight: AppTheme.bold),
                             ),
-                          ]),
-                      const SizedBox(height: 10),
-                      Expanded(
-                        child: PrimaryButton(
-                          onTap: () {},
-                          titleButton: 'TAMBAHKAN KE KERANJANG',
+                            const SizedBox(height: 20),
+                            Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    AppMethods.currency(
+                                        layanan.attributes!.harga.toString()),
+                                    style: AppTheme.primaryTextStyle.copyWith(
+                                      fontWeight: AppTheme.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    layanan.attributes!.satuan.toString(),
+                                    style: AppTheme.greyTextStyle,
+                                  ),
+                                ]),
+                            const SizedBox(height: 10),
+                            PrimaryButton(
+                              onTap: () {
+                                context
+                                    .go('/layanan/${layanan.attributes!.slug}');
+                              },
+                              titleButton: 'LIHAT DETAIL',
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
-                );
+                      );
+                    },
+                  );
+                }
+
+                return Container();
               },
             ),
+            // child: ListView.builder(
+            //   padding: EdgeInsets.zero,
+            //   physics: NeverScrollableScrollPhysics(),
+            //   scrollDirection: Axis.horizontal,
+            //   shrinkWrap: true,
+            //   itemCount: 4,
+            //   itemBuilder: (context, index) {
+            //     return Container(
+            //       width: MediaQuery.of(context).size.width * 0.19,
+            //       padding: EdgeInsets.only(
+            //         left: index == 0 ? 0 : 8,
+            //         right: index == 3 ? 0 : 8,
+            //       ),
+            //       child: Column(
+            //         crossAxisAlignment: CrossAxisAlignment.start,
+            //         children: [
+            //           Container(
+            //             height: 150,
+            //             decoration: BoxDecoration(
+            //               image: const DecorationImage(
+            //                 image: AssetImage('images/product-1.jpg'),
+            //                 fit: BoxFit.cover,
+            //               ),
+            //               borderRadius: BorderRadius.circular(12),
+            //             ),
+            //           ),
+            //           const SizedBox(height: 10),
+            //           Text(
+            //             'Informasi Data Cuaca Untuk Pelbuhan',
+            //             style: AppTheme.blackTextStyle
+            //                 .copyWith(fontWeight: AppTheme.bold),
+            //           ),
+            //           const SizedBox(height: 20),
+            //           Row(
+            //               mainAxisAlignment: MainAxisAlignment.start,
+            //               children: [
+            //                 Text(
+            //                   'Rp 225.000',
+            //                   style: AppTheme.primaryTextStyle.copyWith(
+            //                     fontWeight: AppTheme.bold,
+            //                   ),
+            //                 ),
+            //                 const SizedBox(width: 5),
+            //                 Text(
+            //                   '/ lokasi / hari',
+            //                   style: AppTheme.greyTextStyle,
+            //                 ),
+            //               ]),
+            //           const SizedBox(height: 10),
+            //           Expanded(
+            //             child: PrimaryButton(
+            //               onTap: () {},
+            //               titleButton: 'TAMBAHKAN KE KERANJANG',
+            //             ),
+            //           ),
+            //         ],
+            //       ),
+            //     );
+            //   },
+            // ),
           ),
         ],
       ),

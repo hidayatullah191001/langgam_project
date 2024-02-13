@@ -27,14 +27,14 @@ class _DetailPermintaanSectionState extends State<DetailPermintaanSection> {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowMultiple: false,
-        onFileLoading: (FilePickerStatus status) => print(status),
         allowedExtensions: ['pdf', 'doc', 'docx', 'txt', 'jpg', 'png', 'jpeg'],
       );
 
       final resultUploadFile = await CheckoutService.uploadFile(
         result!.files.first.bytes,
         result.files.first.name,
-        dataPermintaan.layanan!.id.toString(),
+        // dataPermintaan.layanan!.id.toString(),
+        '12',
         'billing_pembayaran',
       );
 
@@ -55,8 +55,7 @@ class _DetailPermintaanSectionState extends State<DetailPermintaanSection> {
             type: CoolAlertType.success,
             text: 'Billing pembayaran berhasil diupload',
           ).then((value) {
-            Navigator.pushNamedAndRemoveUntil(
-                context, '/admin', (route) => false);
+            // context.go('/auth/admin');
             adminController.pickMenu('Permintaan Data Masuk', 1);
           });
         } else {
@@ -83,14 +82,14 @@ class _DetailPermintaanSectionState extends State<DetailPermintaanSection> {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowMultiple: false,
-        onFileLoading: (FilePickerStatus status) => print(status),
         allowedExtensions: ['pdf', 'doc', 'docx', 'txt', 'jpg', 'png', 'jpeg'],
       );
 
       final resultUploadFile = await CheckoutService.uploadFile(
         result!.files.first.bytes,
         result.files.first.name,
-        dataPermintaan.layanan!.id.toString(),
+        // dataPermintaan.layanan!.id.toString(),
+        '12',
         'data_permintaan',
       );
 
@@ -137,114 +136,216 @@ class _DetailPermintaanSectionState extends State<DetailPermintaanSection> {
 
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.symmetric(vertical: 30, horizontal: 30),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                color: AppColors.backgroundColor3,
-              ),
-              child: InkWell(
-                onTap: () =>
-                    adminController.pickMenu('Permintaan Data Masuk', 1),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    const Icon(Icons.arrow_back_ios_new_rounded,
-                        color: AppColors.primaryColor),
-                    const SizedBox(width: 5),
-                    Text(
-                      'Kembali',
-                      style: AppTheme.primaryTextStyle.copyWith(
-                        fontWeight: AppTheme.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Row(
+      margin: const EdgeInsets.only(bottom: 20, right: 40),
+      padding: const EdgeInsets.all(30),
+      decoration: BoxDecoration(
+        color: AppColors.whiteColor,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          InkWell(
+            onTap: () => adminController.pickMenu('Permintaan Data Masuk', 1),
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Text(
-                  "Kode Pesanan : ",
-                  style: AppTheme.blackTextStyle.copyWith(
-                    fontWeight: AppTheme.medium,
-                    fontSize: 18,
-                  ),
-                ),
+                const Icon(Icons.arrow_back_ios_new_rounded,
+                    color: AppColors.primaryColor),
                 const SizedBox(width: 5),
                 Text(
-                  dataPermintaan.nomorPermintaan.toString(),
-                  style: AppTheme.blackTextStyle.copyWith(
-                    fontWeight: AppTheme.medium,
-                    fontSize: 18,
+                  'Kembali',
+                  style: AppTheme.primaryTextStyle.copyWith(
+                    fontWeight: AppTheme.bold,
                   ),
                 ),
               ],
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text(
+          ),
+          const SizedBox(height: 20),
+          Expanded(child: LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth < 800) {
+                return MobileView(
+                    dataPermintaan,
+                    openURLInNewTab,
+                    uploadFileBillingPembayaran,
+                    uploadFileDokumenPermintaan,
+                    permintaanController,
+                    context,
+                    adminController);
+              } else {
+                return WebView(
+                    dataPermintaan,
+                    openURLInNewTab,
+                    uploadFileBillingPembayaran,
+                    uploadFileDokumenPermintaan,
+                    permintaanController,
+                    context,
+                    adminController);
+              }
+            },
+          )),
+        ],
+      ),
+    );
+  }
+
+  ListView MobileView(
+      listPermintaanModelAdmin.PermintaanAdminAttributes dataPermintaan,
+      void openURLInNewTab(String url),
+      Future<Null> uploadFileBillingPembayaran(),
+      Future<Null> uploadFileDokumenPermintaan(),
+      PermintaanController permintaanController,
+      BuildContext context,
+      AdminController adminController) {
+    return ListView(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              "Kode Pesanan : ",
+              style: AppTheme.blackTextStyle.copyWith(
+                fontWeight: AppTheme.medium,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(width: 5),
+            Expanded(
+              child: Text(
+                dataPermintaan.nomorPermintaan.toString(),
+                style: AppTheme.blackTextStyle.copyWith(
+                  fontWeight: AppTheme.medium,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ],
+        ),
+        dataPermintaan.layanan != null
+            ? Expanded(
+                child: Text(
                   dataPermintaan.layanan!.attributes!.judul.toString(),
                   style: AppTheme.blackTextStyle.copyWith(
                     fontWeight: AppTheme.bold,
                     fontSize: 22,
                   ),
                 ),
-                const SizedBox(
-                  width: 5,
-                ),
-                Text(
-                  dataPermintaan.status.toString(),
-                  style: AppTheme.greenTextStyle.copyWith(
-                    fontWeight: AppTheme.bold,
-                  ),
-                ),
-              ],
-            ),
+              )
+            : Container(),
+        Text(
+          dataPermintaan.status.toString(),
+          style: AppTheme.greenTextStyle.copyWith(
+            fontWeight: AppTheme.bold,
+          ),
+        ),
+        const SizedBox(height: 15),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            InformasiPesanan(dataPermintaan),
             const SizedBox(height: 15),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      InformasiPesanan(dataPermintaan),
-                      const SizedBox(height: 15),
-                      InformasiPemesan(dataPermintaan),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 25),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      BerkasPemesan(
-                          dataPermintaan,
-                          openURLInNewTab,
-                          uploadFileBillingPembayaran,
-                          uploadFileDokumenPermintaan),
-                      const SizedBox(height: 15),
-                      PembaharuanData(
-                          permintaanController, context, adminController),
-                    ],
-                  ),
-                ),
-              ],
-            )
+            InformasiPemesan(dataPermintaan),
           ],
         ),
-      ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            BerkasPemesanMobile(dataPermintaan, openURLInNewTab,
+                uploadFileBillingPembayaran, uploadFileDokumenPermintaan),
+            const SizedBox(height: 15),
+            PembaharuanData(permintaanController, context, adminController),
+          ],
+        ),
+      ],
+    );
+  }
+
+  ListView WebView(
+      listPermintaanModelAdmin.PermintaanAdminAttributes dataPermintaan,
+      void openURLInNewTab(String url),
+      Future<Null> uploadFileBillingPembayaran(),
+      Future<Null> uploadFileDokumenPermintaan(),
+      PermintaanController permintaanController,
+      BuildContext context,
+      AdminController adminController) {
+    return ListView(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              "Kode Pesanan : ",
+              style: AppTheme.blackTextStyle.copyWith(
+                fontWeight: AppTheme.medium,
+                fontSize: 18,
+              ),
+            ),
+            const SizedBox(width: 5),
+            Text(
+              dataPermintaan.nomorPermintaan.toString(),
+              style: AppTheme.blackTextStyle.copyWith(
+                fontWeight: AppTheme.medium,
+                fontSize: 18,
+              ),
+            ),
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            dataPermintaan.layanan != null
+                ? Text(
+                    dataPermintaan.layanan!.attributes!.judul.toString(),
+                    style: AppTheme.blackTextStyle.copyWith(
+                      fontWeight: AppTheme.bold,
+                      fontSize: 22,
+                    ),
+                  )
+                : Container(),
+            const SizedBox(
+              width: 5,
+            ),
+            Text(
+              dataPermintaan.status.toString(),
+              style: AppTheme.greenTextStyle.copyWith(
+                fontWeight: AppTheme.bold,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 15),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  InformasiPesanan(dataPermintaan),
+                  const SizedBox(height: 15),
+                  InformasiPemesan(dataPermintaan),
+                ],
+              ),
+            ),
+            const SizedBox(width: 25),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  BerkasPemesan(dataPermintaan, openURLInNewTab,
+                      uploadFileBillingPembayaran, uploadFileDokumenPermintaan),
+                  const SizedBox(height: 15),
+                  PembaharuanData(
+                      permintaanController, context, adminController),
+                ],
+              ),
+            ),
+          ],
+        )
+      ],
     );
   }
 
@@ -310,8 +411,10 @@ class _DetailPermintaanSectionState extends State<DetailPermintaanSection> {
               String billing = permintaanController
                   .permintaanAdmin.attributes!.kodeBilling
                   .toString();
+              final Map user = await AppSession.getUserInformation();
               final data = {
                 "data": {
+                  "operator_user": user['id'],
                   "kode_billing": permintaanController
                           .nomorBillingController.text.isNotEmpty
                       ? permintaanController.nomorBillingController.text
@@ -324,17 +427,10 @@ class _DetailPermintaanSectionState extends State<DetailPermintaanSection> {
                   permintaanController.permintaanAdmin.id.toString(), data);
               if (result == true) {
                 // ignore: use_build_context_synchronously
-                CoolAlert.show(
-                        context: context,
-                        type: CoolAlertType.success,
-                        width: MediaQuery.of(context).size.width * 0.3,
-                        text: "Data permintaan berhasil diperbaharui!")
-                    .then((value) {
-                  Navigator.pushNamedAndRemoveUntil(
-                          context, '/admin', (route) => false)
-                      .then((value) =>
-                          adminController.pickMenu('Permintaan Data Masuk', 1));
-                });
+                AppMethods.successToast(
+                    context, 'Data permintaan berhasil diperbaharui');
+
+                adminController.pickMenu('Permintaan Data Masuk', 1);
               } else {
                 // ignore: use_build_context_synchronously
                 CoolAlert.show(
@@ -354,8 +450,153 @@ class _DetailPermintaanSectionState extends State<DetailPermintaanSection> {
     );
   }
 
+  Container BerkasPemesanMobile(
+      listPermintaanModelAdmin.PermintaanAdminAttributes dataPermintaan,
+      void openURLInNewTab(String url),
+      Future<Null> uploadFileBillingPembayaran(),
+      Future<Null> uploadFileDokumenPermintaan()) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color: AppColors.backgroundColor2,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Berkas Pemesan',
+            style: AppTheme.blackTextStyle.copyWith(
+              fontWeight: AppTheme.bold,
+              fontSize: 18,
+            ),
+          ),
+          const SizedBox(height: 20),
+          // Surat Permintaan
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Surat Permintaan',
+                style: AppTheme.greyTextStyle.copyWith(height: 1.5),
+              ),
+              dataPermintaan.suratPermintaan!.data != null
+                  ? InkWell(
+                      onTap: () {
+                        openURLInNewTab(
+                            '${Constant.host}${dataPermintaan.suratPermintaan!.data!.attributes!.url}');
+                      },
+                      child: Text(
+                        'Download',
+                        style: AppTheme.primaryTextStyle,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    )
+                  : Text(
+                      'Belum ada Surat Permintaan',
+                      style: AppTheme.blackTextStyle.copyWith(
+                        fontWeight: AppTheme.bold,
+                      ),
+                    ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          // Billing Pembayaran
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Billing Pembayaran',
+                style: AppTheme.greyTextStyle.copyWith(height: 1.5),
+              ),
+              const SizedBox(width: 15),
+              dataPermintaan.billingPembayaran!.data != null
+                  ? InkWell(
+                      onTap: () {
+                        openURLInNewTab(
+                            '${Constant.host}${dataPermintaan.suratPermintaan!.data!.attributes!.url}');
+                      },
+                      child: Text(
+                        'Download',
+                        style: AppTheme.primaryTextStyle,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    )
+                  : SecondaryButton(
+                      onTap: uploadFileBillingPembayaran,
+                      titleButton: 'Pilih dan Upload',
+                      fontSize: 14,
+                    ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          // Bukti Pembayaran
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Bukti Pembayaran',
+                style: AppTheme.greyTextStyle.copyWith(height: 1.5),
+              ),
+              const SizedBox(width: 15),
+              dataPermintaan.buktiPembayaran!.data != null
+                  ? InkWell(
+                      onTap: () {
+                        openURLInNewTab(
+                            '${Constant.host}${dataPermintaan.buktiPembayaran!.data!.attributes!.url}');
+                      },
+                      child: Text(
+                        'Download',
+                        style: AppTheme.primaryTextStyle,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    )
+                  : Text(
+                      'Belum ada Bukti Pembayaran',
+                      style: AppTheme.blackTextStyle.copyWith(
+                        fontWeight: AppTheme.bold,
+                      ),
+                    ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          // Dokumen Pembayaran
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Dokumen Permintaan',
+                style: AppTheme.greyTextStyle.copyWith(height: 1.5),
+              ),
+              const SizedBox(width: 15),
+              dataPermintaan.dokumenPermintaan!.data != null
+                  ? InkWell(
+                      onTap: () {
+                        openURLInNewTab(
+                            '${Constant.host}${dataPermintaan.dokumenPermintaan!.data!.attributes!.url}');
+                      },
+                      child: Text(
+                        'Download',
+                        style: AppTheme.primaryTextStyle,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    )
+                  : SecondaryButton(
+                      onTap: uploadFileDokumenPermintaan,
+                      titleButton: 'Pilih dan Upload',
+                      fontSize: 14,
+                    ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Container BerkasPemesan(
-      listPermintaanModelAdmin.Attributes dataPermintaan,
+      listPermintaanModelAdmin.PermintaanAdminAttributes dataPermintaan,
       void openURLInNewTab(String url),
       Future<Null> uploadFileBillingPembayaran(),
       Future<Null> uploadFileDokumenPermintaan()) {
@@ -496,7 +737,7 @@ class _DetailPermintaanSectionState extends State<DetailPermintaanSection> {
   }
 
   Container InformasiPemesan(
-      listPermintaanModelAdmin.Attributes dataPermintaan) {
+      listPermintaanModelAdmin.PermintaanAdminAttributes dataPermintaan) {
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.symmetric(vertical: 10),
@@ -536,7 +777,7 @@ class _DetailPermintaanSectionState extends State<DetailPermintaanSection> {
   }
 
   Container InformasiPesanan(
-      listPermintaanModelAdmin.Attributes dataPermintaan) {
+      listPermintaanModelAdmin.PermintaanAdminAttributes dataPermintaan) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10),
       padding: const EdgeInsets.all(15),
@@ -547,13 +788,13 @@ class _DetailPermintaanSectionState extends State<DetailPermintaanSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Informasi Pesanan ${dataPermintaan.kodeBilling}',
-            style: AppTheme.blackTextStyle.copyWith(
-              fontWeight: AppTheme.bold,
-              fontSize: 18,
-            ),
-          ),
+          // Text(
+          //   'Informasi Pesanan ${dataPermintaan.kodeBilling}',
+          //   style: AppTheme.blackTextStyle.copyWith(
+          //     fontWeight: AppTheme.bold,
+          //     fontSize: 18,
+          //   ),
+          // ),
           const SizedBox(height: 10),
           dataPermintaan.kodeBilling != null
               ? ItemDetailPesanan(
@@ -568,18 +809,18 @@ class _DetailPermintaanSectionState extends State<DetailPermintaanSection> {
               title: 'Terakhir diperbaharui',
               data: AppMethods.date(dataPermintaan.updatedAt.toString())
                   .toString()),
-          ItemDetailPesanan(
-              title: 'Layanan',
-              data: dataPermintaan.layanan!.attributes!.judul.toString()),
+          // ItemDetailPesanan(
+          //     title: 'Layanan',
+          //     data: dataPermintaan.layanan!.attributes!.judul.toString()),
           ItemDetailPesanan(
               title: 'Kuantitas', data: dataPermintaan.kuantitas.toString()),
           ItemDetailPesanan(
               title: 'Tipe Pesanan',
               data: dataPermintaan.komersial == true ? 'Komersial' : 'Free'),
-          ItemDetailPesanan(
-              title: 'Harga Satuan',
-              data:
-                  '${AppMethods.currency(dataPermintaan.layanan!.attributes!.harga.toString())} ${dataPermintaan.layanan!.attributes!.satuan}'),
+          // ItemDetailPesanan(
+          //     title: 'Harga Satuan',
+          //     data:
+          //         '${AppMethods.currency(dataPermintaan.layanan!.attributes!.harga.toString())} ${dataPermintaan.layanan!.attributes!.satuan}'),
           ItemDetailPesanan(
               title: 'Total Harga',
               data: AppMethods.currency(dataPermintaan.total.toString())
@@ -618,20 +859,24 @@ class _DetailPermintaanSectionState extends State<DetailPermintaanSection> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                title,
-                style: AppTheme.blackTextStyle.copyWith(
-                  fontWeight: AppTheme.bold,
-                  letterSpacing: 1.1,
+              Expanded(
+                child: Text(
+                  title,
+                  style: AppTheme.blackTextStyle.copyWith(
+                    fontWeight: AppTheme.bold,
+                    letterSpacing: 1.1,
+                  ),
                 ),
               ),
-              Text(
-                title == 'Catatan User' && data.isEmpty
-                    ? 'Tidak ada catatan'
-                    : data,
-                style: AppTheme.primaryTextStyle.copyWith(
-                  fontWeight: AppTheme.bold,
-                  letterSpacing: 1.1,
+              Expanded(
+                child: Text(
+                  title == 'Catatan User' && data.isEmpty
+                      ? 'Tidak ada catatan'
+                      : data,
+                  style: AppTheme.primaryTextStyle.copyWith(
+                    fontWeight: AppTheme.bold,
+                    letterSpacing: 1.1,
+                  ),
                 ),
               ),
             ],

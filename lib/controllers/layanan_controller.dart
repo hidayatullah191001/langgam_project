@@ -13,8 +13,8 @@ class LayananController extends ChangeNotifier {
   String _intro = "";
   String get intro => _intro;
 
-  List<BidangLayanan> _bidangLayanan = [];
-  List<BidangLayanan> get bidangLayanans => _bidangLayanan;
+  List<bidang_layanan_model.BidangLayanan> _bidangLayanan = [];
+  List<bidang_layanan_model.BidangLayanan> get bidangLayanans => _bidangLayanan;
 
   Layanan? _layanan;
   Layanan? get layanan => _layanan;
@@ -33,7 +33,7 @@ class LayananController extends ChangeNotifier {
   }
 
   void getAllBidangLayanan() async {
-    final List<BidangLayanan> data =
+    final List<bidang_layanan_model.BidangLayanan> data =
         await LayananServices.getAllBidangLayanans();
     bidang_layanan_model.BidangLayanan newData =
         bidang_layanan_model.BidangLayanan(
@@ -51,8 +51,9 @@ class LayananController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void getBidangLayananBySlug(int? id) async {
-    BidangLayanan data = await LayananServices.getBidangLayananById(id);
+  void getBidangLayananBySlug(String slug) async {
+    bidang_layanan_model.BidangLayanan data =
+        await LayananServices.getBidangLayananBySlug(slug);
     _title = data.attributes!.judul.toString();
     _urlBackground = data.attributes!.gambar!.data!.attributes!.url.toString();
     _intro = data.attributes!.intro.toString();

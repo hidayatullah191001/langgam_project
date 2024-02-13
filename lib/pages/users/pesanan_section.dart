@@ -94,7 +94,6 @@ class PesananSection extends StatelessWidget {
                 shrinkWrap: true,
                 itemCount: model.data!.length,
                 itemBuilder: (context, index) {
-                  print(model.data![index]);
                   return ItemPesanan(pesananUser: model.data![index]);
                 },
               );
@@ -126,7 +125,7 @@ class ItemPesanan extends StatelessWidget {
               width: 90,
               child: InkWell(
                 child: Text(
-                  '#${pesananUser.id ?? " ---"}',
+                  '#${pesananUser.attributes!.nomorPermintaan ?? " ---"}',
                   style: AppTheme.primaryTextStyle.copyWith(
                     fontWeight: AppTheme.bold,
                   ),
@@ -145,7 +144,9 @@ class ItemPesanan extends StatelessWidget {
               width: 100,
               child: Text(
                 pesananUser.attributes!.status.toString(),
-                style: AppTheme.softgreyTextStyle,
+                style: pesananUser.attributes!.status == 'Selesai'
+                    ? AppTheme.greenTextStyle
+                    : AppTheme.redTextStyle,
                 textAlign: TextAlign.center,
               ),
             ),
@@ -214,7 +215,6 @@ class _DetailPesananSectionState extends State<DetailPesananSection> {
     String status =
         permintaanController.dataPermintaan.attributes!.status.toString();
     String id = permintaanController.dataPermintaan.id.toString();
-    print(id);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -245,7 +245,10 @@ class _DetailPesananSectionState extends State<DetailPesananSection> {
               TextSpan(
                 text:
                     '${permintaanController.dataPermintaan.attributes!.status}',
-                style: AppTheme.blackTextStyle,
+                style: permintaanController.dataPermintaan.attributes!.status ==
+                        'Selesai'
+                    ? AppTheme.greenTextStyle
+                    : AppTheme.redTextStyle,
               ),
               TextSpan(
                 text: '.',
@@ -400,6 +403,13 @@ class _DetailPesananSectionState extends State<DetailPesananSection> {
               permintaanController.dataPermintaan.attributes!.total.toString()),
         ),
         ItemDetailPesanan(
+          title: 'Tipe Pesanan',
+          price:
+              permintaanController.dataPermintaan.attributes!.komersial == true
+                  ? 'Komersial'
+                  : 'Free',
+        ),
+        ItemDetailPesanan(
           title: 'Lokasi Pesanan:',
           price:
               '${permintaanController.dataPermintaan.attributes!.metadata![0].data}',
@@ -524,7 +534,6 @@ class _DetailPesananSectionState extends State<DetailPesananSection> {
                       await FilePicker.platform.pickFiles(
                     type: FileType.custom,
                     allowMultiple: false,
-                    onFileLoading: (FilePickerStatus status) => print(status),
                     allowedExtensions: [
                       'pdf',
                       'doc',
@@ -631,7 +640,6 @@ class _DetailPesananSectionState extends State<DetailPesananSection> {
                   fontWeight: AppTheme.bold,
                 ),
               ),
-        const Divider(),
         const SizedBox(height: 30),
         permintaanController
                     .dataPermintaan.attributes!.billingPembayaran!.data !=
@@ -688,7 +696,6 @@ class _DetailPesananSectionState extends State<DetailPesananSection> {
                       await FilePicker.platform.pickFiles(
                     type: FileType.custom,
                     allowMultiple: false,
-                    onFileLoading: (FilePickerStatus status) => print(status),
                     allowedExtensions: [
                       'pdf',
                       'doc',
@@ -751,6 +758,53 @@ class _DetailPesananSectionState extends State<DetailPesananSection> {
                 },
                 titleButton: 'PILIH DAN UPLOAD FILE',
               ),
+        const SizedBox(height: 30),
+        permintaanController
+                    .dataPermintaan.attributes!.dokumenPermintaan!.data !=
+                null
+            ? Row(
+                children: [
+                  Text(
+                    'Dokumen Permintaan',
+                    style: AppTheme.blackTextStyle.copyWith(
+                      fontSize: 18,
+                      fontWeight: AppTheme.bold,
+                    ),
+                  ),
+                ],
+              )
+            : Container(),
+        const SizedBox(height: 15),
+        const Divider(),
+        permintaanController
+                    .dataPermintaan.attributes!.dokumenPermintaan!.data !=
+                null
+            ? Padding(
+                padding: const EdgeInsets.symmetric(vertical: 15),
+                child: Row(
+                  children: [
+                    const FaIcon(
+                      FontAwesomeIcons.file,
+                      size: 38,
+                      color: AppColors.softgreyColor,
+                    ),
+                    const SizedBox(width: 20),
+                    InkWell(
+                      onTap: () {
+                        openURLInNewTab(
+                            '${Constant.host}${permintaanController.dataPermintaan.attributes!.dokumenPermintaan!.data!.attributes!.url}');
+                      },
+                      child: Text(
+                        permintaanController.dataPermintaan.attributes!
+                            .dokumenPermintaan!.data!.attributes!.name
+                            .toString(),
+                        style: AppTheme.primaryTextStyle,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            : Container(),
         const SizedBox(height: 15),
       ],
     );

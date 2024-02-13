@@ -58,7 +58,22 @@ class AppMethods {
       context: context,
       title: title,
       autoCloseDuration: const Duration(seconds: 5),
+      primaryColor: AppColors.whiteColor,
+      backgroundColor: AppColors.successColor,
       type: ToastificationType.success,
+      style: ToastificationStyle.fillColored,
+    );
+  }
+
+  static void warningToast(BuildContext context, String title) async {
+    toastification.show(
+      context: context,
+      title: title,
+      autoCloseDuration: const Duration(seconds: 5),
+      primaryColor: AppColors.whiteColor,
+      backgroundColor: AppColors.warningColor,
+      type: ToastificationType.warning,
+      style: ToastificationStyle.fillColored,
     );
   }
 

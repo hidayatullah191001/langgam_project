@@ -124,54 +124,54 @@ class _CheckoutPageState extends State<CheckoutPage> {
           //             .copyWith(fontWeight: AppTheme.bold)),
           //   ],
           // ),
-          const SizedBox(height: 30),
-          Row(
-            children: [
-              Text(
-                'Surat Permintaan',
-                style: AppTheme.blackTextStyle.copyWith(
-                  fontSize: 18,
-                  fontWeight: AppTheme.bold,
-                ),
-              ),
-              Text(
-                '*',
-                style: AppTheme.blackTextStyle.copyWith(
-                  color: AppColors.dangerColor,
-                ),
-              )
-            ],
-          ),
-          const SizedBox(height: 15),
-          const Divider(),
-          const SizedBox(height: 15),
-          Row(
-            children: [
-              SecondaryButton(
-                onTap: () {
-                  pickAndUploadFile();
-                },
-                titleButton: 'PILIH & UPLOAD FILE',
-              ),
-              const SizedBox(width: 15),
-              if (_selectedFile != null) ...[
-                if (_selectedFileName!.toLowerCase().endsWith('.pdf') ||
-                    _selectedFileName!.toLowerCase().endsWith('.doc'))
-                  Text(
-                    'Nama File: $_selectedFileName',
-                    style: AppTheme.primaryTextStyle.copyWith(
-                      fontWeight: AppTheme.medium,
-                    ),
-                  )
-                else
-                  Image.memory(_selectedFile!,
-                      width: 80, height: 80, fit: BoxFit.cover),
-              ] else
-                Text('Belum ada file dipilih'),
-            ],
-          ),
-          const SizedBox(height: 15),
-          const Divider(),
+          // const SizedBox(height: 30),
+          // Row(
+          //   children: [
+          //     Text(
+          //       'Surat Permintaan',
+          //       style: AppTheme.blackTextStyle.copyWith(
+          //         fontSize: 18,
+          //         fontWeight: AppTheme.bold,
+          //       ),
+          //     ),
+          //     Text(
+          //       '*',
+          //       style: AppTheme.blackTextStyle.copyWith(
+          //         color: AppColors.dangerColor,
+          //       ),
+          //     )
+          //   ],
+          // ),
+          // const SizedBox(height: 15),
+          // const Divider(),
+          // const SizedBox(height: 15),
+          // Row(
+          //   children: [
+          //     SecondaryButton(
+          //       onTap: () {
+          //         pickAndUploadFile();
+          //       },
+          //       titleButton: 'PILIH & UPLOAD FILE',
+          //     ),
+          //     const SizedBox(width: 15),
+          //     if (_selectedFile != null) ...[
+          //       if (_selectedFileName!.toLowerCase().endsWith('.pdf') ||
+          //           _selectedFileName!.toLowerCase().endsWith('.doc'))
+          //         Text(
+          //           'Nama File: $_selectedFileName',
+          //           style: AppTheme.primaryTextStyle.copyWith(
+          //             fontWeight: AppTheme.medium,
+          //           ),
+          //         )
+          //       else
+          //         Image.memory(_selectedFile!,
+          //             width: 80, height: 80, fit: BoxFit.cover),
+          //     ] else
+          //       Text('Belum ada file dipilih'),
+          //   ],
+          // ),
+          // const SizedBox(height: 15),
+          // const Divider(),
           const SizedBox(height: 30),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,

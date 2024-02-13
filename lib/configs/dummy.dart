@@ -75,10 +75,10 @@ List<Map<String, dynamic>> ulasanUser = [
 List<String> menuUser = [
   'Dasbor',
   'Pesanan',
-  'Messages',
+  // 'Messages',
   'Unduhan',
   'Alamat',
   'Detail Akun',
-  'Attachments',
+  // 'Attachments',
   'Logout',
 ];

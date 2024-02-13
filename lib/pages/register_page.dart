@@ -227,8 +227,7 @@ class _LoginFormState extends State<LoginForm> {
                   final result = await controller.loginUser(model);
 
                   if (result['success'] == true) {
-                    Navigator.pushNamedAndRemoveUntil(
-                        context, '/', (route) => false);
+                    context.replace('/');
                   } else {
                     AppMethods.dangerToast(context, result['message']);
                   }
@@ -479,8 +478,7 @@ class _RegisterFormState extends State<RegisterForm> {
 
                   if (result['success'] == true) {
                     // ignore: use_build_context_synchronously
-                    Navigator.pushNamedAndRemoveUntil(
-                        context, '/', (route) => false);
+                    context.replace('/');
                   } else {
                     // ignore: use_build_context_synchronously
                     // CoolAlert.show(

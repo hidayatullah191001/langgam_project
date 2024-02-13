@@ -11,6 +11,11 @@ class ProductLayananPage extends StatefulWidget {
 
 class _ProductLayananPageState extends State<ProductLayananPage> {
   String? title = "Semua Layanan";
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,6 +79,7 @@ class _ProductLayananPageState extends State<ProductLayananPage> {
   }
 
   Widget ContentSection() {
+    final controller = context.watch<LayananController>();
     return Container(
       width: double.infinity,
       color: AppColors.whiteColor,
@@ -130,10 +136,10 @@ class _ProductLayananPageState extends State<ProductLayananPage> {
                               onTap: () {
                                 if (data[index].attributes.judul ==
                                     'Semua Layanan') {
-                                  Navigator.pushNamed(context, '/layanan');
+                                  context.go('/layanan');
                                 } else {
-                                  Navigator.pushNamed(context,
-                                      '/layanan?bidang_layanan=${data[index].attributes.slug}');
+                                  context.go(
+                                      '/layanan/${data[index].attributes.slug}');
                                 }
                               },
                               styleHovered: AppTheme.blackTextStyle

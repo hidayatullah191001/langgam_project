@@ -70,8 +70,16 @@ class CheckoutController extends ChangeNotifier {
         width: MediaQuery.of(context).size.width * 0.3,
         text: 'Email yang dimasukkan tidak valid',
       );
+    } else if (cart.length < 1) {
+      CoolAlert.show(
+        context: context,
+        type: CoolAlertType.warning,
+        width: MediaQuery.of(context).size.width * 0.3,
+        text: 'Tidak ada item pesanan!',
+      );
     } else {
       Map<String, dynamic> response = {};
+
       for (var i = 0; i < cart.length; i++) {
         final data = cart[i];
         String lokasiPesanan = "${data['kota']} - ${data['provinsi']}";
@@ -109,16 +117,12 @@ class CheckoutController extends ChangeNotifier {
         cartController.setCartEmpty();
         // ignore: use_build_context_synchronously
         CoolAlert.show(
-          context: context,
-          type: CoolAlertType.success,
-          width: MediaQuery.of(context).size.width * 0.3,
-          text: 'Permintaan berhasil dibuat.',
-          onConfirmBtnTap: () => Navigator.pushNamedAndRemoveUntil(
-            context,
-            '/cart/checkout/success',
-            (route) => false,
-          ),
-        );
+            context: context,
+            type: CoolAlertType.success,
+            width: MediaQuery.of(context).size.width * 0.3,
+            text: 'Permintaan berhasil dibuat.',
+            onConfirmBtnTap: () =>
+                context.go('/cart/checkout/success/${response['success']}'));
       } else {
         // ignore: use_build_context_synchronously
         CoolAlert.show(

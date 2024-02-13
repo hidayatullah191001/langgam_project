@@ -1,13 +1,10 @@
-import 'package:d_method/d_method.dart';
-import 'package:fluro/fluro.dart';
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:hovering/hovering.dart';
+import 'package:go_router/go_router.dart';
 import 'package:langgam_project/configs/configs.dart';
 import 'package:langgam_project/controllers/controller.dart';
 import 'package:langgam_project/pages/pages.dart';
-import 'package:langgam_project/routes/route.dart';
 import 'package:provider/provider.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
 
 void main() {
   runApp(
@@ -24,598 +21,468 @@ void main() {
         ChangeNotifierProvider(create: (_) => LayananController()),
         ChangeNotifierProvider(create: (_) => CheckoutController()),
         ChangeNotifierProvider(create: (_) => PermintaanController()),
+        ChangeNotifierProvider(create: (_) => BeritaController()),
+        ChangeNotifierProvider(create: (_) => BantuanController()),
       ],
       child: MyApp(),
     ),
   );
 }
 
-class MyApp extends StatefulWidget {
-  @override
-  State createState() {
-    return MyAppState();
-  }
-}
+// class MyApp extends StatefulWidget {
+//   @override
+//   State createState() {
+//     return MyAppState();
+//   }
+// }
 
-class MyAppState extends State<MyApp> {
-  MyAppState() {
-    final router = FluroRouter();
-    Routes.configureRoutes(router);
-    Application.router = router;
-  }
+// class MyAppState extends State<MyApp> {
+//   MyAppState() {
+//     final router = FluroRouter();
+//     Routes.configureRoutes(router);
+//     Application.router = router;
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    final app = MaterialApp(
-      title: 'Langgam',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      onGenerateRoute: Application.router.generator,
-    );
-//    print("initial route = ${app.initialRoute}");
-    return app;
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     final app = MaterialApp(
+//       title: 'Langgam',
+//       debugShowCheckedModeBanner: false,
+//       theme: ThemeData(
+//         primarySwatch: Colors.blue,
+//       ),
+//       onGenerateRoute: Application.router.generator,
+//     );
+//     return app;
+//   }
+// }
+
+// class AppRoutes {
+//   static const String root = 'root';
+//   static const String login = 'login';
+
+//   void setup() {
+//     QR.settings.enableDebugLog = true;
+//     QR.settings.autoRestoration = true;
+
+//     QR.settings.notFoundPage = QRoute(
+//       path: 'path',
+//       builder: () => const ErrorPage(),
+//     );
+//     QR.observer.onNavigate.add((path, route) async {
+//       debugPrint('Observer: Navigating to $path');
+//     });
+//     QR.observer.onPop.add((path, route) async {
+//       debugPrint('Observer: popping out from $path');
+//     });
+//     QR.settings.pagesType = const QFadePage();
+//   }
+
+//   final routes = <QRoute>[
+//     QRoute(
+//       path: '/',
+//       name: root,
+//       builder: () => const IndexPage(),
+//     ),
+//     QRoute(
+//       path: '/admin/auth',
+//       name: login,
+//       middleware: [
+//         AuthMiddleware(),
+//       ],
+//       builder: () => const LoginAdmin(),
+//     ),
+//   ];
+// }
+
+// class LoginAdmin extends StatelessWidget {
+//   const LoginAdmin({Key? key}) : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold();
+//   }
+// }
 
 // class MyApp extends StatelessWidget {
 //   const MyApp({Key? key}) : super(key: key);
 
 //   @override
 //   Widget build(BuildContext context) {
-//     return ClientProvider(
-//       uri: 'http://182.16.248.102:1337/graphql',
-//       child: MaterialApp(
-//         title: 'Coba GraphQL',
-//         theme: ThemeData(
-//           primarySwatch: Colors.blue,
-//         ),
-//         home: Scaffold(
-//           appBar: AppBar(
-//             title: Text(
-//               'Layanans',
-//             ),
-//           ),
-//           body: Query(
-//             options: QueryOptions(
-//               document: gql(LayananQuery.queryLayanans),
-//             ),
-//             builder: (result, {fetchMore, refetch}) {
-//               if (result.isLoading) {
-//                 return const Center(
-//                   child: CircularProgressIndicator(),
-//                 );
-//               }
-//               if (result.data == null) {
-//                 return const Center(
-//                   child: Text('Data not found'),
-//                 );
-//               }
-//               final layanans = result.data!['layanans']['data'];
-//               return ListView.builder(
-//                 shrinkWrap: true,
-//                 itemCount: layanans.length,
-//                 itemBuilder: (context, index) {
-//                   final layanan = layanans[index];
-//                   print(layanan['attributes']['judul']);
-//                   return Text(layanan['attributes']['judul'].toString());
-//                 },
-//               );
-//             },
-//           ),
-//         ),
+//     final appRoutes = AppRoutes();
+//     appRoutes.setup();
+//     return MaterialApp.router(
+//       // Add the [QRouteInformationParser]
+//       routeInformationParser: const QRouteInformationParser(),
+//       // Add the [QRouterDelegate] with your routes
+//       routerDelegate: QRouterDelegate(
+//         appRoutes.routes,
 //       ),
+//       theme: ThemeData(colorSchemeSeed: Colors.indigo),
+//       restorationScopeId: 'app',
 //     );
 //   }
 // }
 
-// class BlogRow extends StatelessWidget {
-//   final String title;
-//   final String excerpt;
-//   final String coverURL;
-
-//   const BlogRow({
-//     Key? key,
-//     required this.title,
-//     required this.excerpt,
-//     required this.coverURL,
-//   }) : super(key: key);
+// class AuthMiddleware extends QMiddleware {
+//   final dataStorage = AppSession.getRoleLogin();
 
 //   @override
+//   Future<String?> redirectGuard(String path) async =>
+//       dataStorage != 'admin' ? null : '/admin';
+// }
+
+// class MyApp extends StatelessWidget {
+//   @override
 //   Widget build(BuildContext context) {
-//     return Padding(
-//       padding: const EdgeInsets.all(8.0),
-//       child: Row(
-//         children: [
-//           Expanded(
-//             flex: 1,
-//             child: coverURL != null
-//                 ? Image.network(coverURL)
-//                 : const FlutterLogo(),
+//     return MaterialApp.router(
+//       routerDelegate: QRouterDelegate(
+//         routes: [
+//           QRoute(
+//             path: Routes.index,
+//             builder: () => Scaffold(body: Center(child: Text('Index Page'))),
 //           ),
-//           Expanded(
-//             flex: 2,
-//             child: Column(
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 Text(
-//                   title,
-//                   style: Theme.of(context).textTheme.headline6,
-//                 ),
-//                 const SizedBox(
-//                   height: 10,
-//                 ),
-//                 Text(
-//                   excerpt,
-//                   style: Theme.of(context).textTheme.bodyText2,
-//                 ),
-//               ],
-//             ),
+//           QRoute(
+//             path: Routes.admin,
+//             middleware: [
+//               (QMiddleware next) async {
+//                 // Check if user is authenticated as admin
+//                 // Replace this logic with your authentication logic
+//                 final isAdmin = true; // Example: assuming user is admin
+//                 if (isAdmin) {
+//                   next();
+//                 } else {
+//                   // Redirect to login page or show unauthorized access message
+//                   Q.to(Routes.adminAuth);
+//                 }
+//               },
+//             ],
+//             builder: () => Scaffold(body: Center(child: Text('Admin Page'))),
 //           ),
 //         ],
+
+//         // Routes.register: QRoute(
+//         //   builder: () => Scaffold(body: Center(child: Text('Register Page'))),
+//         // ),
+//         // Routes.myAccount: QRoute(
+//         //   builder: () => Scaffold(body: Center(child: Text('My Account Page'))),
+//         // ),
+//         // Routes.layanan: QRoute(
+//         //   builder: () => Scaffold(body: Center(child: Text('Layanan Page'))),
+//         // ),
+//         // Routes.layananDetail: QRoute(
+//         //   builder: (ctx) {
+//         //     final slug = ctx.pathParams['slug'];
+//         //     return Scaffold(body: Center(child: Text('Layanan Detail Page for $slug')));
+//         //   },
+//         // ),
+//         // Routes.cart: QRoute(
+//         //   builder: () => Scaffold(body: Center(child: Text('Cart Page'))),
+//         // ),
+//         // Routes.checkout: QRoute(
+//         //   builder: () => Scaffold(body: Center(child: Text('Checkout Page'))),
+//         // ),
+//         // Routes.checkoutSuccess: QRoute(
+//         //   builder: () => Scaffold(body: Center(child: Text('Checkout Success Page'))),
+//         // ),
+//         // Routes.berita: QRoute(
+//         //   builder: () => Scaffold(body: Center(child: Text('Berita Page'))),
+//         // ),
+//         // Routes.beritaDetail: QRoute(
+//         //   builder: (ctx) {
+//         //     final slug = ctx.pathParams['slug'];
+//         //     return Scaffold(body: Center(child: Text('Berita Detail Page for $slug')));
+//         //   },
+//         // ),
+//         // Routes.adminAuth: QRoute(
+//         //   builder: () => Scaffold(body: Center(child: Text('Admin Authentication Page'))),
+//         // ),
 //       ),
+//       routeInformationParser: QRouteInformationParser(),
 //     );
 //   }
 // }
 
-// class MyApp extends StatelessWidget {
-//   const MyApp({super.key});
+// class Routes {}
 
-//   // This widget is the root of your application.,
-//   @override
-//   Widget build(BuildContext context) {
-//     // return ClientProvider(
-//     //   uri: Constant.apigpl,
-//     //   child: MaterialApp(
-//     //     title: 'Langgam',
-//     //     initialRoute: '/',
-//     //     routes: {
-//     //       '/': (context) => const IndexPage(),
-//     //       '/register': (context) => const RegisterPage(),
-//     //       '/my-account': (context) => const MyAccountPage(),
-//     //       '/layanan': (context) => const ProductLayananPage(),
-//     //       '/layanan/detail': (context) => DetailProductLayananPage(),
-//     //       '/cart': (context) => const CartPage(),
-//     //       '/cart/checkout': (context) => const CheckoutPage(),
-//     //       '/cart/checkout/finish': (context) => const CheckoutFinishPage(),
-//     //       '/berita': (context) => const BeritaPage(),
-//     //       '/berita/detail': (context) => const DetailBeritaPage(),
-//     //       '/admin/auth': (context) => const LoginAdminPage(),
-//     //       '/admin': (context) => const AppAdminPage(),
-//     //     },
-//     //   ),
-//     // );
+// class AppRoutes {
+//   static String index = "/";
+//   static String register = "/register";
+//   static String myAccount = "/my-account";
+//   static String layanan = "/layanan";
+//   static String layananDetail = "/layanan/detail/:slug";
+//   static String cart = "/cart";
+//   static String checkout = "/cart/checkout";
+//   static String checkoutSuccess = "/cart/checkout/success";
+//   static String berita = "/berita";
+//   static String beritaDetail = "/berita/detail/:slug";
+//   static String adminAuth = "/admin/auth";
+//   static String admin = "/admin";
 
-//     return MaterialApp(
-//       title: 'Langgam',
-//       initialRoute: '/',
-//       routes: {
-//         '/': (context) => const IndexPage(),
-//         '/register': (context) => const RegisterPage(),
-//         '/my-account': (context) => const MyAccountPage(),
-//         '/layanan': (context) => const ProductLayananPage(),
-//         '/layanan/detail': (context) => DetailProductLayananPage(),
-//         '/cart': (context) => const CartPage(),
-//         '/cart/checkout': (context) => const CheckoutPage(),
-//         '/cart/checkout/finish': (context) => const CheckoutFinishPage(),
-//         '/berita': (context) => const BeritaPage(),
-//         '/berita/detail': (context) => const DetailBeritaPage(),
-//         '/admin/auth': (context) => const LoginAdminPage(),
-//         '/admin': (context) => const AppAdminPage(),
-//       },
-//     );
-//   }
-// }
-
-// import 'package:flutter/material.dart';
-
-// void main() {
-//   runApp(MyApp());
-// }
-
-// class MyApp extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       title: 'Flutter Navbar with Dropdown',
-//       theme: ThemeData(
-//         primarySwatch: Colors.blue,
-//       ),
-//       home: MyHomePage(),
-//     );
-//   }
-// }
-
-// class MyHomePage extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('Flutter Navbar with Dropdown'),
-//       ),
-//       body: Center(
-//         child: NavbarWithDropdown(),
-//       ),
-//     );
-//   }
-// }
-
-// class NavbarWithDropdown extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MouseRegion(
-//       child: Container(
-//         padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-//         color: Colors.blue,
-//         child: Row(
-//           mainAxisSize: MainAxisSize.min,
-//           children: [
-//             NavItem(title: 'Home'),
-//             NavItem(title: 'About'),
-//             NavItem(title: 'Services', hasDropdown: true),
-//             NavItem(title: 'Contact'),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-// class NavItem extends StatefulWidget {
-//   final String title;
-//   final bool hasDropdown;
-
-//   NavItem({required this.title, this.hasDropdown = false});
-
-//   @override
-//   _NavItemState createState() => _NavItemState();
-// }
-
-// class _NavItemState extends State<NavItem> {
-//   bool isHovered = false;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return MouseRegion(
-//       onEnter: (_) {
-//         setState(() {
-//           isHovered = true;
-//         });
-//         _showMyDialog(context);
-//       },
-//       onExit: (_) {
-//         setState(() {
-//           isHovered = false;
-//         });
-//         Navigator.of(context).pop();
-//       },
-//       child: Padding(
-//         padding: const EdgeInsets.symmetric(horizontal: 16.0),
-//         child: Row(
-//           mainAxisSize: MainAxisSize.min,
-//           children: [
-//             Text(
-//               widget.title,
-//               style: const TextStyle(
-//                 color: Colors.white,
-//                 fontSize: 16.0,
-//               ),
-//             ),
-//             if (widget.hasDropdown) DropdownArrow(isHovered: isHovered),
-//           ],
-//         ),
-//       ),
+//   void setup() {
+//     QR.settings.enableDebugLog = false;
+//     QR.settings.autoRestoration = true;
+//     QR.settings.notFoundPage = QRoute(
+//       path: 'path',
+//       builder: () => const ErrorPage(),
 //     );
 //   }
 
-//   // Fungsi untuk menampilkan dialog
-//   Future<void> _showMyDialog(BuildContext context) async {
-//     return showDialog<void>(
-//       context: context,
-//       builder: (BuildContext context) {
-//         return AlertDialog(
-//           title: Text('Judul Dialog'),
-//           content: Text('Isi dari dialog.'),
-//           actions: [
-//             TextButton(
-//               onPressed: () {
-//                 Navigator.of(context).pop();
-//               },
-//               child: Text('Tutup'),
-//             ),
-//           ],
-//         );
-//       },
-//     );
-//   }
-// }
-
-// class DropdownArrow extends StatelessWidget {
-//   final bool isHovered;
-
-//   DropdownArrow({required this.isHovered});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return AnimatedContainer(
-//       duration: const Duration(milliseconds: 300),
-//       curve: Curves.easeInOut,
-//       transform: isHovered ? Matrix4.rotationZ(0.5) : Matrix4.rotationZ(0),
-//       child: const Icon(
-//         Icons.arrow_drop_down,
-//         color: Colors.white,
-//       ),
-//     );
-//   }
-// }
-
-// class DropdownMenu extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       width: 200,
-//       height: 100,
-//       color: Colors.blue,
-//       child: Column(
-//         mainAxisSize: MainAxisSize.min,
-//         children: [
-//           ListTile(
-//             title: Text('Option 1'),
-//             onTap: () {
-//               // Handle option 1
+//   final routes = <QRoute>[
+//     QRoute(
+//       path: index,
+//       name: 'index',
+//       builder: () => const IndexPage(),
+//     ),
+//     QRoute(
+//       path: register,
+//       name: 'register',
+//       builder: () => const RegisterPage(),
+//     ),
+//     QRoute(
+//       path: '/layanan',
+//       name: 'layanan',
+//       builder: () => ProductLayananPage(),
+//     ),
+//     QRoute(
+//       path: '/layanan/detail/:slug',
+//       name: 'detail-layanan',
+//       builder: () => DetailProductLayananPage(),
+//     ),
+//     QRoute(
+//         path: '/auth',
+//         name: 'adminAuth',
+//         builder: () => const LoginAdminPage(),
+//         middleware: [
+//           QMiddlewareBuilder(
+//             redirectGuardFunc: (_) async {
+//               final role = await AppSession.getRoleLogin();
+//               print('role $role');
+//               if (role == 'admin' || role != null) {
+//                 return QR.to('/auth/admin');
+//               } else {
+//                 return QR.to('/auth');
+//               }
 //             },
-//           ),
-//           ListTile(
-//             title: Text('Option 2'),
-//             onTap: () {
-//               // Handle option 2
-//             },
-//           ),
-//           // Add more ListTile widgets for additional options
+//           )
 //         ],
-//       ),
-//     );
-//   }
-// }
-
-// void main() {
-//   runApp(MyApp());
-// }
-
-// class MyApp extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       home: MyWidget(),
-//     );
-//   }
-// }
-
-// class MyWidget extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('Contoh ShowDialog dengan OverlayEntry'),
-//       ),
-//       body: Center(
-//         child: MouseRegionWidget(),
-//       ),
-//     );
-//   }
-// }
-
-// class MouseRegionWidget extends StatefulWidget {
-//   @override
-//   _MouseRegionWidgetState createState() => _MouseRegionWidgetState();
-// }
-
-// class _MouseRegionWidgetState extends State<MouseRegionWidget> {
-//   GlobalKey _key = GlobalKey();
-//   OverlayEntry? _overlayEntry;
-//   bool _isMouseInside = false;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return MouseRegion(
-//       onEnter: (event) {
-//         // Menampilkan dialog ketika mouse masuk
-//         _showMyDialog(context);
-//         _isMouseInside = true;
-//       },
-//       onExit: (event) {
-//         // Menutup dialog ketika mouse keluar
-//         _isMouseInside = false;
-//         _overlayEntry!.remove();
-//       },
-//       child: Container(
-//         key: _key,
-//         width: 100,
-//         height: 100,
-//         color: Colors.blue,
-//         child: Center(
-//           child: Text(
-//             'Arahkan Mouse ke Sini',
-//             style: TextStyle(color: Colors.white),
+//         children: [
+//           QRoute(
+//             path: '/admin',
+//             name: 'admin',
+//             builder: () => const AppAdminPage(),
 //           ),
-//         ),
-//       ),
-//     );
-//   }
-
-//   Future<void> _showMyDialog(BuildContext context) async {
-//     _overlayEntry = OverlayEntry(
-//       builder: (context) => Positioned(
-//         width: 100,
-//         height: 100,
-//         child: MouseRegion(
-//           onExit: (event) {
-//             // Menutup dialog ketika mouse keluar dari dialog
-//             if (!_isMouseInside) {
-//               _overlayEntry!.remove();
-//             }
-//           },
-//           child: Material(
-//             color: Colors.transparent,
-//             child: AlertDialog(
-//               title: Text('Judul Dialog'),
-//               content: Text('Isi dari dialog.'),
-//               actions: [
-//                 TextButton(
-//                   onPressed: () {
-//                     _overlayEntry!.remove();
-//                   },
-//                   child: Text('Tutup'),
-//                 ),
-//               ],
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-
-//     Overlay.of(context).insert(_overlayEntry!);
-//   }
+//         ]),
+//   ];
 // }
 
-// void main() {
-//   runApp(MyApp());
-// }
+class LoginInfo extends ChangeNotifier {
+  /// The username of login.
+  String get userName => _userName;
+  String _userName = '';
 
-// class MyApp extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       home: MyWidget(),
-//     );
-//   }
-// }
+  /// Whether a user has logged in.
+  bool get loggedIn => _userName.isNotEmpty;
 
-// class MyWidget extends StatelessWidget {
-//   final _key = GlobalKey<ScaffoldState>();
+  /// Logs in a user.
+  void login(String userName) {
+    _userName = userName;
+    notifyListeners();
+  }
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('Contoh ShowDialog dengan Hovering'),
-//       ),
-//       body: Center(
-//         child: HoverWidget(
-//                 hoverChild: Container(
-//                   height: 200,
-//                   width: 200,
-//                   color: Colors.green,
-//                   child: Center(child: Text('Hover Me..')),
-//                 ),
-//                 onHover: (event) {
-//                   _key.currentState?.showSnackBar(const SnackBar(
-//                     content: Text('Yaay! I am Hovered'),
-//                   ));
-//                 },
-//                 child: Container(
-//                   height: 200,
-//                   width: 200,
-//                   color: Colors.red,
-//                   child: Center(child: Text('Hover Me..')),
-//                 ),
-//               ),
-//       ),
-//     );
-//   }
+  /// Logs out the current user.
+  void logout() {
+    _userName = '';
+    notifyListeners();
+  }
+}
 
-//   Future<void> _showMyDialog(BuildContext context) async {
-//     return showDialog<void>(
-//       context: context,
-//       builder: (BuildContext context) {
-//         return AlertDialog(
-//           title: Text('Judul Dialog'),
-//           content: Text('Isi dari dialog.'),
-//           actions: [
-//             TextButton(
-//               onPressed: () {
-//                 Navigator.of(context).pop();
-//               },
-//               child: Text('Tutup'),
-//             ),
-//           ],
-//         );
-//       },
-//     );
-//   }
-// }
+final GoRouter _router = GoRouter(
+  routes: <RouteBase>[
+    GoRoute(
+      path: '/',
+      builder: (BuildContext context, GoRouterState state) {
+        return const IndexPage();
+      },
+      routes: <RouteBase>[
+        GoRoute(
+            path: 'layanan',
+            builder: (BuildContext context, GoRouterState state) {
+              return ProductLayananPage();
+            },
+            routes: <RouteBase>[
+              GoRoute(
+                path: 'detail/:slug',
+                builder: (context, GoRouterState state) {
+                  return DetailProductLayananPage(
+                      slug: state.pathParameters['slug']!);
+                },
+              ),
+            ]),
+        GoRoute(
+          path: 'layanan/:slug',
+          builder: (context, GoRouterState state) {
+            return ProductLayananPage(
+              slugBidangLayanan: state.pathParameters['slug']!,
+            );
+          },
+        ),
+        GoRoute(
+          path: 'register',
+          builder: (BuildContext context, GoRouterState state) {
+            return RegisterPage();
+          },
+        ),
+        GoRoute(
+          path: 'cart',
+          builder: (BuildContext context, GoRouterState state) {
+            return CartPage();
+          },
+          routes: <RouteBase>[
+            GoRoute(
+              path: 'checkout',
+              redirect: (context, state) async {
+                final role = await AppSession.getRoleLogin();
+                if ((role != 'customer' || role == null) &&
+                    state.matchedLocation == '/cart/checkout') {
+                  return '/register';
+                }
+              },
+              builder: (BuildContext context, GoRouterState state) {
+                return CheckoutPage();
+              },
+              routes: <RouteBase>[
+                GoRoute(
+                  path: 'success/:success',
+                  redirect: (context, state) async {
+                    bool isSuccess =
+                        bool.parse(state.pathParameters['success']!);
 
+                    final role = await AppSession.getRoleLogin();
+                    final String? stringDataCart =
+                        await AppSession.getDataCartUser();
+                    List dataCart = json.decode(stringDataCart.toString());
+                    print(isSuccess);
+                    if ((role != 'customer' || role.isEmpty) &&
+                        state.matchedLocation == '/cart/checkout/success') {
+                      return '/register';
+                    } else if (state.matchedLocation ==
+                            '/cart/checkout/success' &&
+                        dataCart.length > 0 &&
+                        role == 'customer') {
+                      return '/cart/checkout';
+                    } else if (isSuccess != true) {
+                      return '/cart/checkout';
+                    }
+                  },
+                  builder: (BuildContext context, GoRouterState state) {
+                    print(state.matchedLocation);
+                    return CheckoutFinishPage();
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+        GoRoute(
+          path: 'my-account',
+          redirect: (context, state) async {
+            final role = await AppSession.getRoleLogin();
+            print(state.matchedLocation);
 
+            if (state.matchedLocation == '/my-account') {
+              if (role.isEmpty) {
+                return '/register';
+              } else {
+                if (role == 'authenticated') {
+                  return '/auth/admin';
+                } else if (role == 'customer') {
+                  return '/my-account';
+                } else {
+                  return '/register';
+                }
+              }
+            }
+          },
+          builder: (context, state) {
+            return MyAccountPage();
+          },
+        ),
+        GoRoute(
+          path: 'auth',
+          redirect: (context, state) async {
+            final role = await AppSession.getRoleLogin();
+            if (state.matchedLocation == '/auth') {
+              if (role.isEmpty) {
+                return '/auth';
+              } else {
+                if (role == 'customer') {
+                  return '/';
+                } else if (role == 'authenticated') {
+                  return '/auth/admin';
+                } else {
+                  return '/auth';
+                }
+              }
+            }
+          },
+          builder: (context, state) {
+            return LoginAdminPage();
+          },
+          routes: <RouteBase>[
+            GoRoute(
+              path: 'admin',
+              builder: (context, state) {
+                return AppAdminPage();
+              },
+              redirect: (context, state) async {
+                final role = await AppSession.getRoleLogin();
+                print(role);
+                if ((role != 'authenticated' || role.isEmpty) &&
+                    state.matchedLocation == '/auth/admin') {
+                  return '/auth';
+                } else {
+                  return '/auth/admin';
+                }
+              },
+            )
+          ],
+        ),
+        GoRoute(
+          path: 'berita',
+          builder: (context, state) => const BeritaPage(),
+        ),
+        GoRoute(
+          path: 'berita/:slug',
+          builder: (context, state) {
+            final slug = state.pathParameters['slug']!;
+            return DetailBeritaPage(
+              slug: slug,
+            );
+          },
+        ),
+        GoRoute(
+          path: 'bantuan/:slug',
+          builder: (context, state) {
+            final slug = state.pathParameters['slug']!;
+            return BantuanPage(slug: slug);
+          },
+        ),
+      ],
+    ),
+  ],
+);
 
-// void main() {
-//   runApp(MyApp());
-// }
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
 
-// class MyApp extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       home: MyWidget(),
-//     );
-//   }
-// }
-
-// class MyWidget extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('Contoh ShowDialog dengan HoverWidget'),
-//       ),
-//       body: Center(
-//         child: HoverDialogWidget(),
-//       ),
-//     );
-//   }
-// }
-
-// class HoverDialogWidget extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return HoverWidget(
-//       onHover: (event) {
-//         // Menampilkan dialog ketika mouse masuk
-//         _showMyDialog(context);
-//       },
-//       hoverChild:
-//           Container(), // Widget yang akan ditampilkan saat mouse di atasnya
-//       child: Container(
-//         width: 100,
-//         height: 100,
-//         color: Colors.blue,
-//         child: Center(
-//           child: Text(
-//             'Arahkan Mouse ke Sini',
-//             style: TextStyle(color: Colors.white),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-
-//   Future<void> _showMyDialog(BuildContext context) async {
-//     return showDialog<void>(
-//       context: context,
-//       builder: (BuildContext context) {
-//         return AlertDialog(
-//           title: Text('Judul Dialog'),
-//           content: Text('Isi dari dialog.'),
-//           actions: [
-//             TextButton(
-//               onPressed: () {
-//                 Navigator.of(context).pop();
-//               },
-//               child: Text('Tutup'),
-//             ),
-//           ],
-//         );
-//       },
-//     );
-//   }
-// }
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      title: 'Langgam',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(primarySwatch: Colors.blue),
+      routerConfig: _router,
+    );
+  }
+}

@@ -9,7 +9,7 @@ class LayananServices {
 
     if (filter == false) {
       responseBody = await APIRequest.gets(
-        '${Constant.apirest}/layanans?populate=gambar',
+        '${Constant.apirest}/layanans?populate=*',
       );
     } else {
       if (slugBidangLayanan != null) {
@@ -60,6 +60,24 @@ class LayananServices {
     }
   }
 
+  static Future<List<Layanan>> getLayananByBidangLayananId(String id) async {
+    try {
+      String filters = "\$eq";
+      Map? responseBody = await APIRequest.gets(
+        '${Constant.apirest}/layanans?populate=*&filters[bidang_layanan][id][$filters]=$id',
+      );
+      if (responseBody!['data'] != null) {
+        return List<Layanan>.from(
+                responseBody['data'].map((json) => Layanan.fromJson(json)))
+            .toList();
+      } else {
+        return [];
+      }
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
   static Future<List<BidangLayanan>> getAllBidangLayanans() async {
     // String token = await AppSession.getToken();
     Map? responseBody = await APIRequest.gets(
@@ -88,6 +106,22 @@ class LayananServices {
 
     if (responseBody['data'] != null) {
       return BidangLayanan.fromJson(responseBody['data']);
+    } else {
+      throw Exception();
+    }
+  }
+
+  static Future<BidangLayanan> getBidangLayananBySlug(String slug) async {
+    // String token = await AppSession.getToken();
+    String filters = "\$eq";
+
+    Map? responseBody = await APIRequest.gets(
+      '${Constant.apirest}/bidang-layanans?filters[slug][$filters]=$slug',
+    );
+    if (responseBody == null) return throw 'Error';
+
+    if (responseBody['data'] != null) {
+      return BidangLayanan.fromJson(responseBody['data'][0]);
     } else {
       throw Exception();
     }

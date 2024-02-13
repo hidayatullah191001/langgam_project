@@ -73,9 +73,9 @@ class HeroSectionCart extends StatelessWidget {
             text: 'KERANJANG BELANJA',
             onTap: () {
               if (currentRoute == '/cart/checkout') {
-                Navigator.pop(context);
+                context.pop();
               } else {
-                Navigator.pushNamed(context, '/cart');
+                context.go('/cart');
               }
             },
             styleBeforeHovered: heroPosition == 'KERANJANG BELANJA'
@@ -104,9 +104,9 @@ class HeroSectionCart extends StatelessWidget {
             onTap: () {
               if (isSuccess == false) {
                 if (currentRoute == '/cart') {
-                  Navigator.pushNamed(context, '/cart/checkout');
+                  context.go('/cart/checkout');
                 } else {
-                  Navigator.pop(context);
+                  context.pop();
                 }
               }
             },

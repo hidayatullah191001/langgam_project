@@ -77,6 +77,7 @@ class SecondaryButton extends StatelessWidget {
   }
 }
 
+// ignore: must_be_immutable
 class TextButtonHovered extends StatefulWidget {
   int? index;
   final String text;

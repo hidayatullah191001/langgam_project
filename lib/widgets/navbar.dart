@@ -43,7 +43,8 @@ class _NavbarState extends State<Navbar> {
           children: [
             InkWell(
               onTap: () {
-                Navigator.pushReplacementNamed(context, '/');
+                // Navigator.pushReplacementNamed(context, '/');
+                context.pushReplacement('/');
               },
               child: Row(
                 children: [
@@ -119,19 +120,28 @@ class _NavbarState extends State<Navbar> {
                     color: Color(0xffe4e4e4),
                   ),
                 ),
-                ItemNavBar(
-                  title: 'UPDATE',
-                  onHover: (event) {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return Dialog(
-                          alignment: const Alignment(0.7, -0.55),
-                          child: ModalUpdate(context),
-                        );
-                      },
-                    );
+                GestureDetector(
+                  onTap: () {
+                    context.go('/berita');
                   },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Row(
+                      children: [
+                        Text(
+                          'BERITA',
+                          style: AppTheme.secondaryTextStyle.copyWith(
+                            fontWeight: AppTheme.semiBold,
+                          ),
+                        ),
+                        const Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          color: Color(0xffe4e4e4),
+                          size: 16,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
                 Container(
                   width: 1,
@@ -184,7 +194,8 @@ class _NavbarState extends State<Navbar> {
                       onPressed: () {
                         // Scaffold.of(context).openEndDrawer();
                         // controller.pickDrawer('Cart');
-                        Navigator.pushNamed(context, '/cart');
+                        context.go('/cart');
+                        // Navigator.pushNamed(context, '/cart');
                       },
                       icon: const Icon(
                         Icons.shopping_cart_outlined,
@@ -224,7 +235,7 @@ class _NavbarState extends State<Navbar> {
               ),
               InkWell(
                 onTap: () {
-                  Navigator.pop(context);
+                  context.pop();
                 },
                 child: const Icon(
                   Icons.close,
@@ -233,45 +244,39 @@ class _NavbarState extends State<Navbar> {
               ),
             ],
           ),
-          TextButtonHovered(
-            text: 'Panduan',
-            onTap: () {},
-            styleBeforeHovered: AppTheme.greyTextStyle,
-            styleHovered: AppTheme.primaryTextStyle.copyWith(
-              fontWeight: AppTheme.bold,
-            ),
-          ),
-          TextButtonHovered(
-            text: 'Peraturan Pemerintah',
-            onTap: () {},
-            styleBeforeHovered: AppTheme.greyTextStyle,
-            styleHovered: AppTheme.primaryTextStyle.copyWith(
-              fontWeight: AppTheme.bold,
-            ),
-          ),
-          TextButtonHovered(
-            text: 'Tentang Kami',
-            onTap: () {},
-            styleBeforeHovered: AppTheme.greyTextStyle,
-            styleHovered: AppTheme.primaryTextStyle.copyWith(
-              fontWeight: AppTheme.bold,
-            ),
-          ),
-          TextButtonHovered(
-            text: 'Hubungi Kami',
-            onTap: () {},
-            styleBeforeHovered: AppTheme.greyTextStyle,
-            styleHovered: AppTheme.primaryTextStyle.copyWith(
-              fontWeight: AppTheme.bold,
-            ),
-          ),
-          TextButtonHovered(
-            text: 'Konfirmasi Pembayaran',
-            onTap: () {},
-            styleBeforeHovered: AppTheme.greyTextStyle,
-            styleHovered: AppTheme.primaryTextStyle.copyWith(
-              fontWeight: AppTheme.bold,
-            ),
+          FutureBuilder(
+            future: BantuanService.getAllBantuan(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              }
+              if (snapshot.hasData) {
+                List<BantuanData> data = snapshot.data!.data!;
+
+                return SizedBox(
+                  height: 100,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    padding: EdgeInsets.zero,
+                    itemCount: data.length,
+                    itemBuilder: (context, index) {
+                      final BantuanAttributes bantuan = data[index].attributes!;
+                      return TextButtonHovered(
+                        text: bantuan.judul.toString(),
+                        onTap: () {
+                          context.go('/bantuan/${bantuan.slug}');
+                        },
+                        styleBeforeHovered: AppTheme.greyTextStyle,
+                        styleHovered: AppTheme.primaryTextStyle.copyWith(
+                          fontWeight: AppTheme.bold,
+                        ),
+                      );
+                    },
+                  ),
+                );
+              }
+              return Container();
+            },
           ),
         ],
       ),
@@ -389,18 +394,12 @@ class _NavbarState extends State<Navbar> {
                   padding: EdgeInsets.zero,
                   itemCount: data.length,
                   itemBuilder: (context, index) {
-                    // BidangLayanan bidangLayanan = data[index];
-                    print(data[index].attributes.judul);
                     return ItemNavBarDropDown(
                       text: data[index].attributes.judul.toString(),
                       onTap: () {
-                        Navigator.pushNamed(context,
-                            '/layanan?bidang_layanan=${data[index].attributes.slug}');
+                        context.go('/layanan/${data[index].attributes.slug}');
                       },
                     );
-                    // return ListTile(
-                    //   title: Text(data[index].attributes.judul.toString()),
-                    // );
                   },
                 );
               }
@@ -520,15 +519,6 @@ class _ItemNavBarDropDownState extends State<ItemNavBarDropDown> {
         onExit: (_) => setState(() => isHovered = false),
         child: Row(
           children: [
-            // Center(
-            //   child: Lottie.asset(
-            //     widget.lottieJson ?? '',
-            //     fit: BoxFit.cover,
-            //     width: 30,
-            //     height: 30,
-            //   ),
-            // ),
-            // const SizedBox(width: 15),
             AnimatedDefaultTextStyle(
               duration: const Duration(milliseconds: 200),
               style: isHovered
@@ -544,11 +534,5 @@ class _ItemNavBarDropDownState extends State<ItemNavBarDropDown> {
         ),
       ),
     );
-  }
-
-  void _handleHover(bool hover) {
-    setState(() {
-      isHovered = hover;
-    });
   }
 }

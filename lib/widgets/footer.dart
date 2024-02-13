@@ -16,6 +16,7 @@ class Footer extends StatelessWidget {
                 const EdgeInsets.symmetric(horizontal: 150.0, vertical: 50.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -205,21 +206,40 @@ class Footer extends StatelessWidget {
                     const SizedBox(
                       height: 30,
                     ),
-                    TextButtonHovered(
-                      onTap: () {},
-                      text: 'Akun Saya',
-                    ),
-                    TextButtonHovered(
-                      onTap: () {},
-                      text: 'Hubungi Kami',
-                    ),
-                    TextButtonHovered(
-                      onTap: () {},
-                      text: 'Panduan',
-                    ),
-                    TextButtonHovered(
-                      onTap: () {},
-                      text: 'Syarat & Ketentuan Layanan',
+                    FutureBuilder(
+                      future: BantuanService.getAllBantuan(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Center(child: CircularProgressIndicator());
+                        }
+                        if (snapshot.hasData) {
+                          List<BantuanData> data = snapshot.data!.data!;
+
+                          return Container(
+                            width: 200,
+                            height: 150,
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              padding: EdgeInsets.zero,
+                              itemCount: data.length,
+                              itemBuilder: (context, index) {
+                                final BantuanAttributes bantuan =
+                                    data[index].attributes!;
+                                return Expanded(
+                                  child: TextButtonHovered(
+                                    onTap: () {
+                                      context.go('/bantuan/${bantuan.slug}');
+                                    },
+                                    text: bantuan.judul.toString(),
+                                  ),
+                                );
+                              },
+                            ),
+                          );
+                        }
+                        return Container();
+                      },
                     ),
                   ],
                 ),

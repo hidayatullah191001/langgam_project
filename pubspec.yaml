@@ -58,11 +58,14 @@ dependencies:
   advance_pdf_viewer2: ^2.0.5
   url_launcher: ^6.2.4
   toastification: ^1.0.0
+  qlevar_router: ^1.10.1
+  go_router: ^13.2.0
+  number_pagination: ^0.0.3+2
   
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
+    
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your

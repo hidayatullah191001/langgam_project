@@ -6,6 +6,11 @@ class AuthController extends ChangeNotifier {
     return result;
   }
 
+  Future<Map<String, dynamic>> loginAdmin(SignInFormModel model) async {
+    final result = await AuthServices.signInAdmin(model);
+    return result;
+  }
+
   Future<Map<String, dynamic>> registerUser(SignUpFormModel model) async {
     final result = await AuthServices.register(model);
     return result;

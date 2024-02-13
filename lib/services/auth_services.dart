@@ -24,23 +24,91 @@ class AuthServices {
           role = responseDetailUser['role']['type'];
         }
 
-        Map user = {
-          'username': username,
-          'email': email,
-          'id': id,
-          'role': role,
-        };
-
-        if (responseBody['blocked'] == true) {
+        if (role == 'customer') {
+          Map user = {
+            'username': username,
+            'email': email,
+            'id': id,
+            'role': role,
+          };
+          if (responseBody['blocked'] == true) {
+            return {
+              "success": false,
+              "message": "Akun anda belum diaktivasi, silahkan hubungi admin",
+            };
+          } else {
+            AppSession.saveUserInformation(user, token);
+            return {
+              "success": true,
+              "message": "Berhasil login",
+            };
+          }
+        } else {
           return {
             "success": false,
-            "message": "Akun anda belum diaktivasi, silahkan hubungi admin",
+            "message": "Akun kamu tidak memiliki akses ke halaman ini"
           };
+        }
+      } else {
+        return {
+          "success": false,
+          "message": "Email atau password salah, coba lagi",
+        };
+      }
+    }
+
+    return {
+      "success": false,
+      "message": "Something went wrong",
+    };
+  }
+
+  static Future<Map<String, dynamic>> signInAdmin(SignInFormModel value) async {
+    Map? responseBody = await APIRequest.post(
+      '${Constant.apirest}/auth/local?populate=*',
+      body: value.toJson(),
+    );
+    if (responseBody!.isNotEmpty) {
+      if (responseBody['jwt'] != null) {
+        String token = responseBody['jwt'].toString();
+        String email = responseBody['user']['email'].toString();
+        String id = responseBody['user']['id'].toString();
+        String username = responseBody['user']['username'].toString();
+        String role = "";
+
+        Map? responseDetailUser = await APIRequest.gets(
+            "${Constant.apirest}/users/me?populate=*",
+            headers: {
+              'Authorization': 'Bearer $token',
+            });
+
+        if (responseDetailUser!.isNotEmpty) {
+          role = responseDetailUser['role']['type'];
+        }
+
+        if (role == 'authenticated') {
+          Map user = {
+            'username': username,
+            'email': email,
+            'id': id,
+            'role': role,
+          };
+          if (responseBody['blocked'] == true) {
+            return {
+              "success": false,
+              "message": "Akun anda belum diaktivasi, silahkan hubungi admin",
+            };
+          } else {
+            AppSession.saveUserInformation(user, token);
+            return {
+              "success": true,
+              "message": "Berhasil login",
+            };
+          }
         } else {
-          AppSession.saveUserInformation(user, token);
           return {
-            "success": true,
-            "message": "Berhasil login",
+            "success": false,
+            "message": "Akun kamu tidak memiliki akses ke halaman admin",
           };
         }
       } else {
@@ -63,21 +131,19 @@ class AuthServices {
       body: value.toJson(),
     );
     if (responseBody!.isNotEmpty) {
-      print(responseBody);
       if (responseBody['jwt'] != null) {
-        String token = responseBody['jwt'].toString();
-        String email = responseBody['user']['email'].toString();
-        String id = responseBody['user']['id'].toString();
-        String username = responseBody['user']['username'].toString();
-        String role = responseBody['role']['type'].toString();
-        print(token);
-        Map user = {
-          'username': username,
-          'email': email,
-          'id': id,
-          'role': role,
-        };
-        AppSession.saveUserInformation(user, token);
+        // String token = responseBody['jwt'].toString();
+        // String email = responseBody['user']['email'].toString();
+        // String id = responseBody['user']['id'].toString();
+        // String username = responseBody['user']['username'].toString();
+        // String role = responseBody['role']['type'].toString();
+        // // Map user = {
+        // //   'username': username,
+        // //   'email': email,
+        // //   'id': id,
+        // //   'role': role,
+        // // };
+        // // AppSession.saveUserInformation(user, token);
         return {
           "success": true,
           "message":

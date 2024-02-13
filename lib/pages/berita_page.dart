@@ -32,7 +32,6 @@ class BeritaPage extends StatelessWidget {
             );
           } else {
             return CustomScrollView(
-              cacheExtent: 5000,
               slivers: [
                 SliverList(
                   delegate: SliverChildListDelegate([
@@ -49,7 +48,7 @@ class BeritaPage extends StatelessWidget {
                 ),
                 SliverList(
                   delegate: SliverChildListDelegate([
-                    // ContentSection(context),
+                    ContentSection(context),
                     const Footer(),
                   ]),
                 ),
@@ -60,60 +59,53 @@ class BeritaPage extends StatelessWidget {
       ),
       endDrawer: controller.selectedDrawer == 'Login'
           ? const LoginDrawer()
-          : (controller.selectedDrawer == 'Cart'
-              ? const CartDrawer()
-              : Container()),
+          : Container(),
     );
   }
 
-//   Widget ContentSection(BuildContext context) {
-//     return Container(
-//       padding: const EdgeInsets.symmetric(
-//         vertical: 50,
-//         horizontal: 150,
-//       ),
-//       child: Query(
-//         options: QueryOptions(
-//           document: gql(
-//             BeritaQuery.queryBeritas(),
-//           ),
-//         ),
-//         builder: (result, {fetchMore, refetch}) {
-//           if (result.isLoading) {
-//             return Center(child: CircularProgressIndicator());
-//           }
+  Widget ContentSection(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+        vertical: 50,
+        horizontal: 150,
+      ),
+      child: FutureBuilder(
+        future: BeritaService.getAllBerita(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+          if (!snapshot.hasData) {
+            return Center(
+              child: Text('Data not Found', style: AppTheme.blackTextStyle),
+            );
+          }
 
-//           if (result.data == null) {
-//             return const Center(
-//               child: Text('Data not found'),
-//             );
-//           }
-//           final posts = result.data!['posts']['data'];
-
-//           return ListView.builder(
-//             padding: EdgeInsets.zero,
-//             itemCount: posts.length,
-//             shrinkWrap: true,
-//             physics: const NeverScrollableScrollPhysics(),
-//             itemBuilder: (context, index) {
-//               final post = posts[index]['attributes'];
-//               return ItemBerita(
-//                 data: post,
-//                 id: posts[index]['id'],
-//               );
-//             },
-//           );
-//         },
-//       ),
-//     );
-//   }
+          if (snapshot.hasData) {
+            List<BeritaData> data = snapshot.data!.data!;
+            return ListView.builder(
+              padding: EdgeInsets.zero,
+              itemCount: data.length,
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
+                final BeritaAttributes post = data[index].attributes!;
+                return ItemBerita(
+                  data: post,
+                );
+              },
+            );
+          }
+          return Container();
+        },
+      ),
+    );
+  }
 }
 
 class ItemBerita extends StatefulWidget {
-  final dynamic data;
-  final String id;
-  const ItemBerita({Key? key, required this.data, required this.id})
-      : super(key: key);
+  final BeritaAttributes data;
+  const ItemBerita({Key? key, required this.data}) : super(key: key);
 
   @override
   State<ItemBerita> createState() => _ItemBeritaState();
@@ -125,7 +117,7 @@ class _ItemBeritaState extends State<ItemBerita> {
   @override
   Widget build(BuildContext context) {
     String urlGambar =
-        '${Constant.host}${widget.data['gambar']['data']['attributes']['url']}';
+        '${Constant.host}${widget.data.gambar!.data!.attributes!.url}';
     return MouseRegion(
       onEnter: (_) => _handleHover(true),
       onExit: (_) => _handleHover(false),
@@ -175,7 +167,7 @@ class _ItemBeritaState extends State<ItemBerita> {
                     ),
                     const SizedBox(width: 5),
                     Text(
-                      'Sulaiman',
+                      'Admin',
                       style: AppTheme.greyTextStyle.copyWith(
                         fontSize: 14,
                       ),
@@ -183,7 +175,7 @@ class _ItemBeritaState extends State<ItemBerita> {
                   ]),
                   const SizedBox(height: 10),
                   Text(
-                    widget.data['judul'],
+                    widget.data.judul!,
                     style: AppTheme.blackTextStyle.copyWith(
                       fontSize: 18,
                       fontWeight: AppTheme.bold,
@@ -191,17 +183,13 @@ class _ItemBeritaState extends State<ItemBerita> {
                   ),
                   const SizedBox(height: 15),
                   Text(
-                    widget.data['intro'],
+                    widget.data.intro!,
                     style: AppTheme.greyTextStyle,
                   ),
                   const SizedBox(height: 15),
                   PrimaryButton(
                     onTap: () {
-                      Navigator.pushNamed(
-                        context,
-                        '/berita/detail',
-                        arguments: widget.id,
-                      );
+                      context.go('/berita/${widget.data.slug}');
                     },
                     titleButton: 'LANJUTKAN MEMBACA',
                   ),

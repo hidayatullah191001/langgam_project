@@ -170,7 +170,7 @@ class CheckoutFinishPage extends StatelessWidget {
           Center(
             child: PrimaryButton(
               onTap: () {
-                Navigator.pushNamed(context, '/my-account');
+                context.replace('/my-account');
                 controller.pickMenu('Pesanan', 1);
               },
               titleButton: 'Lihat Pesanan Saya',
@@ -180,8 +180,7 @@ class CheckoutFinishPage extends StatelessWidget {
           Center(
             child: SecondaryButton(
               onTap: () {
-                Navigator.pushNamedAndRemoveUntil(
-                    context, '/', (route) => false);
+                context.replace('/');
               },
               titleButton: 'Kembali ke Halaman Utama',
             ),

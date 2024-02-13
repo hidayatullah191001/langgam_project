@@ -147,16 +147,37 @@ class _IndexPageState extends State<IndexPage> {
             const SizedBox(
               height: 15,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                UpdateCard(),
-                SizedBox(width: 15),
-                UpdateCard(),
-                SizedBox(width: 15),
-                UpdateCard(),
-              ],
-            )
+            SizedBox(
+              height: 320,
+              child: FutureBuilder<BeritaModel>(
+                future: BeritaService.getAllBerita(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                  if (!snapshot.hasData) {
+                    return Center(
+                        child: Text(snapshot.error.toString(),
+                            style: AppTheme.blackTextStyle));
+                  }
+                  if (snapshot.hasData) {
+                    List data = snapshot.data!.data as List;
+                    return ListView.builder(
+                      padding: EdgeInsets.zero,
+                      controller: _scrollController,
+                      scrollDirection: Axis.horizontal,
+                      itemCount: data.length,
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        final BeritaData berita = data[index];
+                        return UpdateCard(data: berita.attributes!);
+                      },
+                    );
+                  }
+                  return Container();
+                },
+              ),
+            ),
           ],
         ),
       ),
@@ -226,85 +247,39 @@ class _IndexPageState extends State<IndexPage> {
                 const SizedBox(
                   width: 20,
                 ),
-                // Expanded(
-                //   child: SizedBox(
-                //       height: 300,
-                //       child: Query(
-                //         options: QueryOptions(
-                //           document: gql(
-                //             LayananQuery.queryLayanans(),
-                //           ),
-                //         ),
-                //         builder: (result, {fetchMore, refetch}) {
-                //           if (result.isLoading) {
-                //             return Center(child: CircularProgressIndicator());
-                //           }
-
-                //           if (result.data == null) {
-                //             return Center(
-                //               child: Text(
-                //                 'Data not found',
-                //                 style: AppTheme.greyTextStyle,
-                //               ),
-                //             );
-                //           }
-
-                //           final layanans = result.data!['layanans']['data'];
-
-                //           return ListView.builder(
-                //             padding: EdgeInsets.zero,
-                //             controller: _scrollController,
-                //             scrollDirection: Axis.horizontal,
-                //             itemCount: 5,
-                //             shrinkWrap: true,
-                //             itemBuilder: (context, index) {
-                //               print('id ${layanans[index]['id']}');
-                //               final layanan = layanans[index]['attributes'];
-
-                //               return LayananPopulerCard(data: layanan);
-                //             },
-                //           );
-                //         },
-                //       )),
-                // ),
                 Expanded(
-                  child: SizedBox(
-                    height: 300,
-                    child: FutureBuilder(
-                      initialData: [],
-                      future: LayananServices.getAllLayanans(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(child: CircularProgressIndicator());
-                        }
+                  child: FutureBuilder(
+                    future: LayananServices.getAllLayanans(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      }
 
-                        if (!snapshot.hasData) {
-                          return Center(
-                              child: Text(snapshot.error.toString(),
-                                  style: AppTheme.blackTextStyle));
-                        }
+                      if (!snapshot.hasData) {
+                        return Center(
+                            child: Text(snapshot.error.toString(),
+                                style: AppTheme.blackTextStyle));
+                      }
 
-                        if (snapshot.hasData) {
-                          List data = snapshot.data as List;
-                          return ListView.builder(
-                            padding: EdgeInsets.zero,
-                            controller: _scrollController,
-                            scrollDirection: Axis.horizontal,
-                            itemCount: 5,
-                            shrinkWrap: true,
-                            itemBuilder: (context, index) {
-                              final Layanan layanan = data[index];
-                              return LayananPopulerCard(
-                                data: layanan.attributes,
-                                idProduct: layanan.id.toString(),
-                              );
-                            },
-                          );
-                        }
-                        return Container();
-                      },
-                    ),
+                      List data = snapshot.data as List;
+                      return SizedBox(
+                        height: 300,
+                        child: ListView.builder(
+                          padding: EdgeInsets.zero,
+                          controller: _scrollController,
+                          scrollDirection: Axis.horizontal,
+                          itemCount: 5,
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            final Layanan layanan = data[index];
+                            return LayananPopulerCard(
+                              data: layanan.attributes,
+                              idProduct: layanan.id.toString(),
+                            );
+                          },
+                        ),
+                      );
+                    },
                   ),
                 ),
                 const SizedBox(
@@ -326,7 +301,11 @@ class _IndexPageState extends State<IndexPage> {
             const SizedBox(
               height: 20,
             ),
-            PrimaryButton(onTap: () {}, titleButton: 'SELENGKAPNYA'),
+            PrimaryButton(
+                onTap: () {
+                  context.go('/layanan');
+                },
+                titleButton: 'SELENGKAPNYA'),
           ],
         ),
       ),
@@ -389,7 +368,9 @@ class _IndexPageState extends State<IndexPage> {
                   ),
                   PrimaryButton(
                     onTap: () {
-                      Application.router.navigateTo(context, Routes.layanan);
+                      // Application.router.navigateTo(context, Routes.layanan);
+                      // Navigator.pushNamed(context, '/layanan');
+                      context.go('/layanan');
                     },
                     titleButton: 'LIHAT SEMUA LAYANAN',
                   ),
@@ -435,19 +416,44 @@ class _IndexPageState extends State<IndexPage> {
           ),
           SizedBox(
             height: 234,
-            child: ListView.builder(
-              padding: EdgeInsets.zero,
-              scrollDirection: Axis.horizontal,
-              shrinkWrap: true,
-              itemCount: layanans.length,
-              itemBuilder: (context, index) {
-                final data = layanans[index];
-                return LayananCard(
-                  index: index,
-                  imagePath: data['imagePath'],
-                  titleLayanan: data['title'],
-                  descriptionLayanan: data['description'],
-                );
+            child: FutureBuilder(
+              future: LayananServices.getAllBidangLayanans(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
+
+                if (!snapshot.hasData) {
+                  return Center(
+                      child: Text('Gagal mengambil data, coba lagi',
+                          style: AppTheme.whiteTextStyle));
+                }
+                if (snapshot.hasData) {
+                  List<bidang_layanan_model.BidangLayanan> bidangLayanans =
+                      snapshot.data!;
+                  return ListView.builder(
+                    padding: EdgeInsets.zero,
+                    scrollDirection: Axis.horizontal,
+                    shrinkWrap: true,
+                    itemCount: bidangLayanans.length,
+                    itemBuilder: (context, index) {
+                      final data = bidangLayanans[index].attributes!;
+                      return InkWell(
+                        onTap: () {
+                          context.go('/layanan/${data.slug}');
+                        },
+                        child: LayananCard(
+                          index: index,
+                          imagePath:
+                              '${Constant.host}${data.gambar!.data!.attributes!.url}',
+                          titleLayanan: data.judul!,
+                          descriptionLayanan: data.intro ?? '',
+                        ),
+                      );
+                    },
+                  );
+                }
+                return Container();
               },
             ),
           ),

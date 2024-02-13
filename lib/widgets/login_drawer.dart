@@ -120,8 +120,7 @@ class _LoginDrawerState extends State<LoginDrawer> {
                           final result = await controller.loginUser(model);
 
                           if (result['success'] == true) {
-                            Navigator.pushNamedAndRemoveUntil(
-                                context, '/', (route) => false);
+                            context.pushReplacement('/');
                           } else {
                             // CoolAlert.show(
                             //     context: context,
@@ -238,7 +237,9 @@ class _LoginDrawerState extends State<LoginDrawer> {
                           const SizedBox(height: 20),
                           TextButtonHovered(
                             onTap: () {
-                              Navigator.pushNamed(context, '/register');
+                              // Navigator.pushNamed(context, '/register');
+                              // QR.to('/register');
+                              context.go('/register');
                             },
                             text: 'BUAT AKUN',
                             styleHovered: AppTheme.blackTextStyle.copyWith(

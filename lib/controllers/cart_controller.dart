@@ -108,7 +108,6 @@ class CartController extends ChangeNotifier {
     for (var cart in _cartList) {
       cart['totalHarga'] = 0.toString();
     }
-    print('set to free = $_cartList');
     AppSession.saveDataCartUser(_cartList);
     notifyListeners();
   }
@@ -118,11 +117,8 @@ class CartController extends ChangeNotifier {
       int hargaProduk = cart['product']['harga'];
       int itemCountProduct = int.parse(cart['item']);
       int total = hargaProduk * itemCountProduct;
-      print('total Harga = $total');
       cart['totalHarga'] = total.toString();
     }
-
-    print('set to komersil = $_cartList');
     AppSession.saveDataCartUser(_cartList);
     notifyListeners();
   }
@@ -136,9 +132,7 @@ class CartController extends ChangeNotifier {
 
   void getDataCart() async {
     final String? stringDataCart = await AppSession.getDataCartUser();
-    // print('dataCart = $dataCart');
     List dataCart = json.decode(stringDataCart.toString());
     _cartList = dataCart;
-    // print('dataCart = $_datacartList');
   }
 }

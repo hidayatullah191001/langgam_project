@@ -82,13 +82,17 @@ class _LayananCardState extends State<LayananCard> {
                           duration: const Duration(milliseconds: 300),
                           height: 0,
                         ),
-                  AnimatedOpacity(
-                    duration: const Duration(milliseconds: 300),
-                    opacity: isHovered ? 1.0 : 0.0,
-                    child: Text(
-                      widget.descriptionLayanan,
-                      style: AppTheme.whiteTextStyle.copyWith(
-                        fontSize: 14,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 300),
+                      opacity: isHovered ? 1.0 : 0.0,
+                      child: Text(
+                        widget.descriptionLayanan,
+                        style: AppTheme.whiteTextStyle.copyWith(
+                          fontSize: 14,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ),
@@ -127,16 +131,12 @@ class _LayananPopulerCardState extends State<LayananPopulerCard> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    // user = context.watch<NavbarController>().getUser();
     getDataUser();
     context.read<WilayahController>().getAllDataProvinces();
-    // context.read<WilayahController>().getAllDataCities();
-    // context.read<WilayahController>().getAllDataKecamatan();
   }
 
   getDataUser() async {
     final Map<String, dynamic> data = await AppSession.getUserInformation();
-    print('data = $data');
     setState(() {
       user = data;
     });
@@ -470,13 +470,8 @@ class _LayananPopulerCardState extends State<LayananPopulerCard> {
                     context: context,
                     width: MediaQuery.of(context).size.width * 0.3,
                     type: CoolAlertType.error,
-                    text: 'Maaf, kamu harus login atau daftar terlebih dahulu',
-                  ).then(
-                    (value) => Navigator.pushNamed(
-                      context,
-                      '/register',
-                    ),
-                  );
+                    text: 'Maaf, kamu harus login terlebih dahulu',
+                  ).then((value) => context.go('/register'));
                 } else {
                   final productItem = {
                     'user': user,
@@ -519,62 +514,68 @@ class _LayananPopulerCardState extends State<LayananPopulerCard> {
 }
 
 class UpdateCard extends StatelessWidget {
-  const UpdateCard({Key? key}) : super(key: key);
+  final BeritaAttributes data;
+  const UpdateCard({Key? key, required this.data}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width * 0.18,
-      height: MediaQuery.of(context).size.width * 0.22,
-      margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: AppColors.whiteColor,
-        borderRadius: BorderRadius.circular(6),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
-            spreadRadius: 2,
-            blurRadius: 7,
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Container(
-            height: 150,
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(6), topRight: Radius.circular(6)),
-              image: DecorationImage(
-                image: NetworkImage(
-                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJ2kxB8JDD63E_xsfOFEje7eWSkvri0295El8holhZGkwJxB4KDIuG8M6LrJhquZEleys&usqp=CAU'),
-                fit: BoxFit.cover,
-              ),
+    return InkWell(
+      onTap: () {
+        context.go('/berita/${data.slug}');
+      },
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.18,
+        height: MediaQuery.of(context).size.width * 0.22,
+        margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: AppColors.whiteColor,
+          borderRadius: BorderRadius.circular(6),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 2,
+              blurRadius: 7,
             ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 25,
-                horizontal: 18,
-              ),
-              child: Text(
-                'Gempa Berkekuatan 6.5 Skala Richter Guncang Selatan Jawa ',
-                style: AppTheme.blackTextStyle.copyWith(
-                  fontWeight: AppTheme.bold,
-                  fontSize: 18,
-                  overflow: TextOverflow.fade,
+          ],
+        ),
+        child: Column(
+          children: [
+            Container(
+              height: 150,
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(6), topRight: Radius.circular(6)),
+                image: DecorationImage(
+                  image: NetworkImage(
+                      '${Constant.host}${data.gambar!.data!.attributes!.url}'),
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
-          ),
-        ],
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 25,
+                  horizontal: 18,
+                ),
+                child: Text(
+                  data.judul!.toString(),
+                  style: AppTheme.blackTextStyle.copyWith(
+                    fontWeight: AppTheme.bold,
+                    fontSize: 18,
+                    overflow: TextOverflow.fade,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class ItemLayananCardList extends StatelessWidget {
+class ItemLayananCardList extends StatefulWidget {
   final Layanan data;
   final int id;
   const ItemLayananCardList({
@@ -582,6 +583,27 @@ class ItemLayananCardList extends StatelessWidget {
     required this.data,
     required this.id,
   });
+
+  @override
+  State<ItemLayananCardList> createState() => _ItemLayananCardListState();
+}
+
+class _ItemLayananCardListState extends State<ItemLayananCardList> {
+  Map<String, dynamic> user = {};
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getDataUser();
+    context.read<WilayahController>().getAllDataProvinces();
+  }
+
+  getDataUser() async {
+    final Map<String, dynamic> data = await AppSession.getUserInformation();
+    setState(() {
+      user = data;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -602,7 +624,7 @@ class ItemLayananCardList extends StatelessWidget {
                   borderRadius: BorderRadius.circular(16),
                   image: DecorationImage(
                     image: NetworkImage(
-                      '${Constant.host}${data.attributes!.gambar!.data!.attributes!.url}',
+                      '${Constant.host}${widget.data.attributes!.gambar!.data!.attributes!.url}',
                     ),
                     fit: BoxFit.cover,
                   ),
@@ -615,12 +637,10 @@ class ItemLayananCardList extends StatelessWidget {
                   children: [
                     TextButtonHovered(
                       onTap: () {
-                        Navigator.pushNamed(
-                          context,
-                          '/layanan/detail/${data.attributes!.slug}',
-                        );
+                        context.go(
+                            '/layanan/detail/${widget.data.attributes!.slug}');
                       },
-                      text: data.attributes!.judul.toString(),
+                      text: widget.data.attributes!.judul.toString(),
                       styleBeforeHovered: AppTheme.blackTextStyle.copyWith(
                         fontWeight: AppTheme.bold,
                         fontSize: 18,
@@ -635,7 +655,7 @@ class ItemLayananCardList extends StatelessWidget {
                       children: [
                         Text(
                           AppMethods.currency(
-                              data.attributes!.harga.toString()),
+                              widget.data.attributes!.harga.toString()),
                           style: AppTheme.primaryTextStyle.copyWith(
                             fontWeight: AppTheme.bold,
                             fontSize: 18,
@@ -645,8 +665,8 @@ class ItemLayananCardList extends StatelessWidget {
                           width: 5,
                         ),
                         Text(
-                          data.attributes!.satuan != null
-                              ? data.attributes!.satuan.toString()
+                          widget.data.attributes!.satuan != null
+                              ? widget.data.attributes!.satuan.toString()
                               : '/ hari',
                           style: AppTheme.greyTextStyle.copyWith(
                             fontWeight: AppTheme.medium,
@@ -660,14 +680,26 @@ class ItemLayananCardList extends StatelessWidget {
                       height: 10,
                     ),
                     Text(
-                      data.attributes!.intro.toString(),
+                      widget.data.attributes!.intro.toString(),
                       style: AppTheme.greyTextStyle.copyWith(
                         fontWeight: AppTheme.medium,
                         height: 1.5,
                       ),
                     ),
                     PrimaryButton(
-                      onTap: () {},
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return Dialog(
+                              child: ModalInformationCart(
+                                  context,
+                                  widget.data.attributes!,
+                                  widget.id.toString()),
+                            );
+                          },
+                        );
+                      },
                       titleButton: 'TAMBAH KE KERANJANG',
                     ),
                     const SizedBox(
@@ -680,6 +712,253 @@ class ItemLayananCardList extends StatelessWidget {
           ),
           Divider(),
         ],
+      ),
+    );
+  }
+
+  Widget ModalInformationCart(
+      BuildContext context, dynamic data, String idProduct) {
+    final controller = context.watch<CartController>();
+    final wilayahController = context.watch<WilayahController>();
+
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.5,
+      padding: const EdgeInsets.all(35),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Container(
+                  width: 200,
+                  height: 180,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    image: DecorationImage(
+                      image: NetworkImage(
+                          '${Constant.host}${data.gambar?.data?.attributes?.url.toString()}'),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 15),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        data.judul.toString(),
+                        style: AppTheme.blackTextStyle.copyWith(
+                          fontSize: 18,
+                          fontWeight: AppTheme.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        data.intro.toString(),
+                        style: AppTheme.greyTextStyle.copyWith(
+                          fontSize: 14,
+                          fontWeight: AppTheme.medium,
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              controller.remover();
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.withOpacity(0.1),
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(6),
+                                  bottomLeft: Radius.circular(6),
+                                ),
+                              ),
+                              child: const Icon(
+                                Icons.remove,
+                                color: AppColors.primaryColor,
+                                size: 19,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            color: Colors.blue.withOpacity(0.1),
+                            child: Text(
+                              controller.itemsCount.toString(),
+                              style: AppTheme.blackTextStyle.copyWith(
+                                fontSize: 13,
+                                fontWeight: AppTheme.medium,
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () {
+                              controller.add();
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.withOpacity(0.1),
+                                borderRadius: const BorderRadius.only(
+                                  topRight: Radius.circular(6),
+                                  bottomRight: Radius.circular(6),
+                                ),
+                              ),
+                              child: const Icon(
+                                Icons.add,
+                                color: AppColors.primaryColor,
+                                size: 19,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Total Harga', style: AppTheme.blackTextStyle),
+                          Text(
+                            AppMethods.currency(
+                                controller.total(data.harga).toString()),
+                            style: AppTheme.primaryTextStyle.copyWith(
+                                fontWeight: AppTheme.bold, fontSize: 18),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+            const SizedBox(height: 10),
+            const SizedBox(
+              height: 10,
+            ),
+            // START PROVINSI
+            DropdownButtonFormField<String>(
+              value: wilayahController.selectedProvince,
+              onChanged: (String? value) {
+                setState(() {
+                  wilayahController.setSelectedProvince(value);
+                  wilayahController.setSelectedCity(null);
+                  wilayahController.setSelectedDistrict(null);
+                });
+                if (wilayahController.selectedProvince!.isNotEmpty) {
+                  wilayahController
+                      .getAllDataCities(wilayahController.selectedProvince!);
+                }
+              },
+              decoration: InputDecoration(
+                hintStyle: AppTheme.greyTextStyle.copyWith(
+                  fontSize: 12,
+                ),
+                isDense: true,
+                border: OutlineInputBorder(
+                  borderSide:
+                      const BorderSide(color: AppColors.greyColor, width: 2),
+                  borderRadius: BorderRadius.circular(7),
+                ),
+              ),
+              items: wilayahController.provinces.map((data) {
+                return DropdownMenuItem<String>(
+                  value: data.attributes!.namaProvinsi,
+                  child: Text(data.attributes!.namaProvinsi.toString()),
+                );
+              }).toList(),
+              hint: Text('Pilih Provinsi', style: AppTheme.greyTextStyle),
+            ),
+            // END PROVINSI
+            const SizedBox(
+              height: 10,
+            ),
+            // START OF KOTAS
+            DropdownButtonFormField<String>(
+              value: wilayahController.selectedCity,
+              onChanged: (String? value) {
+                setState(() {
+                  wilayahController.setSelectedCity(value);
+                  wilayahController.setSelectedDistrict(null);
+                });
+                if (wilayahController.selectedCity!.isNotEmpty) {
+                  wilayahController
+                      .getAllDataKecamatan(wilayahController.selectedCity!);
+                }
+              },
+              decoration: InputDecoration(
+                hintStyle: AppTheme.greyTextStyle.copyWith(
+                  fontSize: 12,
+                ),
+                isDense: true,
+                border: OutlineInputBorder(
+                  borderSide:
+                      const BorderSide(color: AppColors.greyColor, width: 2),
+                  borderRadius: BorderRadius.circular(7),
+                ),
+              ),
+              items: wilayahController
+                  .getCitiesByProvince(wilayahController.selectedProvince ?? "")
+                  .map((city) {
+                return DropdownMenuItem<String>(
+                  value: city.attributes!.namaKota,
+                  child: Text(city.attributes!.namaKota.toString()),
+                );
+              }).toList(),
+              hint: Text('Pilih Kota', style: AppTheme.greyTextStyle),
+            ),
+            // END OF KOTAS
+            const SizedBox(
+              height: 10,
+            ),
+            const SizedBox(
+              height: 12,
+            ),
+            PrimaryButton(
+              onTap: () {
+                if (user['token'] == null &&
+                    user['email'] == null &&
+                    user['id'] == null) {
+                  AppMethods.coolAlertDanger(context,
+                      'Maaf, kamu harus login atau daftar terlebih dahulu');
+                  context.go('/register');
+                } else {
+                  final productItem = {
+                    'user': user,
+                    'product': {
+                      'id': idProduct,
+                      'judul': data.judul,
+                      'harga': data.harga,
+                      'satuan': data.satuan,
+                      'gambar': data.gambar?.data?.attributes?.url,
+                    },
+                    'provinsi': wilayahController.selectedProvince,
+                    'kota': wilayahController.selectedCity,
+                    'item': controller.itemsCount.toString(),
+                    'totalHarga': controller.totalHarga.toString(),
+                  };
+                  controller.addToCart(productItem);
+                  CoolAlert.show(
+                    context: context,
+                    width: MediaQuery.of(context).size.width * 0.3,
+                    type: CoolAlertType.success,
+                    text: 'Product berhasil ditambahkan kedalam keranjang',
+                  );
+                  wilayahController.setSelectedProvince(null);
+                  wilayahController.setSelectedCity(null);
+                }
+              },
+              titleButton: 'Tambahkan Ke Keranjang',
+            ),
+          ],
+        ),
       ),
     );
   }

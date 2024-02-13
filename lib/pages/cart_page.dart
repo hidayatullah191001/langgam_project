@@ -133,7 +133,7 @@ class _CartPageState extends State<CartPage> {
                         const SizedBox(height: 15),
                         PrimaryButton(
                           onTap: () {
-                            Navigator.pushNamed(context, '/layanan');
+                            context.go('/layanan');
                           },
                           titleButton: 'LIHAT SEMUA LAYANAN',
                         )
@@ -196,7 +196,6 @@ class _CartPageState extends State<CartPage> {
                           final productCart = carts[index];
                           return ItemCartProduct(context,
                               data: productCart, index: index);
-                          // return CartItemWidget(data: productCart, index: index);
                         },
                       ),
                       const Divider(),
@@ -294,14 +293,14 @@ class _CartPageState extends State<CartPage> {
                           type: CoolAlertType.error,
                           text:
                               'Maaf, kamu harus login atau daftar terlebih dahulu',
-                        ).then(
-                          (value) => Navigator.pushNamed(
-                            context,
-                            '/register',
-                          ),
-                        );
+                        ).then((value) => context.go('/register'));
                       } else {
-                        Navigator.pushNamed(context, '/cart/checkout');
+                        if (cartController.carts.length > 0) {
+                          context.go('/cart/checkout');
+                        } else {
+                          AppMethods.coolAlertDanger(context,
+                              'Keranjang kamu masih kosong, pilih layanan dahulu');
+                        }
                       }
                     },
                     titleButton: 'LANJUTKAN KE CHECKOUT',

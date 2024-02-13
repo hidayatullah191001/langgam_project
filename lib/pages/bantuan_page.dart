@@ -1,19 +1,19 @@
 part of 'pages.dart';
 
-class DetailBeritaPage extends StatefulWidget {
+class BantuanPage extends StatefulWidget {
   final String slug;
-  const DetailBeritaPage({Key? key, required this.slug}) : super(key: key);
+  const BantuanPage({Key? key, required this.slug}) : super(key: key);
 
   @override
-  State<DetailBeritaPage> createState() => _DetailBeritaPageState();
+  State<BantuanPage> createState() => _BantuanPageState();
 }
 
-class _DetailBeritaPageState extends State<DetailBeritaPage> {
+class _BantuanPageState extends State<BantuanPage> {
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    context.read<BeritaController>().getBeritaBySlug(widget.slug);
+    context.read<BantuanController>().getBantuanBySlug(widget.slug);
   }
 
   @override
@@ -78,31 +78,18 @@ class _DetailBeritaPageState extends State<DetailBeritaPage> {
 
   Widget ContentSection() {
     return FutureBuilder(
-      future: BeritaService.getBeritaBySlug(widget.slug),
+      future: BantuanService.getBantuanBySlug(widget.slug),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Container(
-            height: 200,
-            margin: const EdgeInsets.symmetric(
-              vertical: 100,
-            ),
-            child: Center(child: CircularProgressIndicator()),
-          );
+          return Center(child: CircularProgressIndicator());
         }
 
         if (!snapshot.hasData) {
-          return Container(
-            margin: const EdgeInsets.symmetric(
-              vertical: 100,
-            ),
-            child: Center(
-              child: Text('Tidak bisa mengambil data, coba lagi'),
-            ),
-          );
+          return Center(child: Text('Tidak bisa mengambil data, coba lagi'));
         }
 
         if (snapshot.hasData) {
-          final berita = snapshot.data!.data![0].attributes;
+          final bantuan = snapshot.data!.data![0].attributes;
           return Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 150, vertical: 50),
@@ -110,7 +97,7 @@ class _DetailBeritaPageState extends State<DetailBeritaPage> {
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Center(
                 child: Text(
-                  berita!.judul.toString(),
+                  bantuan!.judul.toString(),
                   style: AppTheme.blackTextStyle.copyWith(
                     fontSize: 18,
                     fontWeight: AppTheme.bold,
@@ -118,14 +105,21 @@ class _DetailBeritaPageState extends State<DetailBeritaPage> {
                 ),
               ),
               const SizedBox(height: 10),
-              berita.gambar!.data != null
+              bantuan.gambar!.data != null
                   ? Image.network(
-                      '${Constant.host}${berita.gambar!.data!.attributes!.url}',
+                      '${Constant.host}${bantuan.gambar!.data!.attributes!.url}',
+                    )
+                  : Container(),
+              const SizedBox(height: 10),
+              bantuan.intro != null
+                  ? Text(
+                      bantuan.intro.toString(),
+                      style: AppTheme.greyTextStyle,
                     )
                   : Container(),
               const SizedBox(height: 20),
               JsonTextWidget(
-                jsonData: berita.konten!,
+                jsonData: bantuan.konten!,
               ),
             ]),
           );
@@ -133,39 +127,11 @@ class _DetailBeritaPageState extends State<DetailBeritaPage> {
         return Container();
       },
     );
-  }
-}
 
-class JsonTextWidget extends StatelessWidget {
-  final List<Konten> jsonData;
+    // if (bantuanController.bantuan == null) {
+    //   return Center(child: CircularProgressIndicator());
+    // } else {
 
-  JsonTextWidget({required this.jsonData});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      shrinkWrap: true,
-      padding: EdgeInsets.zero,
-      itemCount: jsonData.length,
-      itemBuilder: (context, index) {
-        final item = jsonData[index];
-
-        if (item.type == 'heading') {
-          return Text(
-            item.children![0].text!,
-            style: AppTheme.blackTextStyle
-                .copyWith(fontSize: 24, fontWeight: AppTheme.bold),
-          );
-        } else if (item.type == 'paragraph') {
-          return Container(
-            margin: const EdgeInsets.symmetric(vertical: 5),
-            child: Text(
-              item.children![0].text!,
-              style: AppTheme.greyTextStyle,
-            ),
-          );
-        }
-      },
-    );
+    // }
   }
 }

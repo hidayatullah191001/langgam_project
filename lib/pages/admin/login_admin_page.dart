@@ -25,17 +25,24 @@ class LoginAdminPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset(
-                'images/logo.png',
-                width: 50,
-                height: 50,
-                fit: BoxFit.cover,
-              ),
-              Text(
-                'Langgam | Pelayanan Terpadu',
-                style: AppTheme.blackTextStyle.copyWith(
-                  fontWeight: AppTheme.bold,
-                ),
+              InkWell(
+                onTap: () {
+                  context.replace('/');
+                },
+                child: Column(children: [
+                  Image.asset(
+                    'images/logo.png',
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.cover,
+                  ),
+                  Text(
+                    'Langgam | Pelayanan Terpadu',
+                    style: AppTheme.blackTextStyle.copyWith(
+                      fontWeight: AppTheme.bold,
+                    ),
+                  ),
+                ]),
               ),
               const SizedBox(height: 30),
               CustomFormUser(
@@ -73,21 +80,11 @@ class LoginAdminPage extends StatelessWidget {
                       identifier: emailController.text,
                       password: passwordController.text,
                     );
-                    final result = await controller.loginUser(model);
-
-                    if (result == true) {
-                      Navigator.pushNamedAndRemoveUntil(
-                          context, '/admin', (route) => false);
+                    final result = await controller.loginAdmin(model);
+                    if (result['success'] == true) {
+                      context.go('/auth/admin');
                     } else {
-                      CoolAlert.show(
-                          context: context,
-                          width: MediaQuery.of(context).size.width * 0.3,
-                          type: CoolAlertType.error,
-                          text:
-                              'Gagal login, pastikan email dan password benar',
-                          onConfirmBtnTap: () {
-                            Navigator.pop(context);
-                          });
+                      AppMethods.dangerToast(context, result['message']);
                     }
                   }
                 },

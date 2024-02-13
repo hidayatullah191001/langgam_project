@@ -19,7 +19,6 @@ class WilayahController extends ChangeNotifier {
 
   void setSelectedProvince(String? province) {
     _selectedProvince = province;
-    print('dari controller = $_selectedProvince');
     notifyListeners();
   }
 
