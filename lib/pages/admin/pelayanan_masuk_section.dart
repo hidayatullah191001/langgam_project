@@ -59,7 +59,6 @@ class _PelayananMasukSectionState extends State<PelayananMasukSection> {
                   setState(() {
                     _selectedIndex = index;
                     _selectedStatus = status[index];
-                    print(_selectedStatus);
                   });
                 },
                 child: Container(
@@ -197,7 +196,6 @@ class _PelayananMasukSectionState extends State<PelayananMasukSection> {
                   setState(() {
                     _selectedIndex = index;
                     _selectedStatus = status[index];
-                    print(_selectedStatus);
                   });
                 },
                 child: Container(
@@ -349,8 +347,6 @@ class _ItemPesananAdminWidgetState extends State<ItemPesananAdminWidget> {
   Widget build(BuildContext context) {
     final controller = context.watch<AdminController>();
     final permintaanController = context.watch<PermintaanController>();
-
-    print('data widget ${widget.pesananUser.attributes!.nomorPermintaan}');
     return Container(
       padding: const EdgeInsets.all(20),
       margin: const EdgeInsets.all(10),
@@ -515,8 +511,6 @@ class _ItemPesananAdminMobileWidgetState
   Widget build(BuildContext context) {
     final controller = context.watch<AdminController>();
     final permintaanController = context.watch<PermintaanController>();
-
-    print('data widget ${widget.pesananUser.attributes}');
     return Container(
       padding: const EdgeInsets.all(20),
       margin: const EdgeInsets.only(bottom: 10),
@@ -560,10 +554,8 @@ class _ItemPesananAdminMobileWidgetState
               InkWell(
                 onTap: () {
                   controller.pickMenu('Detail Permintaan', 1);
-                  print(widget.pesananUser);
                   permintaanController
                       .setDataPermintaanAdmin(widget.pesananUser);
-                  print('print ${permintaanController.permintaan}');
                 },
                 child: Container(
                   padding:
@@ -610,101 +602,6 @@ class _ItemPesananAdminMobileWidgetState
               ),
             ],
           ),
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //   children: [
-          //     Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          //       Text(
-          //         widget.pesananUser.attributes!.nama.toString(),
-          //         style: AppTheme.blackTextStyle
-          //             .copyWith(fontSize: 18, fontWeight: AppTheme.medium),
-          //       ),
-          //       Text(
-          //         'Dibuat pada ${AppMethods.date(widget.pesananUser.attributes!.createdAt.toString())}',
-          //         style: AppTheme.blackTextStyle.copyWith(fontSize: 12),
-          //       ),
-          //     ]),
-          //     const SizedBox(height: 5),
-          //     Expanded(
-          //       child: Column(
-          //         children: [
-          //           RichText(
-          //             textAlign: TextAlign.center,
-          //             text: TextSpan(
-          //               text:
-          //                   '${widget.pesananUser.attributes!.layanan == null ? '' : widget.pesananUser.attributes!.layanan!.attributes!.judul} ',
-          //               style: AppTheme.primaryTextStyle.copyWith(
-          //                 fontWeight: AppTheme.bold,
-          //               ),
-          //               children: [
-          //                 TextSpan(
-          //                     text:
-          //                         'untuk ${widget.pesananUser.attributes!.kuantitas} item',
-          //                     style: AppTheme.softgreyTextStyle),
-          //               ],
-          //             ),
-          //           ),
-          //           Text(
-          //             '${AppMethods.currency(widget.pesananUser.attributes!.total.toString())}',
-          //             style: AppTheme.primaryTextStyle.copyWith(
-          //               fontWeight: AppTheme.bold,
-          //               fontSize: 18,
-          //             ),
-          //           ),
-          //         ],
-          //       ),
-          //     ),
-          //     const SizedBox(height: 15),
-          //     Row(
-          //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //       children: [
-          //         InkWell(
-          //           onTap: () {
-          //             controller.pickMenu('Detail Permintaan', 1);
-          //             print(widget.pesananUser);
-          //             permintaanController
-          //                 .setDataPermintaanAdmin(widget.pesananUser);
-          //             print('print ${permintaanController.permintaan}');
-          //           },
-          //           child: const CircleAvatar(
-          //             backgroundColor: AppColors.primaryColor,
-          //             radius: 15,
-          //             child: Icon(Icons.remove_red_eye,
-          //                 color: AppColors.whiteColor, size: 17),
-          //           ),
-          //         ),
-          //         const SizedBox(width: 10),
-          //         InkWell(
-          //           onTap: () async {
-          //             CoolAlert.show(
-          //               context: context,
-          //               type: CoolAlertType.warning,
-          //               width: MediaQuery.of(context).size.width * 0.3,
-          //               confirmBtnText: 'Hapus',
-          //               confirmBtnColor: AppColors.dangerColor,
-          //               cancelBtnText: 'Batal',
-          //               showCancelBtn: true,
-          //               text: 'Kamu yakin ingin menghapus data permintaan ini?',
-          //               onConfirmBtnTap: () {
-          //                 deletePermintaan(widget.pesananUser.id.toString());
-          //               },
-          //             ).then((value) {
-          //               context.go('/auth/admin');
-          //               controller.pickMenu('Permintaan Data Masuk', 1);
-          //               // context.go('/auth/admin');
-          //             });
-          //           },
-          //           child: const CircleAvatar(
-          //             radius: 15,
-          //             backgroundColor: AppColors.dangerColor,
-          //             child: Icon(Icons.delete,
-          //                 color: AppColors.whiteColor, size: 17),
-          //           ),
-          //         ),
-          //       ],
-          //     ),
-          //   ],
-          // ),
         ],
       ),
     );

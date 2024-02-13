@@ -145,6 +145,11 @@ class _AppAdminPageState extends State<AppAdminPage> {
                 buildConditionalWidget(
                     controller.selectedMenu == 'Detail Permintaan',
                     const DetailPermintaanSection()),
+                buildConditionalWidget(
+                    controller.selectedMenu == 'Rekap Permintaan',
+                    const RekapPermintaanSection()),
+                buildConditionalWidget(controller.selectedMenu == 'Logbook',
+                    const LogbookSection()),
               ],
             ),
           ),

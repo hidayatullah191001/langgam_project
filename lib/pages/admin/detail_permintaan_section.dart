@@ -788,13 +788,13 @@ class _DetailPermintaanSectionState extends State<DetailPermintaanSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Text(
-          //   'Informasi Pesanan ${dataPermintaan.kodeBilling}',
-          //   style: AppTheme.blackTextStyle.copyWith(
-          //     fontWeight: AppTheme.bold,
-          //     fontSize: 18,
-          //   ),
-          // ),
+          Text(
+            'Informasi Pesanan',
+            style: AppTheme.blackTextStyle.copyWith(
+              fontWeight: AppTheme.bold,
+              fontSize: 18,
+            ),
+          ),
           const SizedBox(height: 10),
           dataPermintaan.kodeBilling != null
               ? ItemDetailPesanan(
@@ -809,18 +809,18 @@ class _DetailPermintaanSectionState extends State<DetailPermintaanSection> {
               title: 'Terakhir diperbaharui',
               data: AppMethods.date(dataPermintaan.updatedAt.toString())
                   .toString()),
-          // ItemDetailPesanan(
-          //     title: 'Layanan',
-          //     data: dataPermintaan.layanan!.attributes!.judul.toString()),
+          ItemDetailPesanan(
+              title: 'Layanan',
+              data: dataPermintaan.layanan!.attributes!.judul.toString()),
           ItemDetailPesanan(
               title: 'Kuantitas', data: dataPermintaan.kuantitas.toString()),
           ItemDetailPesanan(
               title: 'Tipe Pesanan',
               data: dataPermintaan.komersial == true ? 'Komersial' : 'Free'),
-          // ItemDetailPesanan(
-          //     title: 'Harga Satuan',
-          //     data:
-          //         '${AppMethods.currency(dataPermintaan.layanan!.attributes!.harga.toString())} ${dataPermintaan.layanan!.attributes!.satuan}'),
+          ItemDetailPesanan(
+              title: 'Harga Satuan',
+              data:
+                  '${AppMethods.currency(dataPermintaan.layanan!.attributes!.harga.toString())} ${dataPermintaan.layanan!.attributes!.satuan}'),
           ItemDetailPesanan(
               title: 'Total Harga',
               data: AppMethods.currency(dataPermintaan.total.toString())

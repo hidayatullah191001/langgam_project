@@ -38,6 +38,44 @@ class PrimaryButton extends StatelessWidget {
   }
 }
 
+class SuccessButton extends StatelessWidget {
+  final VoidCallback onTap;
+  final String titleButton;
+  double fontSize;
+  SuccessButton({
+    Key? key,
+    required this.onTap,
+    required this.titleButton,
+    this.fontSize = 14,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.successColor,
+      borderRadius: BorderRadius.circular(8),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 18,
+            vertical: 13,
+          ),
+          child: Text(
+            titleButton.toUpperCase(),
+            style: AppTheme.whiteTextStyle.copyWith(
+              fontWeight: AppTheme.medium,
+              fontSize: fontSize,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class SecondaryButton extends StatelessWidget {
   final VoidCallback onTap;
   final String titleButton;
@@ -68,6 +106,44 @@ class SecondaryButton extends StatelessWidget {
               fontWeight: AppTheme.medium,
               fontSize: fontSize,
               color: AppColors.greyColor,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class DangerButton extends StatelessWidget {
+  final VoidCallback onTap;
+  final String titleButton;
+  double fontSize;
+  DangerButton({
+    Key? key,
+    required this.onTap,
+    required this.titleButton,
+    this.fontSize = 14,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.dangerColor,
+      borderRadius: BorderRadius.circular(8),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 18,
+            vertical: 13,
+          ),
+          child: Text(
+            titleButton.toUpperCase(),
+            style: AppTheme.whiteTextStyle.copyWith(
+              fontWeight: AppTheme.medium,
+              fontSize: fontSize,
             ),
             textAlign: TextAlign.center,
           ),

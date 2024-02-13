@@ -22,18 +22,24 @@ class PermintaanService {
 
   static Future<ListPermintaanModelAdmin> getAllPermintaan({int? page}) async {
     final String token = await AppSession.getToken();
-    print(token);
     String filters = "\$eq";
+    Map? responseBody = {};
 
-    Map? responseBody = await APIRequest.gets(
-      '${Constant.apirest}/permintaans?populate=*',
-      headers: {'Authorization': 'Bearer $token'},
-    );
+    if (page != null) {
+      responseBody = await APIRequest.gets(
+        '${Constant.apirest}/permintaans?populate=*&pagination[page]=$page',
+        headers: {'Authorization': 'Bearer $token'},
+      );
+    } else {
+      responseBody = await APIRequest.gets(
+        '${Constant.apirest}/permintaans?populate=*',
+        headers: {'Authorization': 'Bearer $token'},
+      );
+    }
 
     if (responseBody == null) {
       throw "Data kosong";
     } else {
-      print('ini response = $responseBody');
       return ListPermintaanModelAdmin.fromJson(
           responseBody as Map<String, dynamic>);
     }
@@ -104,10 +110,10 @@ class PermintaanService {
 
     String filters = "\$eq";
     Map? responseBody = {};
-    print('page = $page');
+
     if (page != null) {
       responseBody = await APIRequest.gets(
-        '${Constant.apirest}/permintaans?populate=*&filters[status][$filters]=$status&pagination[start]=$page',
+        '${Constant.apirest}/permintaans?populate=*&filters[status][$filters]=$status&pagination[page]=$page',
         headers: {'Authorization': 'Bearer $token'},
       );
     } else {
@@ -148,8 +154,6 @@ class PermintaanService {
 
   static Future<ListPermintaanModelAdmin> getAllNewPermintaan() async {
     final String token = await AppSession.getToken();
-    print(token);
-
     Map? responseBody = await APIRequest.gets(
       '${Constant.apirest}/permintaans?populate=*&sort[0]=createdAt:desc',
       headers: {'Authorization': 'Bearer $token'},
@@ -158,9 +162,46 @@ class PermintaanService {
     if (responseBody == null) {
       throw "Data kosong";
     } else {
-      print('ini response = $responseBody');
       return ListPermintaanModelAdmin.fromJson(
           responseBody as Map<String, dynamic>);
+    }
+  }
+
+  static Future<ListPermintaanModelAdmin> getAllPermintaanByDate(
+      {String? startDate, String? finishDate, int? page}) async {
+    final String token = await AppSession.getToken();
+    // 2024-01-12
+    String gte = "\$gte";
+    String lte = "\$lte";
+    String filters;
+    String pagination;
+
+    if (startDate != null) {
+      filters = "filters[createdAt][$gte]=$startDate";
+    } else if (finishDate != null) {
+      filters = "filters[createdAt][$lte]=$finishDate";
+    } else {
+      filters =
+          "filters[createdAt][$gte]=$startDate&filters[createdAt][$lte]=$finishDate";
+    }
+
+    if (page != null) {
+      pagination = "pagination[page]=$page";
+    } else {
+      pagination = "";
+    }
+
+    Map? responseBody = await APIRequest.gets(
+        '${Constant.apirest}/permintaans?populate=*&$filters&$pagination',
+        headers: {
+          'Authorization': 'Bearer $token',
+        });
+    if (responseBody == null) throw "Data kosong";
+    if (responseBody['data'] != null) {
+      return ListPermintaanModelAdmin.fromJson(
+          responseBody as Map<String, dynamic>);
+    } else {
+      throw Exception();
     }
   }
 }

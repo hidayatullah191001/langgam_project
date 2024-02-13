@@ -148,4 +148,23 @@ class PermintaanController extends ChangeNotifier {
       changeState(DataState.error);
     }
   }
+
+  void getAllPermintaanByDate(String startDate, String finishDate,
+      {int? page}) async {
+    changeState(DataState.loading);
+    try {
+      final data;
+      if (startDate.isNotEmpty || finishDate.isNotEmpty) {
+        data = await PermintaanService.getAllPermintaanByDate(
+            startDate: startDate, finishDate: finishDate, page: page);
+      } else {
+        data = await PermintaanService.getAllPermintaan(page: page);
+      }
+      _permintaan = data;
+
+      changeState(DataState.filled);
+    } catch (e) {
+      changeState(DataState.error);
+    }
+  }
 }

@@ -8,6 +8,8 @@ class CustomFormUser extends StatefulWidget {
   int minLines;
   int maxLines;
   String? hintText;
+  VoidCallback? onTap;
+  TextInputType? keyboardType;
 
   CustomFormUser({
     Key? key,
@@ -18,6 +20,8 @@ class CustomFormUser extends StatefulWidget {
     this.minLines = 1,
     this.maxLines = 1,
     this.hintText,
+    this.onTap,
+    this.keyboardType = TextInputType.text,
   }) : super(key: key);
 
   @override
@@ -56,7 +60,9 @@ class _CustomFormUserState extends State<CustomFormUser> {
           controller: widget.controller,
           obscureText: widget.isObscure ? _isPasswordHidden : false,
           minLines: widget.minLines,
+          onTap: widget.onTap,
           maxLines: widget.maxLines,
+          keyboardType: widget.keyboardType,
           decoration: InputDecoration(
             hintText: widget.hintText,
             hintStyle: AppTheme.greyTextStyle.copyWith(

@@ -35,19 +35,6 @@ class CheckoutController extends ChangeNotifier {
     }
     final cartController = Provider.of<CartController>(context, listen: false);
 
-    // print(namaDepanController.text);
-    // print(namaBelakangController.text);
-    // print(namaPerusahaanController.text);
-    // print(provinsi);
-    // print(kota);
-    // print(kecamatan);
-    // print(alamatJalanController.text);
-    // print(kodePosController.text);
-    // print(teleponController.text);
-    // print(alamatEmailController.text);
-    // print(selectedKeperluan);
-    // print(catatanPesananController.text);
-
     if (namaDepanController.text.isEmpty ||
         namaBelakangController.text.isEmpty ||
         provinsi.isEmpty ||
