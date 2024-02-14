@@ -1,29 +1,30 @@
 part of 'services.dart';
 
 class LayananServices {
-  static Future<List<Layanan>> getAllLayanans(
-      {bool filter = false, String? slugBidangLayanan}) async {
+  static Future<Layanan> getAllLayanans(
+      {bool filter = false, String? slugBidangLayanan, int? page}) async {
     // String token = await AppSession.getToken();
     Map? responseBody = {};
     String filters = "\$eq";
 
     if (filter == false) {
       responseBody = await APIRequest.gets(
-        '${Constant.apirest}/layanans?populate=*',
+        '${Constant.apirest}/layanans?populate=*&pagination[page]=$page',
       );
     } else {
       if (slugBidangLayanan != null) {
         responseBody = await APIRequest.gets(
-          '${Constant.apirest}/layanans?populate=gambar&filters[bidang_layanan][slug][$filters]=$slugBidangLayanan',
+          '${Constant.apirest}/layanans?populate=gambar&filters[bidang_layanan][slug][$filters]=$slugBidangLayanan&pagination[page]=$page',
         );
       }
     }
 
-    if (responseBody == null) return [];
+    if (responseBody == null) throw "Data Kosong";
 
     if (responseBody['data'] != null) {
-      return List<Layanan>.from(
-          responseBody['data'].map((json) => Layanan.fromJson(json))).toList();
+      // return List<Layanan>.from(
+      //     responseBody['data'].map((json) => Layanan.fromJson(json))).toList();
+      return Layanan.fromJson(responseBody as Map<String, dynamic>);
     } else {
       throw Exception();
     }
@@ -35,7 +36,7 @@ class LayananServices {
         '${Constant.apirest}/layanans/$id?populate=*',
       );
       if (responseBody!['data'] != null) {
-        return Layanan.fromJson(responseBody['data']);
+        return Layanan.fromJson(responseBody as Map<String, dynamic>);
       } else {
         throw "Error Get Data";
       }
@@ -51,7 +52,7 @@ class LayananServices {
         '${Constant.apirest}/layanans?populate=*&filters[slug][$filters]=$slug',
       );
       if (responseBody!['data'] != null) {
-        return Layanan.fromJson(responseBody['data'][0]);
+        return Layanan.fromJson(responseBody as Map<String, dynamic>);
       } else {
         throw "Error Get Data";
       }
@@ -60,25 +61,42 @@ class LayananServices {
     }
   }
 
-  static Future<List<Layanan>> getLayananByBidangLayananId(String id) async {
+  static Future<Layanan> getLayananByBidangLayananId(String id) async {
     try {
       String filters = "\$eq";
       Map? responseBody = await APIRequest.gets(
         '${Constant.apirest}/layanans?populate=*&filters[bidang_layanan][id][$filters]=$id',
       );
       if (responseBody!['data'] != null) {
-        return List<Layanan>.from(
-                responseBody['data'].map((json) => Layanan.fromJson(json)))
-            .toList();
+        // return List<Layanan>.from(
+        //         responseBody['data'].map((json) => Layanan.fromJson(json)))
+        //     .toList();
+        return Layanan.fromJson(responseBody as Map<String, dynamic>);
       } else {
-        return [];
+        return throw "Data kosong";
       }
     } catch (e) {
       throw Exception(e);
     }
   }
 
-  static Future<List<BidangLayanan>> getAllBidangLayanans() async {
+  static Future<Layanan> getLayananByValue(String value) async {
+    try {
+      String filters = "\$contains";
+      Map? responseBody = await APIRequest.gets(
+        '${Constant.apirest}/layanans?populate=*&filters[judul][$filters]=$value',
+      );
+      if (responseBody!['data'] != null) {
+        return Layanan.fromJson(responseBody as Map<String, dynamic>);
+      } else {
+        return throw "Data kosong";
+      }
+    } catch (e) {
+      throw Exception(e);
+    }
+  }
+
+  static Future<List<BidangLayanan>> getAllBidangLayanans({int? page}) async {
     // String token = await AppSession.getToken();
     Map? responseBody = await APIRequest.gets(
       '${Constant.apirest}/bidang-layanans?populate=*',

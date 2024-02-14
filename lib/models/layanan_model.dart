@@ -3,15 +3,43 @@ import 'package:langgam_project/models/gambar_model.dart';
 import 'package:langgam_project/models/konten_model.dart';
 
 class Layanan {
-  int? id;
-  Attributes? attributes;
+  List<LayananData>? data;
+  Meta? meta;
 
-  Layanan({this.id, this.attributes});
+  Layanan({this.data, this.meta});
 
   Layanan.fromJson(Map<String, dynamic> json) {
+    if (json['data'] != null) {
+      data = <LayananData>[];
+      json['data'].forEach((v) {
+        data!.add(new LayananData.fromJson(v));
+      });
+    }
+    meta = json['meta'] != null ? new Meta.fromJson(json['meta']) : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    if (this.data != null) {
+      data['data'] = this.data!.map((v) => v.toJson()).toList();
+    }
+    if (this.meta != null) {
+      data['meta'] = this.meta!.toJson();
+    }
+    return data;
+  }
+}
+
+class LayananData {
+  int? id;
+  LayananAttributes? attributes;
+
+  LayananData({this.id, this.attributes});
+
+  LayananData.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     attributes = json['attributes'] != null
-        ? new Attributes.fromJson(json['attributes'])
+        ? new LayananAttributes.fromJson(json['attributes'])
         : null;
   }
 
@@ -25,7 +53,7 @@ class Layanan {
   }
 }
 
-class Attributes {
+class LayananAttributes {
   String? slug;
   String? intro;
   String? createdAt;
@@ -37,7 +65,7 @@ class Attributes {
   Gambar? gambar;
   BidangLayanan? bidangLayanan;
 
-  Attributes({
+  LayananAttributes({
     this.slug,
     this.intro,
     this.createdAt,
@@ -50,7 +78,7 @@ class Attributes {
     this.bidangLayanan,
   });
 
-  Attributes.fromJson(Map<String, dynamic> json) {
+  LayananAttributes.fromJson(Map<String, dynamic> json) {
     slug = json['slug'];
     intro = json['intro'];
     createdAt = json['createdAt'];
@@ -89,6 +117,51 @@ class Attributes {
     if (this.bidangLayanan != null) {
       data['bidang_layanan']['data'] = this.bidangLayanan!.toJson();
     }
+    return data;
+  }
+}
+
+class Meta {
+  Pagination? pagination;
+
+  Meta({this.pagination});
+
+  Meta.fromJson(Map<String, dynamic> json) {
+    pagination = json['pagination'] != null
+        ? new Pagination.fromJson(json['pagination'])
+        : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    if (this.pagination != null) {
+      data['pagination'] = this.pagination!.toJson();
+    }
+    return data;
+  }
+}
+
+class Pagination {
+  int? page;
+  int? pageSize;
+  int? pageCount;
+  int? total;
+
+  Pagination({this.page, this.pageSize, this.pageCount, this.total});
+
+  Pagination.fromJson(Map<String, dynamic> json) {
+    page = json['page'];
+    pageSize = json['pageSize'];
+    pageCount = json['pageCount'];
+    total = json['total'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['page'] = this.page;
+    data['pageSize'] = this.pageSize;
+    data['pageCount'] = this.pageCount;
+    data['total'] = this.total;
     return data;
   }
 }

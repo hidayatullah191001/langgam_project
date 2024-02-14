@@ -1,13 +1,20 @@
 part of 'services.dart';
 
 class BeritaService {
-  static Future<BeritaModel> getAllBerita() async {
+  static Future<BeritaModel> getAllBerita({int? page}) async {
     // String token = await AppSession.getToken();
     String filters = "\$eq";
+    Map? responseBody = {};
 
-    Map? responseBody = await APIRequest.gets(
-      '${Constant.apirest}/posts?populate=*',
-    );
+    if (page == null) {
+      responseBody = await APIRequest.gets(
+        '${Constant.apirest}/posts?populate=*',
+      );
+    } else {
+      responseBody = await APIRequest.gets(
+        '${Constant.apirest}/posts?populate=*&pagination[page]=$page',
+      );
+    }
 
     if (responseBody == null) throw "Data Null";
 

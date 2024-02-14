@@ -57,6 +57,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   @override
   Widget build(BuildContext context) {
+    final searchController = context.watch<PencarianController>();
+
     return Scaffold(
       body: LayoutBuilder(
         builder: (context, BoxConstraints constraints) {
@@ -85,11 +87,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
               slivers: [
                 SliverList(
                   delegate: SliverChildListDelegate([
-                    HeroSectionCart(
-                      heroPosition: 'PEMESANAN',
-                    ),
-                    ContentSection(context),
-                    const Footer(),
+                    !searchController.isSearchBoolean
+                        ? defaultWidget()
+                        : searchWidget(),
                   ]),
                 ),
               ],
@@ -101,6 +101,82 @@ class _CheckoutPageState extends State<CheckoutPage> {
     );
   }
 
+  Widget defaultWidget() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        HeroSectionCart(
+          heroPosition: 'PEMESANAN',
+        ),
+        ContentSection(context),
+        const Footer(),
+      ],
+    );
+  }
+
+  Widget searchWidget() {
+    final searchController = context.watch<PencarianController>();
+    return Container(
+      width: double.infinity,
+      color: AppColors.whiteColor,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 150.0,
+      ),
+      child: FutureBuilder(
+        future: LayananServices.getLayananByValue(searchController.value!),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (!snapshot.hasData) {
+            return Center(
+              child: Text(
+                'Data dengan kueri ${searchController.value} tidak ditemukan',
+              ),
+            );
+          }
+
+          if (snapshot.hasData) {
+            Layanan data = snapshot.data!;
+            if (data.data!.length < 1) {
+              return Center(
+                child: Column(
+                  children: [
+                    Lottie.asset(
+                      'lottie/empty_cart.json',
+                      width: 150,
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Data tidak ditemukan',
+                      style: AppTheme.greyTextStyle.copyWith(
+                        fontSize: 14,
+                        fontWeight: AppTheme.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+            return ListView.builder(
+              padding: EdgeInsets.zero,
+              itemCount: data.data!.length,
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
+                final LayananData layanan = data.data![index];
+                return ItemLayananCardList(
+                  data: layanan,
+                  id: layanan.id!,
+                );
+              },
+            );
+          }
+          return Container();
+        },
+      ),
+    );
+  }
+
   Widget ContentSection(BuildContext context) {
     return Container(
       width: double.infinity,
@@ -109,69 +185,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.start,
-          //   children: [
-          //     Text(
-          //       'Pelanggan lama?',
-          //       style: AppTheme.blackTextStyle.copyWith(
-          //         fontWeight: AppTheme.bold,
-          //       ),
-          //     ),
-          //     const SizedBox(width: 5),
-          //     Text('Klik di sini untuk login',
-          //         style: AppTheme.primaryTextStyle
-          //             .copyWith(fontWeight: AppTheme.bold)),
-          //   ],
-          // ),
-          // const SizedBox(height: 30),
-          // Row(
-          //   children: [
-          //     Text(
-          //       'Surat Permintaan',
-          //       style: AppTheme.blackTextStyle.copyWith(
-          //         fontSize: 18,
-          //         fontWeight: AppTheme.bold,
-          //       ),
-          //     ),
-          //     Text(
-          //       '*',
-          //       style: AppTheme.blackTextStyle.copyWith(
-          //         color: AppColors.dangerColor,
-          //       ),
-          //     )
-          //   ],
-          // ),
-          // const SizedBox(height: 15),
-          // const Divider(),
-          // const SizedBox(height: 15),
-          // Row(
-          //   children: [
-          //     SecondaryButton(
-          //       onTap: () {
-          //         pickAndUploadFile();
-          //       },
-          //       titleButton: 'PILIH & UPLOAD FILE',
-          //     ),
-          //     const SizedBox(width: 15),
-          //     if (_selectedFile != null) ...[
-          //       if (_selectedFileName!.toLowerCase().endsWith('.pdf') ||
-          //           _selectedFileName!.toLowerCase().endsWith('.doc'))
-          //         Text(
-          //           'Nama File: $_selectedFileName',
-          //           style: AppTheme.primaryTextStyle.copyWith(
-          //             fontWeight: AppTheme.medium,
-          //           ),
-          //         )
-          //       else
-          //         Image.memory(_selectedFile!,
-          //             width: 80, height: 80, fit: BoxFit.cover),
-          //     ] else
-          //       Text('Belum ada file dipilih'),
-          //   ],
-          // ),
-          // const SizedBox(height: 15),
-          // const Divider(),
           const SizedBox(height: 30),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,

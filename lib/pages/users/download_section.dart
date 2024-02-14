@@ -41,7 +41,26 @@ class DownloadSection extends StatelessWidget {
         }
         if (snapshot.hasData) {
           ListPermintaanModel model = snapshot.data as ListPermintaanModel;
-
+          if (model.data!.length < 1) {
+            return Center(
+              child: Column(
+                children: [
+                  Lottie.asset(
+                    'lottie/empty_cart.json',
+                    width: 150,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Kamu belum memiliki file unduhan',
+                    style: AppTheme.greyTextStyle.copyWith(
+                      fontSize: 14,
+                      fontWeight: AppTheme.bold,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
           return ListView.builder(
             padding: EdgeInsets.zero,
             shrinkWrap: true,
@@ -95,20 +114,9 @@ class DownloadSection extends StatelessWidget {
                         ],
                       ),
                     ),
-                    // TextButtonHovered(
-                    //   text:
-                    //       '${data.attributes!.dokumenPermintaan!.data!.attributes!.name}',
-                    //   onTap: () {
-
-                    //   },
-                    //   styleHovered: AppTheme.blackTextStyle.copyWith(
-                    //     fontWeight: AppTheme.bold,
-                    //   ),
-                    // ),
                   ],
                 ),
               );
-              // return ItemPesanan(pesananUser: model.data![index]);
             },
           );
         }

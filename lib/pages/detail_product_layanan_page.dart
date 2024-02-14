@@ -34,6 +34,8 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
   @override
   Widget build(BuildContext context) {
     final layananController = context.watch<LayananController>();
+    final searchController = context.watch<PencarianController>();
+
     return Scaffold(
       body: LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
@@ -81,8 +83,9 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                 SliverToBoxAdapter(
                   child: Column(
                     children: [
-                      ContentSection(),
-                      const Footer(),
+                      !searchController.isSearchBoolean
+                          ? defaultWidget()
+                          : searchWidget(),
                     ],
                   ),
                 ),
@@ -92,6 +95,79 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
         }
       }),
       endDrawer: const LoginDrawer(),
+    );
+  }
+
+  Widget defaultWidget() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ContentSection(),
+        const Footer(),
+      ],
+    );
+  }
+
+  Widget searchWidget() {
+    final searchController = context.watch<PencarianController>();
+    return Container(
+      width: double.infinity,
+      color: AppColors.whiteColor,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 150.0,
+      ),
+      child: FutureBuilder(
+        future: LayananServices.getLayananByValue(searchController.value!),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (!snapshot.hasData) {
+            return Center(
+              child: Text(
+                'Data dengan kueri ${searchController.value} tidak ditemukan',
+              ),
+            );
+          }
+
+          if (snapshot.hasData) {
+            Layanan data = snapshot.data!;
+            if (data.data!.length < 1) {
+              return Center(
+                child: Column(
+                  children: [
+                    Lottie.asset(
+                      'lottie/empty_cart.json',
+                      width: 150,
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Data tidak ditemukan',
+                      style: AppTheme.greyTextStyle.copyWith(
+                        fontSize: 14,
+                        fontWeight: AppTheme.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+            return ListView.builder(
+              padding: EdgeInsets.zero,
+              itemCount: data.data!.length,
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
+                final LayananData layanan = data.data![index];
+                return ItemLayananCardList(
+                  data: layanan,
+                  id: layanan.id!,
+                );
+              },
+            );
+          }
+          return Container();
+        },
+      ),
     );
   }
 
@@ -285,12 +361,12 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                             ),
                           ),
                           const SizedBox(width: 15),
-                          Expanded(
-                            child: PrimaryButton(
-                              onTap: () {},
-                              titleButton: 'PESAN SEKARANG',
-                            ),
-                          ),
+                          // Expanded(
+                          //   child: PrimaryButton(
+                          //     onTap: () {},
+                          //     titleButton: 'PESAN SEKARANG',
+                          //   ),
+                          // ),
                         ],
                       ),
                     ],
@@ -579,16 +655,16 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                 }
 
                 if (snapshot.hasData) {
-                  List<Layanan> data = snapshot.data!;
+                  Layanan data = snapshot.data!;
 
                   return ListView.builder(
                     padding: EdgeInsets.zero,
                     physics: NeverScrollableScrollPhysics(),
                     scrollDirection: Axis.horizontal,
                     shrinkWrap: true,
-                    itemCount: 4,
+                    itemCount: data.data!.length >= 4 ? 4 : data.data!.length,
                     itemBuilder: (context, index) {
-                      final layanan = data[index];
+                      final layanan = data.data![index];
                       return Container(
                         width: MediaQuery.of(context).size.width * 0.19,
                         padding: EdgeInsets.only(

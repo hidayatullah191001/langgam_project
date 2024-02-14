@@ -11,9 +11,7 @@ class _NavbarState extends State<Navbar> {
   Map<String, dynamic> user = {};
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    // context.watch<CartController>().getDataCart();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       getDataUser();
     });
@@ -30,6 +28,7 @@ class _NavbarState extends State<Navbar> {
   Widget build(BuildContext context) {
     final controller = context.watch<NavbarController>();
     final cartController = context.watch<CartController>();
+    final searchController = context.watch<PencarianController>();
 
     return Container(
       width: double.infinity,
@@ -75,16 +74,36 @@ class _NavbarState extends State<Navbar> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
                 child: TextFormField(
+                  onChanged: (value) {
+                    searchController.setValueSearch(value);
+                    if (value.length > 0) {
+                      searchController.setSearchBoolean(true);
+                    } else {
+                      searchController.setSearchBoolean(false);
+                      searchController.setValueSearch('');
+                    }
+                  },
                   decoration: InputDecoration(
                     isDense: true,
                     hintText: 'Cari produk',
                     hintStyle: AppTheme.greyTextStyle.copyWith(
                       fontSize: 14,
                     ),
-                    suffixIcon: const Icon(
-                      Icons.search_rounded,
-                      color: AppColors.blackColor,
-                    ),
+                    suffixIcon: searchController.isSearchBoolean
+                        ? InkWell(
+                            onTap: () {
+                              searchController.setSearchBoolean(false);
+                              searchController.setValueSearch('');
+                            },
+                            child: const Icon(
+                              Icons.highlight_remove_rounded,
+                              color: AppColors.blackColor,
+                            ),
+                          )
+                        : const Icon(
+                            Icons.search_rounded,
+                            color: AppColors.blackColor,
+                          ),
                     border: OutlineInputBorder(
                       borderSide: const BorderSide(
                         color: Color(0xffe4e4e4),

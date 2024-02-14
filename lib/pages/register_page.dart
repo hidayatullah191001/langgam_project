@@ -12,6 +12,8 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    final searchController = context.watch<PencarianController>();
+
     return Scaffold(
       body: LayoutBuilder(
         builder: (context, BoxConstraints constraints) {
@@ -54,12 +56,9 @@ class _RegisterPageState extends State<RegisterPage> {
                 SliverToBoxAdapter(
                   child: Column(
                     children: [
-                      HeroSection(
-                        heroTitle: 'AKUN SAYA',
-                        heroPosition: 'RUMAH  ',
-                      ),
-                      ContentSection(context),
-                      const Footer(),
+                      !searchController.isSearchBoolean
+                          ? defaultWidget()
+                          : searchWidget(),
                     ],
                   ),
                 ),
@@ -69,6 +68,83 @@ class _RegisterPageState extends State<RegisterPage> {
         },
       ),
       endDrawer: const LoginDrawer(),
+    );
+  }
+
+  Widget defaultWidget() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        HeroSection(
+          heroTitle: 'AKUN SAYA',
+          heroPosition: 'RUMAH  ',
+        ),
+        ContentSection(context),
+        const Footer(),
+      ],
+    );
+  }
+
+  Widget searchWidget() {
+    final searchController = context.watch<PencarianController>();
+    return Container(
+      width: double.infinity,
+      color: AppColors.whiteColor,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 150.0,
+      ),
+      child: FutureBuilder(
+        future: LayananServices.getLayananByValue(searchController.value!),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (!snapshot.hasData) {
+            return Center(
+              child: Text(
+                'Data dengan kueri ${searchController.value} tidak ditemukan',
+              ),
+            );
+          }
+
+          if (snapshot.hasData) {
+            Layanan data = snapshot.data!;
+            if (data.data!.length < 1) {
+              return Center(
+                child: Column(
+                  children: [
+                    Lottie.asset(
+                      'lottie/empty_cart.json',
+                      width: 150,
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Data tidak ditemukan',
+                      style: AppTheme.greyTextStyle.copyWith(
+                        fontSize: 14,
+                        fontWeight: AppTheme.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+            return ListView.builder(
+              padding: EdgeInsets.zero,
+              itemCount: data.data!.length,
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
+                final LayananData layanan = data.data![index];
+                return ItemLayananCardList(
+                  data: layanan,
+                  id: layanan.id!,
+                );
+              },
+            );
+          }
+          return Container();
+        },
+      ),
     );
   }
 

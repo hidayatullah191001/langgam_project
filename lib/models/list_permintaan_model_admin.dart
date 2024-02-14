@@ -57,165 +57,6 @@ class PermintaanAdminData {
   }
 }
 
-// class PermintaanAdminAttributes {
-//   String? nama;
-//   String? email;
-//   String? telepon;
-//   String? perusahaan;
-//   String? alamat;
-//   String? kecamatan;
-//   String? kota;
-//   String? provinsi;
-//   String? status;
-//   int? kuantitas;
-//   bool? komersial;
-//   String? createdAt;
-//   String? updatedAt;
-//   int? harga;
-//   int? total;
-//   String? kodeBilling;
-//   String? nomorPermintaan;
-//   SuratPermintaan? suratPermintaan;
-//   BillingPembayaran? billingPembayaran;
-//   BuktiPembayaran? buktiPembayaran;
-//   DokumenPermintaan? dokumenPermintaan;
-//   List<Metadata>? metadata;
-//   List<Komentar>? komentar;
-//   CustomerUser? customerUser;
-//   OperatorUser? operatorUser;
-//   Layanan? layanan;
-
-//   PermintaanAdminAttributes(
-//       {this.nama,
-//       this.email,
-//       this.telepon,
-//       this.perusahaan,
-//       this.alamat,
-//       this.kecamatan,
-//       this.kota,
-//       this.provinsi,
-//       this.status,
-//       this.kuantitas,
-//       this.komersial,
-//       this.createdAt,
-//       this.updatedAt,
-//       this.harga,
-//       this.total,
-//       this.kodeBilling,
-//       this.nomorPermintaan,
-//       this.suratPermintaan,
-//       this.billingPembayaran,
-//       this.buktiPembayaran,
-//       this.dokumenPermintaan,
-//       this.metadata,
-//       this.komentar,
-//       // this.customerUser,
-//       // this.operatorUser,
-//       this.layanan});
-
-//   PermintaanAdminAttributes.fromJson(Map<String, dynamic> json) {
-//     nama = json['nama'];
-//     email = json['email'];
-//     telepon = json['telepon'];
-//     perusahaan = json['perusahaan'];
-//     alamat = json['alamat'];
-//     kecamatan = json['kecamatan'];
-//     kota = json['kota'];
-//     provinsi = json['provinsi'];
-//     status = json['status'];
-//     kuantitas = json['kuantitas'];
-//     komersial = json['komersial'];
-//     createdAt = json['createdAt'];
-//     updatedAt = json['updatedAt'];
-//     harga = json['harga'];
-//     total = json['total'];
-//     kodeBilling = json['kode_billing'];
-//     nomorPermintaan = json['nomor_permintaan'];
-//     suratPermintaan = json['surat_permintaan']['data'] != null
-//         ? SuratPermintaan.fromJson(json['surat_permintaan'])
-//         : null;
-//     billingPembayaran = json['billing_pembayaran']['data'] != null
-//         ? BillingPembayaran.fromJson(json['billing_pembayaran'])
-//         : null;
-//     buktiPembayaran = json['bukti_pembayaran']['data'] != null
-//         ? BuktiPembayaran.fromJson(json['bukti_pembayaran'])
-//         : null;
-//     dokumenPermintaan = json['dokumen_permintaan']['data'] != null
-//         ? DokumenPermintaan.fromJson(json['dokumen_permintaan'])
-//         : null;
-//     if (json['metadata'] != null) {
-//       metadata = <Metadata>[];
-//       json['metadata'].forEach((v) {
-//         metadata!.add(new Metadata.fromJson(v));
-//       });
-//     }
-//     if (json['komentar'] != null) {
-//       komentar = <Komentar>[];
-//       json['komentar'].forEach((v) {
-//         komentar!.add(new Komentar.fromJson(v));
-//       });
-//     }
-//     customerUser = json['customer_user']['data'] != null
-//         ? CustomerUser.fromJson(json['customer_user']['data'])
-//         : null;
-//     operatorUser = json['operator_user']['data'] == null
-//         ? null
-//         : OperatorUser.fromJson(json['operator_user']['data']);
-//     layanan = json['layanan']['data'] != null
-//         ? Layanan.fromJson(json['layanan']['data'])
-//         : null;
-//   }
-
-//   Map<String, dynamic> toJson() {
-//     final Map<String, dynamic> data = new Map<String, dynamic>();
-//     data['nama'] = this.nama;
-//     data['email'] = this.email;
-//     data['telepon'] = this.telepon;
-//     data['perusahaan'] = this.perusahaan;
-//     data['alamat'] = this.alamat;
-//     data['kecamatan'] = this.kecamatan;
-//     data['kota'] = this.kota;
-//     data['provinsi'] = this.provinsi;
-//     data['status'] = this.status;
-//     data['kuantitas'] = this.kuantitas;
-//     data['komersial'] = this.komersial;
-//     data['createdAt'] = this.createdAt;
-//     data['updatedAt'] = this.updatedAt;
-//     data['harga'] = this.harga;
-//     data['total'] = this.total;
-//     data['kode_billing'] = this.kodeBilling;
-//     data['nomor_permintaan'] = this.nomorPermintaan;
-//     if (this.suratPermintaan != null) {
-//       data['surat_permintaan'] = this.suratPermintaan!.toJson();
-//     }
-//     if (this.billingPembayaran != null) {
-//       data['billing_pembayaran'] = this.billingPembayaran!.toJson();
-//     }
-//     if (this.buktiPembayaran != null) {
-//       data['bukti_pembayaran'] = this.buktiPembayaran!.toJson();
-//     }
-//     if (this.dokumenPermintaan != null) {
-//       data['dokumen_permintaan'] = this.dokumenPermintaan!.toJson();
-//     }
-//     if (this.metadata != null) {
-//       data['metadata'] = this.metadata!.map((v) => v.toJson()).toList();
-//     }
-//     if (this.komentar != null) {
-//       data['komentar'] = this.komentar!.map((v) => v.toJson()).toList();
-//     }
-//     if (this.customerUser != null) {
-//       data['customer_user'] = this.customerUser!.toJson();
-//     }
-//     if (this.operatorUser != null) {
-//       data['operator_user'] = this.operatorUser!.toJson();
-//     }
-//     if (this.layanan != null) {
-//       data['layanan'] = this.layanan!.toJson();
-//     }
-//     return data;
-//   }
-// }
-
 class PermintaanAdminAttributes {
   String? nama;
   String? email;
@@ -242,7 +83,7 @@ class PermintaanAdminAttributes {
   List<Komentar>? komentar;
   CustomerUser? customerUser;
   OperatorUser? operatorUser;
-  Layanan? layanan;
+  LayananData? layanan;
 
   PermintaanAdminAttributes(
       {this.nama,
@@ -321,7 +162,7 @@ class PermintaanAdminAttributes {
         ? new OperatorUser.fromJson(json['operator_user'])
         : null;
     layanan = json['layanan']['data'] != null
-        ? new Layanan.fromJson(json['layanan']['data'])
+        ? new LayananData.fromJson(json['layanan']['data'])
         : null;
   }
 

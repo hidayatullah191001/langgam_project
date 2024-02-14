@@ -17,8 +17,11 @@ class _ProductLayananPageState extends State<ProductLayananPage> {
     super.initState();
   }
 
+  int selectedPageNumber = 1;
+
   @override
   Widget build(BuildContext context) {
+    final searchController = context.watch<PencarianController>();
     return Scaffold(
       body: LayoutBuilder(
         builder: (context, BoxConstraints constraints) {
@@ -61,11 +64,9 @@ class _ProductLayananPageState extends State<ProductLayananPage> {
                 SliverToBoxAdapter(
                   child: Column(
                     children: [
-                      HeroSection(
-                        heroTitle: title!,
-                      ),
-                      ContentSection(),
-                      const Footer(),
+                      !searchController.isSearchBoolean
+                          ? defaultWidget()
+                          : searchWidget(),
                     ],
                   ),
                 ),
@@ -75,6 +76,83 @@ class _ProductLayananPageState extends State<ProductLayananPage> {
         },
       ),
       endDrawer: const LoginDrawer(),
+    );
+  }
+
+  Widget defaultWidget() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        HeroSection(
+          heroTitle: title!,
+        ),
+        ContentSection(),
+        const Footer(),
+      ],
+    );
+  }
+
+  Widget searchWidget() {
+    final searchController = context.watch<PencarianController>();
+
+    return Container(
+      width: double.infinity,
+      color: AppColors.whiteColor,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 150.0,
+      ),
+      child: FutureBuilder(
+        future: LayananServices.getLayananByValue(searchController.value!),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (!snapshot.hasData) {
+            return Center(
+              child: Text(
+                'Data dengan kueri ${searchController.value} tidak ditemukan',
+              ),
+            );
+          }
+
+          if (snapshot.hasData) {
+            Layanan data = snapshot.data!;
+            if (data.data!.length < 1) {
+              return Center(
+                child: Column(
+                  children: [
+                    Lottie.asset(
+                      'lottie/empty_cart.json',
+                      width: 150,
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Data tidak ditemukan',
+                      style: AppTheme.greyTextStyle.copyWith(
+                        fontSize: 14,
+                        fontWeight: AppTheme.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+            return ListView.builder(
+              padding: EdgeInsets.zero,
+              itemCount: data.data!.length,
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
+                final LayananData layanan = data.data![index];
+                return ItemLayananCardList(
+                  data: layanan,
+                  id: layanan.id!,
+                );
+              },
+            );
+          }
+          return Container();
+        },
+      ),
     );
   }
 
@@ -170,12 +248,13 @@ class _ProductLayananPageState extends State<ProductLayananPage> {
                   //   color: AppColors.greyColor,
                   // ),
                   FutureBuilder(
-                    initialData: [],
                     future: widget.slugBidangLayanan == null
-                        ? LayananServices.getAllLayanans()
+                        ? LayananServices.getAllLayanans(
+                            page: selectedPageNumber)
                         : LayananServices.getAllLayanans(
                             filter: true,
                             slugBidangLayanan: widget.slugBidangLayanan,
+                            page: selectedPageNumber,
                           ),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
@@ -189,18 +268,38 @@ class _ProductLayananPageState extends State<ProductLayananPage> {
                       }
 
                       if (snapshot.hasData) {
-                        List data = snapshot.data as List;
-                        return ListView.builder(
-                          padding: EdgeInsets.zero,
-                          itemCount: data.length,
-                          shrinkWrap: true,
-                          itemBuilder: (context, index) {
-                            final Layanan layanan = data[index];
-                            return ItemLayananCardList(
-                              data: layanan,
-                              id: layanan.id!,
-                            );
-                          },
+                        Layanan data = snapshot.data!;
+                        final meta = snapshot.data!.meta;
+                        return Column(
+                          children: [
+                            ListView.builder(
+                              padding: EdgeInsets.zero,
+                              itemCount: data.data!.length,
+                              shrinkWrap: true,
+                              itemBuilder: (context, index) {
+                                final LayananData layanan = data.data![index];
+                                return ItemLayananCardList(
+                                  data: layanan,
+                                  id: layanan.id!,
+                                );
+                              },
+                            ),
+                            data.data!.length > 0
+                                ? NumberPagination(
+                                    onPageChanged: (int pageNumber) {
+                                      //do somthing for selected page
+                                      setState(() {
+                                        selectedPageNumber = pageNumber;
+                                      });
+                                    },
+                                    pageTotal: meta!.pagination!.pageCount!,
+                                    pageInit:
+                                        selectedPageNumber, // picked number when init page
+                                    colorPrimary: AppColors.primaryColor,
+                                    colorSub: AppColors.backgroundColor3,
+                                  )
+                                : Container(),
+                          ],
                         );
                       }
                       return Container();

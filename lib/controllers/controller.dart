@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'dart:html';
-import 'dart:js_interop';
 
 import 'package:cool_alert/cool_alert.dart';
 import 'package:email_validator/email_validator.dart';
@@ -23,8 +21,7 @@ import 'package:langgam_project/models/list_permintaan_model.dart'
 import 'package:langgam_project/models/list_permintaan_model_admin.dart'
     as listPermintaanModelAdmin;
 import 'package:langgam_project/models/logbook_model.dart';
-import 'package:langgam_project/models/permintaan_model.dart'
-    as permintaanModel;
+
 import 'package:langgam_project/models/provinsi_model.dart';
 import 'package:langgam_project/services/services.dart';
 import 'package:provider/provider.dart';
@@ -41,3 +38,4 @@ part 'permintaan_controller.dart';
 part 'berita_controller.dart';
 part 'bantuan_controller.dart';
 part 'logbook_controller.dart';
+part 'search_controller.dart';

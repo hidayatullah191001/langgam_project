@@ -77,7 +77,7 @@ List<String> menuUser = [
   'Pesanan',
   // 'Messages',
   'Unduhan',
-  'Alamat',
+  // 'Alamat',
   'Detail Akun',
   // 'Attachments',
   'Logout',

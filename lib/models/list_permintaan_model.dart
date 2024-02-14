@@ -83,7 +83,7 @@ class Attributes {
   List<Komentar>? komentar;
   CustomerUser? customerUser;
   OperatorUser? operatorUser;
-  Layanan? layanan;
+  LayananData? layanan;
 
   Attributes(
       {this.nama,
@@ -162,7 +162,7 @@ class Attributes {
         ? new OperatorUser.fromJson(json['operator_user'])
         : null;
     layanan = json['layanan'] != null
-        ? new Layanan.fromJson(json['layanan']['data'])
+        ? new LayananData.fromJson(json['layanan']['data'])
         : null;
   }
 

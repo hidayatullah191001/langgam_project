@@ -21,7 +21,7 @@ import 'package:langgam_project/models/permintaan_all_model.dart';
 import 'package:langgam_project/models/permintaan_model.dart';
 import 'package:langgam_project/models/provinsi_model.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:langgam_project/models/setting_web_model.dart';
 import 'package:langgam_project/models/bantuan_model.dart';
 
 part 'auth_services.dart';
@@ -32,3 +32,4 @@ part 'permintaan_services.dart';
 part 'berita_services.dart';
 part 'bantuan_services.dart';
 part 'logbook_services.dart';
+part 'settings_service.dart';

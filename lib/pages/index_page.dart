@@ -45,9 +45,12 @@ class _IndexPageState extends State<IndexPage> {
     );
   }
 
+  bool isSearchBoolean = false;
+
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<NavbarController>();
+    final searchController = context.watch<PencarianController>();
 
     return Scaffold(
       body: LayoutBuilder(
@@ -91,11 +94,9 @@ class _IndexPageState extends State<IndexPage> {
                 ),
                 SliverList(
                   delegate: SliverChildListDelegate([
-                    OpeningSection(context),
-                    LayananBMKGSection(),
-                    LayananPopulerSection(),
-                    UpdateSection(),
-                    const Footer(),
+                    !searchController.isSearchBoolean
+                        ? defaultWidget()
+                        : searchWidget(),
                   ]),
                 ),
               ],
@@ -103,12 +104,93 @@ class _IndexPageState extends State<IndexPage> {
           }
         },
       ),
-      // endDrawer: controller.selectedDrawer == 'Login'
-      //     ? const LoginDrawer()
-      //     : (controller.selectedDrawer == 'Cart'
-      //         ? const CartDrawer()
-      //         : Container()),
       endDrawer: const LoginDrawer(),
+    );
+  }
+
+  Widget searchWidget() {
+    final searchController = context.watch<PencarianController>();
+    return Container(
+      width: double.infinity,
+      color: AppColors.whiteColor,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 150.0,
+      ),
+      child: FutureBuilder(
+        future: LayananServices.getLayananByValue(searchController.value!),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (!snapshot.hasData) {
+            return Center(
+              child: Text(
+                'Data dengan kueri ${searchController.value} tidak ditemukan',
+              ),
+            );
+          }
+
+          if (snapshot.hasData) {
+            Layanan data = snapshot.data!;
+            if (data.data!.length < 1) {
+              return Center(
+                child: Column(
+                  children: [
+                    Lottie.asset(
+                      'lottie/empty_cart.json',
+                      width: 150,
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Data tidak ditemukan',
+                      style: AppTheme.greyTextStyle.copyWith(
+                        fontSize: 14,
+                        fontWeight: AppTheme.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    PrimaryButton(
+                      onTap: () {
+                        searchController.setSearchBoolean(false);
+                      },
+                      titleButton: "KEMBALI",
+                    )
+                  ],
+                ),
+              );
+            } else {
+              return ListView.builder(
+                padding: EdgeInsets.zero,
+                itemCount: data.data!.length,
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  final LayananData layanan = data.data![index];
+
+                  print(layanan.attributes!.judul);
+                  return ItemLayananCardList(
+                    data: layanan,
+                    id: layanan.id!,
+                  );
+                },
+              );
+            }
+          }
+          return Container();
+        },
+      ),
+    );
+  }
+
+  Widget defaultWidget() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        OpeningSection(context),
+        LayananBMKGSection(),
+        LayananPopulerSection(),
+        UpdateSection(),
+        const Footer(),
+      ],
     );
   }
 
@@ -249,7 +331,7 @@ class _IndexPageState extends State<IndexPage> {
                 ),
                 Expanded(
                   child: FutureBuilder(
-                    future: LayananServices.getAllLayanans(),
+                    future: LayananServices.getAllLayanans(page: 1),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return Center(child: CircularProgressIndicator());
@@ -261,7 +343,7 @@ class _IndexPageState extends State<IndexPage> {
                                 style: AppTheme.blackTextStyle));
                       }
 
-                      List data = snapshot.data as List;
+                      Layanan data = snapshot.data!;
                       return SizedBox(
                         height: 300,
                         child: ListView.builder(
@@ -271,7 +353,7 @@ class _IndexPageState extends State<IndexPage> {
                           itemCount: 5,
                           shrinkWrap: true,
                           itemBuilder: (context, index) {
-                            final Layanan layanan = data[index];
+                            final LayananData layanan = data.data![index];
                             return LayananPopulerCard(
                               data: layanan.attributes,
                               idProduct: layanan.id.toString(),

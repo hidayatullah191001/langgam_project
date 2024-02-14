@@ -5,6 +5,8 @@ class CheckoutFinishPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final searchController = context.watch<PencarianController>();
+
     return Scaffold(
       body: LayoutBuilder(
         builder: (context, BoxConstraints constraints) {
@@ -82,83 +84,7 @@ class CheckoutFinishPage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 30),
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.spaceAround,
-          //   children: [
-          //     Column(
-          //       children: [
-          //         Text('Nomor Pesanan:', style: AppTheme.greyTextStyle),
-          //         const SizedBox(height: 15),
-          //         Text(
-          //           '16533',
-          //           style: AppTheme.blackTextStyle.copyWith(
-          //             fontWeight: AppTheme.bold,
-          //           ),
-          //         ),
-          //       ],
-          //     ),
-          //     Container(
-          //       width: 1,
-          //       height: 80,
-          //       color: AppColors.softgreyColor,
-          //     ),
-          //     Column(children: [
-          //       Text('Tanggal:', style: AppTheme.greyTextStyle),
-          //       const SizedBox(height: 15),
-          //       Text(
-          //         'Januari 24, 2024',
-          //         style: AppTheme.blackTextStyle.copyWith(
-          //           fontWeight: AppTheme.bold,
-          //         ),
-          //       ),
-          //     ]),
-          //     Container(
-          //       width: 1,
-          //       height: 80,
-          //       color: AppColors.softgreyColor,
-          //     ),
-          //     Column(children: [
-          //       Text('Email:', style: AppTheme.greyTextStyle),
-          //       const SizedBox(height: 15),
-          //       Text(
-          //         'dayat@gmail.com',
-          //         style: AppTheme.blackTextStyle.copyWith(
-          //           fontWeight: AppTheme.bold,
-          //         ),
-          //       ),
-          //     ]),
-          //     Container(
-          //       width: 1,
-          //       height: 80,
-          //       color: AppColors.softgreyColor,
-          //     ),
-          //     Column(children: [
-          //       Text('Total:', style: AppTheme.greyTextStyle),
-          //       const SizedBox(height: 15),
-          //       Text(
-          //         'Rp166.500',
-          //         style: AppTheme.blackTextStyle.copyWith(
-          //           fontWeight: AppTheme.bold,
-          //         ),
-          //       ),
-          //     ]),
-          //     Container(
-          //       width: 1,
-          //       height: 80,
-          //       color: AppColors.softgreyColor,
-          //     ),
-          //     Column(children: [
-          //       Text('Metode Pembayaran:', style: AppTheme.greyTextStyle),
-          //       const SizedBox(height: 15),
-          //       Text(
-          //         'Bayar Setelah Disetujui',
-          //         style: AppTheme.blackTextStyle.copyWith(
-          //           fontWeight: AppTheme.bold,
-          //         ),
-          //       ),
-          //     ]),
-          //   ],
-          // ),
+          
           const SizedBox(height: 20),
           Center(
             child: Text(
@@ -170,7 +96,7 @@ class CheckoutFinishPage extends StatelessWidget {
           Center(
             child: PrimaryButton(
               onTap: () {
-                context.replace('/my-account');
+                context.go('/my-account');
                 controller.pickMenu('Pesanan', 1);
               },
               titleButton: 'Lihat Pesanan Saya',

@@ -78,7 +78,7 @@ class CheckoutController extends ChangeNotifier {
             alamat: alamatJalanController.text,
             telepon: teleponController.text,
             perusahaan: namaPerusahaanController.text,
-            provinsi: AppMethods.convertToTitleCase(provinsi),
+            provinsi: provinsi,
             kota: kota,
             kecamatan: kecamatan,
             status: "Menunggu Persetujuan",

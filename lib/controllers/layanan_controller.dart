@@ -1,8 +1,8 @@
 part of 'controller.dart';
 
 class LayananController extends ChangeNotifier {
-  List<Layanan> _layanans = [];
-  List<Layanan> get layanans => _layanans;
+  Layanan? _layanans;
+  Layanan get layanans => _layanans!;
 
   String _title = "SEMUA LAYANAN";
   String get title => _title;
@@ -16,11 +16,11 @@ class LayananController extends ChangeNotifier {
   List<bidang_layanan_model.BidangLayanan> _bidangLayanan = [];
   List<bidang_layanan_model.BidangLayanan> get bidangLayanans => _bidangLayanan;
 
-  Layanan? _layanan;
-  Layanan? get layanan => _layanan;
+  LayananData? _layanan;
+  LayananData? get layanan => _layanan;
 
   void getDataLayanans({String? slug}) async {
-    final List<Layanan> data;
+    final Layanan data;
 
     if (slug != null) {
       data = await LayananServices.getAllLayanans(
@@ -62,18 +62,18 @@ class LayananController extends ChangeNotifier {
 
   void getLayananById(String id) async {
     final Layanan data = await LayananServices.getLayananById(id);
-    _layanan = data;
+    _layanan = data.data![0];
     notifyListeners();
   }
 
   void getLayananBySlug(String slug) async {
     final Layanan data = await LayananServices.getLayananBySlug(slug);
-    _layanan = data;
+    _layanan = data.data![0];
     notifyListeners();
   }
 
-  void setLayananFromApi(Layanan? data) {
-    _layanan = data;
-    notifyListeners();
-  }
+  // void setLayananFromApi(Layanan? data) {
+  //   _layanan = data;
+  //   notifyListeners();
+  // }
 }

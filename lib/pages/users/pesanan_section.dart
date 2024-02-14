@@ -593,19 +593,24 @@ class _DetailPesananSectionState extends State<DetailPesananSection> {
                 },
                 titleButton: 'PILIH & UPLOAD FILE'),
         const SizedBox(height: 30),
-        Row(
-          children: [
-            Text(
-              'Billing Pembayaran',
-              style: AppTheme.blackTextStyle.copyWith(
-                fontSize: 18,
-                fontWeight: AppTheme.bold,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 15),
-        const Divider(),
+        permintaanController
+                    .dataPermintaan.attributes!.billingPembayaran!.data !=
+                null
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Billing Pembayaran',
+                    style: AppTheme.blackTextStyle.copyWith(
+                      fontSize: 18,
+                      fontWeight: AppTheme.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  const Divider(),
+                ],
+              )
+            : Container(),
         permintaanController
                     .dataPermintaan.attributes!.billingPembayaran!.data !=
                 null
@@ -634,39 +639,78 @@ class _DetailPesananSectionState extends State<DetailPesananSection> {
                   ],
                 ),
               )
-            : Text(
-                'Belum ada Billing Pembayaran!',
-                style: AppTheme.blackTextStyle.copyWith(
-                  fontWeight: AppTheme.bold,
-                ),
-              ),
+            : Container(),
         const SizedBox(height: 30),
         permintaanController
                     .dataPermintaan.attributes!.billingPembayaran!.data !=
                 null
-            ? Row(
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Bukti Pembayaran',
+                    'Isi Kuesioner terlebih dahulu',
                     style: AppTheme.blackTextStyle.copyWith(
                       fontSize: 18,
                       fontWeight: AppTheme.bold,
                     ),
                   ),
-                  Text(
-                    '*',
-                    style: AppTheme.blackTextStyle.copyWith(
-                      color: AppColors.dangerColor,
-                    ),
-                  )
+                  const SizedBox(height: 15),
+                  const Divider()
                 ],
               )
             : Container(),
         const SizedBox(height: 15),
-        const Divider(),
-        const SizedBox(height: 15),
         permintaanController
                     .dataPermintaan.attributes!.billingPembayaran!.data !=
+                null
+            ? Row(
+                children: [
+                  PrimaryButton(
+                      onTap: () {
+                        openURLInNewTab(
+                            'https://eskm.bmkg.go.id/survey/437783/0/2/2023-07/2023/0');
+                      },
+                      titleButton: 'Kuesioner e-SKM'),
+                  const SizedBox(width: 10),
+                  PrimaryButton(
+                      onTap: () {
+                        openURLInNewTab('https://forms.gle/LDCdWFMbMVuTwKuEA ');
+                      },
+                      titleButton: 'Kuesioner Survey Persepsi Korupsi'),
+                ],
+              )
+            : Container(),
+        const SizedBox(height: 30),
+        permintaanController
+                    .dataPermintaan.attributes!.billingPembayaran!.data !=
+                null
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        'Bukti Pembayaran',
+                        style: AppTheme.blackTextStyle.copyWith(
+                          fontSize: 18,
+                          fontWeight: AppTheme.bold,
+                        ),
+                      ),
+                      Text(
+                        '*',
+                        style: AppTheme.blackTextStyle.copyWith(
+                          color: AppColors.dangerColor,
+                        ),
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 15),
+                  const Divider(),
+                ],
+              )
+            : Container(),
+        const SizedBox(height: 15),
+        permintaanController.dataPermintaan.attributes!.buktiPembayaran!.data !=
                 null
             ? Row(
                 children: [
@@ -679,90 +723,95 @@ class _DetailPesananSectionState extends State<DetailPesananSection> {
                   InkWell(
                     onTap: () {
                       openURLInNewTab(
-                          '${Constant.host}${permintaanController.dataPermintaan.attributes!.billingPembayaran!.data!.attributes!.url}');
+                          '${Constant.host}${permintaanController.dataPermintaan.attributes!.buktiPembayaran!.data!.attributes!.url}');
                     },
                     child: Text(
                       permintaanController.dataPermintaan.attributes!
-                          .billingPembayaran!.data!.attributes!.name
+                          .buktiPembayaran!.data!.attributes!.name
                           .toString(),
                       style: AppTheme.primaryTextStyle,
                     ),
                   ),
                 ],
               )
-            : SecondaryButton(
-                onTap: () async {
-                  FilePickerResult? result =
-                      await FilePicker.platform.pickFiles(
-                    type: FileType.custom,
-                    allowMultiple: false,
-                    allowedExtensions: [
-                      'pdf',
-                      'doc',
-                      'docx',
-                      'txt',
-                      'jpg',
-                      'png',
-                      'jpeg'
-                    ],
-                  );
-
-                  final resultUploadFile = await CheckoutService.uploadFile(
-                      result!.files.first.bytes,
-                      result.files.first.name,
-                      permintaanController
-                          .dataPermintaan.attributes!.layanan!.id
-                          .toString(),
-                      'bukti_pembayaran');
-
-                  if (resultUploadFile['success'] == true) {
-                    int? idFileUpload = resultUploadFile['idFileUpload'];
-                    final data = {
-                      "data": {
-                        "bukti_pembayaran": idFileUpload,
-                      }
-                    };
-                    final update = await PermintaanService.updatePermintaan(
-                        permintaanController.dataPermintaan.id.toString(),
-                        data);
-                    if (update) {
-                      // ignore: use_build_context_synchronously
-                      CoolAlert.show(
-                        context: context,
-                        width: MediaQuery.of(context).size.width * 0.3,
-                        type: CoolAlertType.success,
-                        text: 'Bukti pembayaran berhasil diupload',
-                      ).then((value) {
-                        Navigator.pushNamedAndRemoveUntil(
-                            context, '/my-account', (route) => false);
-                        accountcontroller.pickMenu('Pesanan', 1);
-                      });
-                    } else {
-                      // ignore: use_build_context_synchronously
-                      CoolAlert.show(
-                        context: context,
-                        width: MediaQuery.of(context).size.width * 0.3,
-                        type: CoolAlertType.error,
-                        text: 'Gagal update permintaan',
+            : permintaanController
+                        .dataPermintaan.attributes!.billingPembayaran!.data !=
+                    null
+                ? SecondaryButton(
+                    onTap: () async {
+                      FilePickerResult? result =
+                          await FilePicker.platform.pickFiles(
+                        type: FileType.custom,
+                        allowMultiple: false,
+                        allowedExtensions: [
+                          'pdf',
+                          'doc',
+                          'docx',
+                          'txt',
+                          'jpg',
+                          'png',
+                          'jpeg'
+                        ],
                       );
-                    }
-                  } else {
-                    // ignore: use_build_context_synchronously
-                    CoolAlert.show(
-                      context: context,
-                      width: MediaQuery.of(context).size.width * 0.3,
-                      type: CoolAlertType.error,
-                      text: 'Ada masalah pada saat upload, coba lagi',
-                    );
-                  }
-                },
-                titleButton: 'PILIH DAN UPLOAD FILE',
-              ),
+
+                      final resultUploadFile = await CheckoutService.uploadFile(
+                          result!.files.first.bytes,
+                          result.files.first.name,
+                          permintaanController
+                              .dataPermintaan.attributes!.layanan!.id
+                              .toString(),
+                          'bukti_pembayaran');
+
+                      if (resultUploadFile['success'] == true) {
+                        int? idFileUpload = resultUploadFile['idFileUpload'];
+                        final data = {
+                          "data": {
+                            "bukti_pembayaran": idFileUpload,
+                          }
+                        };
+                        final update = await PermintaanService.updatePermintaan(
+                            permintaanController.dataPermintaan.id.toString(),
+                            data);
+                        if (update) {
+                          // ignore: use_build_context_synchronously
+                          CoolAlert.show(
+                            context: context,
+                            width: MediaQuery.of(context).size.width * 0.3,
+                            type: CoolAlertType.success,
+                            text: 'Bukti pembayaran berhasil diupload',
+                          ).then((value) {
+                            Navigator.pushNamedAndRemoveUntil(
+                                context, '/my-account', (route) => false);
+                            accountcontroller.pickMenu('Pesanan', 1);
+                          });
+                        } else {
+                          // ignore: use_build_context_synchronously
+                          CoolAlert.show(
+                            context: context,
+                            width: MediaQuery.of(context).size.width * 0.3,
+                            type: CoolAlertType.error,
+                            text: 'Gagal update permintaan',
+                          );
+                        }
+                      } else {
+                        // ignore: use_build_context_synchronously
+                        CoolAlert.show(
+                          context: context,
+                          width: MediaQuery.of(context).size.width * 0.3,
+                          type: CoolAlertType.error,
+                          text: 'Ada masalah pada saat upload, coba lagi',
+                        );
+                      }
+                    },
+                    titleButton: 'PILIH DAN UPLOAD FILE',
+                  )
+                : Container(),
         const SizedBox(height: 30),
         permintaanController
                     .dataPermintaan.attributes!.dokumenPermintaan!.data !=
                 null
-            ? Row(
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'Dokumen Permintaan',
@@ -771,11 +820,11 @@ class _DetailPesananSectionState extends State<DetailPesananSection> {
                       fontWeight: AppTheme.bold,
                     ),
                   ),
+                  const SizedBox(height: 15),
+                  const Divider(),
                 ],
               )
             : Container(),
-        const SizedBox(height: 15),
-        const Divider(),
         permintaanController
                     .dataPermintaan.attributes!.dokumenPermintaan!.data !=
                 null

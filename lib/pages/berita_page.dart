@@ -1,11 +1,18 @@
 part of 'pages.dart';
 
-class BeritaPage extends StatelessWidget {
+class BeritaPage extends StatefulWidget {
   const BeritaPage({Key? key}) : super(key: key);
 
   @override
+  State<BeritaPage> createState() => _BeritaPageState();
+}
+
+class _BeritaPageState extends State<BeritaPage> {
+  int selectedPageNumber = 1;
+  @override
   Widget build(BuildContext context) {
     final controller = context.watch<NavbarController>();
+    final searchController = context.watch<PencarianController>();
 
     return Scaffold(
       body: LayoutBuilder(
@@ -48,8 +55,9 @@ class BeritaPage extends StatelessWidget {
                 ),
                 SliverList(
                   delegate: SliverChildListDelegate([
-                    ContentSection(context),
-                    const Footer(),
+                    !searchController.isSearchBoolean
+                        ? defaultWidget(context)
+                        : searchWidget(context),
                   ]),
                 ),
               ],
@@ -63,6 +71,82 @@ class BeritaPage extends StatelessWidget {
     );
   }
 
+  Widget defaultWidget(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        HeroSection(
+          heroTitle: 'Semua Berita',
+        ),
+        ContentSection(context),
+        const Footer(),
+      ],
+    );
+  }
+
+  Widget searchWidget(BuildContext context) {
+    final searchController = context.watch<PencarianController>();
+    return Container(
+      width: double.infinity,
+      color: AppColors.whiteColor,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 150.0,
+      ),
+      child: FutureBuilder(
+        future: LayananServices.getLayananByValue(searchController.value!),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (!snapshot.hasData) {
+            return Center(
+              child: Text(
+                'Data dengan kueri ${searchController.value} tidak ditemukan',
+              ),
+            );
+          }
+
+          if (snapshot.hasData) {
+            Layanan data = snapshot.data!;
+            if (data.data!.length < 1) {
+              return Center(
+                child: Column(
+                  children: [
+                    Lottie.asset(
+                      'lottie/empty_cart.json',
+                      width: 150,
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Data tidak ditemukan',
+                      style: AppTheme.greyTextStyle.copyWith(
+                        fontSize: 14,
+                        fontWeight: AppTheme.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+            return ListView.builder(
+              padding: EdgeInsets.zero,
+              itemCount: data.data!.length,
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
+                final LayananData layanan = data.data![index];
+                return ItemLayananCardList(
+                  data: layanan,
+                  id: layanan.id!,
+                );
+              },
+            );
+          }
+          return Container();
+        },
+      ),
+    );
+  }
+
   Widget ContentSection(BuildContext context) {
     return Container(
       width: double.infinity,
@@ -71,7 +155,7 @@ class BeritaPage extends StatelessWidget {
         horizontal: 150,
       ),
       child: FutureBuilder(
-        future: BeritaService.getAllBerita(),
+        future: BeritaService.getAllBerita(page: selectedPageNumber),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -84,16 +168,36 @@ class BeritaPage extends StatelessWidget {
 
           if (snapshot.hasData) {
             List<BeritaData> data = snapshot.data!.data!;
-            return ListView.builder(
-              padding: EdgeInsets.zero,
-              itemCount: data.length,
-              shrinkWrap: true,
-              itemBuilder: (context, index) {
-                final BeritaAttributes post = data[index].attributes!;
-                return ItemBerita(
-                  data: post,
-                );
-              },
+            final meta = snapshot.data!.meta!;
+            return Column(
+              children: [
+                ListView.builder(
+                  padding: EdgeInsets.zero,
+                  itemCount: data.length,
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) {
+                    final BeritaAttributes post = data[index].attributes!;
+                    return ItemBerita(
+                      data: post,
+                    );
+                  },
+                ),
+                data.length > 0
+                    ? NumberPagination(
+                        onPageChanged: (int pageNumber) {
+                          //do somthing for selected page
+                          setState(() {
+                            selectedPageNumber = pageNumber;
+                          });
+                        },
+                        pageTotal: meta!.pagination!.pageCount!,
+                        pageInit:
+                            selectedPageNumber, // picked number when init page
+                        colorPrimary: AppColors.primaryColor,
+                        colorSub: AppColors.backgroundColor3,
+                      )
+                    : Container(),
+              ],
             );
           }
           return Container();

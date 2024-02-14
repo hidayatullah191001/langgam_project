@@ -412,17 +412,29 @@ class _DetailPermintaanSectionState extends State<DetailPermintaanSection> {
                   .permintaanAdmin.attributes!.kodeBilling
                   .toString();
               final Map user = await AppSession.getUserInformation();
-              final data = {
-                "data": {
-                  "operator_user": user['id'],
-                  "kode_billing": permintaanController
-                          .nomorBillingController.text.isNotEmpty
-                      ? permintaanController.nomorBillingController.text
-                      : billing,
-                  "status": permintaanController.selectedStatus ??
-                      permintaanController.permintaanAdmin.attributes!.status,
-                },
-              };
+              Map<String, dynamic>? data = {};
+              if (permintaanController.nomorBillingController.text.isEmpty) {
+                data = {
+                  "data": {
+                    "operator_user": user['id'],
+                    "status": permintaanController.selectedStatus ??
+                        permintaanController.permintaanAdmin.attributes!.status,
+                  },
+                };
+              } else {
+                data = {
+                  "data": {
+                    "operator_user": user['id'],
+                    "kode_billing": permintaanController
+                            .nomorBillingController.text.isNotEmpty
+                        ? permintaanController.nomorBillingController.text
+                        : billing,
+                    "status": permintaanController.selectedStatus ??
+                        permintaanController.permintaanAdmin.attributes!.status,
+                  },
+                };
+              }
+
               final result = await PermintaanService.updatePermintaan(
                   permintaanController.permintaanAdmin.id.toString(), data);
               if (result == true) {
@@ -431,16 +443,14 @@ class _DetailPermintaanSectionState extends State<DetailPermintaanSection> {
                     context, 'Data permintaan berhasil diperbaharui');
 
                 adminController.pickMenu('Permintaan Data Masuk', 1);
+                permintaanController.nomorBillingController.text = '';
               } else {
                 // ignore: use_build_context_synchronously
                 CoolAlert.show(
-                        context: context,
-                        type: CoolAlertType.error,
-                        width: MediaQuery.of(context).size.width * 0.3,
-                        text: "Gagal menghapus data, coba lagi!")
-                    .then(
-                  (value) => Navigator.pop(context),
-                );
+                    context: context,
+                    type: CoolAlertType.error,
+                    width: MediaQuery.of(context).size.width * 0.3,
+                    text: "Gagal mengupdate data, coba lagi");
               }
             },
             titleButton: 'Perbarui Data',

@@ -113,7 +113,7 @@ class _LayananCardState extends State<LayananCard> {
 }
 
 class LayananPopulerCard extends StatefulWidget {
-  final layanan.Attributes? data;
+  final LayananAttributes? data;
   final String idProduct;
   const LayananPopulerCard(
       {Key? key, required this.data, required this.idProduct})
@@ -576,7 +576,7 @@ class UpdateCard extends StatelessWidget {
 }
 
 class ItemLayananCardList extends StatefulWidget {
-  final Layanan data;
+  final LayananData data;
   final int id;
   const ItemLayananCardList({
     super.key,
