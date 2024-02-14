@@ -302,10 +302,11 @@ class _IndexPageState extends State<IndexPage> {
               height: 20,
             ),
             PrimaryButton(
-                onTap: () {
-                  context.go('/layanan');
-                },
-                titleButton: 'SELENGKAPNYA'),
+              onTap: () {
+                context.go('/layanan');
+              },
+              titleButton: 'SELENGKAPNYA',
+            ),
           ],
         ),
       ),
@@ -331,7 +332,13 @@ class _IndexPageState extends State<IndexPage> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: YoutubePlayer(
-                controller: controlleryt,
+                controller: YoutubePlayerController.fromVideoId(
+                  videoId: 'Ib0YvZmOh8s',
+                  autoPlay: false,
+                  params: const YoutubePlayerParams(
+                    showFullscreenButton: true,
+                  ),
+                ),
                 aspectRatio: 16 / 9,
               ),
             ),

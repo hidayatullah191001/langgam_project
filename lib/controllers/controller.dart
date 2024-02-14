@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:html';
 import 'dart:js_interop';
 
 import 'package:cool_alert/cool_alert.dart';
@@ -10,6 +11,7 @@ import 'package:langgam_project/models/bantuan_model.dart';
 import 'package:langgam_project/models/berita_model.dart';
 import 'package:langgam_project/models/bidang_layanan_model.dart'
     as bidang_layanan_model;
+import 'package:langgam_project/models/forms/logbook_form_model.dart';
 import 'package:langgam_project/models/forms/permintaan_form_model.dart';
 import 'package:langgam_project/models/forms/sign_in_form_model.dart';
 import 'package:langgam_project/models/forms/sign_up_form_model.dart';
@@ -20,6 +22,7 @@ import 'package:langgam_project/models/list_permintaan_model.dart'
     as listPermintaanModel;
 import 'package:langgam_project/models/list_permintaan_model_admin.dart'
     as listPermintaanModelAdmin;
+import 'package:langgam_project/models/logbook_model.dart';
 import 'package:langgam_project/models/permintaan_model.dart'
     as permintaanModel;
 import 'package:langgam_project/models/provinsi_model.dart';
@@ -37,3 +40,4 @@ part 'checkout_controller.dart';
 part 'permintaan_controller.dart';
 part 'berita_controller.dart';
 part 'bantuan_controller.dart';
+part 'logbook_controller.dart';

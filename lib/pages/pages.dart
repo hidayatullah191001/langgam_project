@@ -24,6 +24,7 @@ import 'package:langgam_project/models/layanan_model.dart';
 import 'package:langgam_project/models/list_permintaan_model.dart';
 import 'package:langgam_project/models/list_permintaan_model_admin.dart'
     as listPermintaanModelAdmin;
+import 'package:langgam_project/models/logbook_model.dart';
 import 'package:langgam_project/services/services.dart';
 import 'package:langgam_project/widgets/widgets.dart';
 import 'package:lottie/lottie.dart';

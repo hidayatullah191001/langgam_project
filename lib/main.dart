@@ -23,6 +23,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => PermintaanController()),
         ChangeNotifierProvider(create: (_) => BeritaController()),
         ChangeNotifierProvider(create: (_) => BantuanController()),
+        ChangeNotifierProvider(create: (_) => LogbookController()),
       ],
       child: MyApp(),
     ),
