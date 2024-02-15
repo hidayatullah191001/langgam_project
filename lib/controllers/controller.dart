@@ -23,6 +23,7 @@ import 'package:langgam_project/models/list_permintaan_model_admin.dart'
 import 'package:langgam_project/models/logbook_model.dart';
 
 import 'package:langgam_project/models/provinsi_model.dart';
+import 'package:langgam_project/models/setting_web_model.dart';
 import 'package:langgam_project/services/services.dart';
 import 'package:provider/provider.dart';
 
@@ -39,3 +40,4 @@ part 'berita_controller.dart';
 part 'bantuan_controller.dart';
 part 'logbook_controller.dart';
 part 'search_controller.dart';
+part 'setting_controller.dart';

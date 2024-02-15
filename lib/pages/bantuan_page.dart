@@ -53,7 +53,7 @@ class _BantuanPageState extends State<BantuanPage> {
                     const BannerTop(),
                   ]),
                 ),
-                const SliverAppBar(
+                SliverAppBar(
                   pinned: true,
                   floating: false,
                   collapsedHeight: 101.0,

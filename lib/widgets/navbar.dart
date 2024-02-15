@@ -1,7 +1,8 @@
 part of 'widgets.dart';
 
 class Navbar extends StatefulWidget {
-  const Navbar({Key? key}) : super(key: key);
+  bool? isMobile;
+  Navbar({Key? key, this.isMobile = false}) : super(key: key);
 
   @override
   State<Navbar> createState() => _NavbarState();
@@ -37,7 +38,9 @@ class _NavbarState extends State<Navbar> {
         color: AppColors.whiteColor,
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 150),
+        padding: widget.isMobile!
+            ? const EdgeInsets.symmetric(horizontal: 20)
+            : const EdgeInsets.symmetric(horizontal: 150),
         child: Row(
           children: [
             InkWell(
@@ -58,14 +61,18 @@ class _NavbarState extends State<Navbar> {
                       ),
                     ),
                   ),
-                  const SizedBox(
-                    width: 24,
-                  ),
-                  Text(
-                    'LANGGAM',
-                    style: AppTheme.greyTextStyle
-                        .copyWith(fontSize: 18, fontWeight: AppTheme.bold),
-                  ),
+                  !widget.isMobile!
+                      ? SizedBox(
+                          width: 24,
+                        )
+                      : Container(),
+                  !widget.isMobile!
+                      ? Text(
+                          'LANGGAM',
+                          style: AppTheme.greyTextStyle.copyWith(
+                              fontSize: 18, fontWeight: AppTheme.bold),
+                        )
+                      : Container(),
                 ],
               ),
             ),
@@ -116,115 +123,154 @@ class _NavbarState extends State<Navbar> {
                 ),
               ),
             ),
-            Row(
-              children: [
-                ItemNavBar(
-                  title: 'LAYANAN',
-                  onHover: (event) {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return Dialog(
-                          alignment: const Alignment(0.63, -0.55),
-                          child: ModalLayanan(context),
-                        );
-                      },
-                    );
-                  },
-                ),
-                Container(
-                  width: 1,
-                  height: 16,
-                  decoration: const BoxDecoration(
-                    color: Color(0xffe4e4e4),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    context.go('/berita');
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Row(
-                      children: [
-                        Text(
-                          'BERITA',
-                          style: AppTheme.secondaryTextStyle.copyWith(
-                            fontWeight: AppTheme.semiBold,
+            !widget.isMobile!
+                ? Row(
+                    children: [
+                      ItemNavBar(
+                        title: 'LAYANAN',
+                        onHover: (event) {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Dialog(
+                                alignment: const Alignment(0.63, -0.55),
+                                child: ModalLayanan(context),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                      Container(
+                        width: 1,
+                        height: 16,
+                        decoration: const BoxDecoration(
+                          color: Color(0xffe4e4e4),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          context.go('/berita');
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: Row(
+                            children: [
+                              Text(
+                                'BERITA',
+                                style: AppTheme.secondaryTextStyle.copyWith(
+                                  fontWeight: AppTheme.semiBold,
+                                ),
+                              ),
+                              const Icon(
+                                Icons.keyboard_arrow_down_rounded,
+                                color: Color(0xffe4e4e4),
+                                size: 16,
+                              ),
+                            ],
                           ),
                         ),
-                        const Icon(
-                          Icons.keyboard_arrow_down_rounded,
+                      ),
+                      Container(
+                        width: 1,
+                        height: 16,
+                        decoration: const BoxDecoration(
                           color: Color(0xffe4e4e4),
-                          size: 16,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Container(
-                  width: 1,
-                  height: 16,
-                  decoration: const BoxDecoration(
-                    color: Color(0xffe4e4e4),
-                  ),
-                ),
-                ItemNavBar(
-                  title: 'BANTUAN',
-                  onHover: (event) {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return Dialog(
-                          alignment: const Alignment(0.8, -0.55),
-                          child: ModalBantuan(context),
-                        );
-                      },
-                    );
-                  },
-                ),
-                Container(
-                  width: 1,
-                  height: 16,
-                  decoration: const BoxDecoration(
-                    color: Color(0xffe4e4e4),
-                  ),
-                ),
-                Stack(
-                  children: [
-                    Positioned(
-                      top: 0,
-                      left: 20,
-                      child: CircleAvatar(
-                        backgroundColor: AppColors.primaryColor,
-                        radius: 8,
-                        child: Text(
-                          cartController.carts
-                              .where((cart) =>
-                                  cart['user']['id'] == user['id'] &&
-                                  cart['user']['email'] == user['email'])
-                              .length
-                              .toString(),
-                          style: AppTheme.whiteTextStyle.copyWith(fontSize: 10),
                         ),
                       ),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        // Scaffold.of(context).openEndDrawer();
-                        // controller.pickDrawer('Cart');
-                        context.go('/cart');
-                        // Navigator.pushNamed(context, '/cart');
-                      },
-                      icon: const Icon(
-                        Icons.shopping_cart_outlined,
-                        size: 20,
+                      ItemNavBar(
+                        title: 'BANTUAN',
+                        onHover: (event) {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Dialog(
+                                alignment: const Alignment(0.8, -0.55),
+                                child: ModalBantuan(context),
+                              );
+                            },
+                          );
+                        },
                       ),
-                    ),
-                  ],
-                )
-              ],
-            ),
+                      Container(
+                        width: 1,
+                        height: 16,
+                        decoration: const BoxDecoration(
+                          color: Color(0xffe4e4e4),
+                        ),
+                      ),
+                      Stack(
+                        children: [
+                          Positioned(
+                            top: 0,
+                            left: 20,
+                            child: CircleAvatar(
+                              backgroundColor: AppColors.primaryColor,
+                              radius: 8,
+                              child: Text(
+                                cartController.carts
+                                    .where((cart) =>
+                                        cart['user']['id'] == user['id'] &&
+                                        cart['user']['email'] == user['email'])
+                                    .length
+                                    .toString(),
+                                style: AppTheme.whiteTextStyle
+                                    .copyWith(fontSize: 10),
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              // Scaffold.of(context).openEndDrawer();
+                              // controller.pickDrawer('Cart');
+                              context.go('/cart');
+                              // Navigator.pushNamed(context, '/cart');
+                            },
+                            icon: const Icon(
+                              Icons.shopping_cart_outlined,
+                              size: 20,
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  )
+                : Container(),
+            widget.isMobile!
+                ? Stack(
+                    children: [
+                      Positioned(
+                        top: 0,
+                        left: 20,
+                        child: CircleAvatar(
+                          backgroundColor: AppColors.primaryColor,
+                          radius: 8,
+                          child: Text(
+                            cartController.carts
+                                .where((cart) =>
+                                    cart['user']['id'] == user['id'] &&
+                                    cart['user']['email'] == user['email'])
+                                .length
+                                .toString(),
+                            style:
+                                AppTheme.whiteTextStyle.copyWith(fontSize: 10),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          // Scaffold.of(context).openEndDrawer();
+                          // controller.pickDrawer('Cart');
+                          context.go('/cart');
+                          // Navigator.pushNamed(context, '/cart');
+                        },
+                        icon: const Icon(
+                          Icons.shopping_cart_outlined,
+                          size: 20,
+                        ),
+                      ),
+                    ],
+                  )
+                : Container(),
           ],
         ),
       ),

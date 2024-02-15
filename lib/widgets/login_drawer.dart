@@ -8,16 +8,8 @@ class LoginDrawer extends StatefulWidget {
 }
 
 class _LoginDrawerState extends State<LoginDrawer> {
-  bool _isPasswordHidden = true;
-
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-
-  void _togglePasswordVisibility() {
-    setState(() {
-      _isPasswordHidden = !_isPasswordHidden;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -120,6 +112,7 @@ class _LoginDrawerState extends State<LoginDrawer> {
                           final result = await controller.loginUser(model);
 
                           if (result['success'] == true) {
+                            // ignore: use_build_context_synchronously
                             context.pushReplacement('/');
                           } else {
                             // CoolAlert.show(

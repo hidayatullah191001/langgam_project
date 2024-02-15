@@ -2,7 +2,7 @@ class Kota {
   int? id;
   Attributes? attributes;
 
-  Kota({this.id, this.attributes});
+  Kota({id, attributes});
 
   Kota.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -13,9 +13,9 @@ class Kota {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    if (this.attributes != null) {
-      data['attributes'] = this.attributes!.toJson();
+    data['id'] = id;
+    if (attributes != null) {
+      data['attributes'] = attributes!.toJson();
     }
     return data;
   }
@@ -26,7 +26,7 @@ class Attributes {
   String? namaKota;
   String? namaProvinsi;
 
-  Attributes({this.kodeWilayah, this.namaKota, this.namaProvinsi});
+  Attributes({kodeWilayah, namaKota, namaProvinsi});
 
   Attributes.fromJson(Map<String, dynamic> json) {
     kodeWilayah = json['kode_wilayah'];
@@ -36,9 +36,9 @@ class Attributes {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['kode_wilayah'] = this.kodeWilayah;
-    data['nama_kota'] = this.namaKota;
-    data['nama_provinsi'] = this.namaProvinsi;
+    data['kode_wilayah'] = kodeWilayah;
+    data['nama_kota'] = namaKota;
+    data['nama_provinsi'] = namaProvinsi;
     return data;
   }
 }

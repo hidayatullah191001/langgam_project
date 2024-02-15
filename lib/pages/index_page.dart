@@ -14,17 +14,8 @@ class _IndexPageState extends State<IndexPage> {
 
   @override
   void initState() {
-    controlleryt = YoutubePlayerController.fromVideoId(
-      videoId: 'Ib0YvZmOh8s',
-      autoPlay: false,
-      params: const YoutubePlayerParams(
-        showFullscreenButton: true,
-      ),
-    );
-    // final Map data = await AppSession.getUserInformation();
-    // print(data['email']);
-    setState(() {});
     super.initState();
+    context.read<SettingController>().getSettingWeb();
   }
 
   void _scrollToNext() {
@@ -52,58 +43,85 @@ class _IndexPageState extends State<IndexPage> {
     final controller = context.watch<NavbarController>();
     final searchController = context.watch<PencarianController>();
 
+    return LayoutBuilder(builder: (context, BoxConstraints constraints) {
+      if (constraints.maxWidth < 1200) {
+        return MobileView(searchController, context);
+      } else {
+        return WebView(searchController);
+      }
+    });
+  }
+
+  Widget MobileView(
+      PencarianController searchController, BuildContext context) {
     return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, BoxConstraints constraints) {
-          if (constraints.maxWidth <= 1200) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Lottie.asset('lottie/maintenance.json'),
-                      Text(
-                        'Saat ini hanya tersedia untuk Website. Gunakan laptop untuk membuka',
-                        style: AppTheme.blackTextStyle.copyWith(
-                          fontSize: 18,
-                          fontWeight: AppTheme.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ]),
-              ),
-            );
-          } else {
-            return CustomScrollView(
-              cacheExtent: 5000,
-              slivers: [
-                SliverList(
-                  delegate: SliverChildListDelegate([
-                    const BannerTop(),
-                  ]),
-                ),
-                const SliverAppBar(
-                  pinned: true,
-                  floating: false,
-                  collapsedHeight: 101.0,
-                  automaticallyImplyLeading: false,
-                  flexibleSpace: Navbar(),
-                  actions: [SizedBox()],
-                ),
-                SliverList(
-                  delegate: SliverChildListDelegate([
-                    !searchController.isSearchBoolean
-                        ? defaultWidget()
-                        : searchWidget(),
-                  ]),
-                ),
-              ],
-            );
-          }
-        },
+      drawerEnableOpenDragGesture: false,
+      endDrawerEnableOpenDragGesture: false,
+      appBar: AppBar(
+        title: BannerTopMobile(),
+        backgroundColor: AppColors.primaryColor,
+        actions: [
+          Container(),
+        ],
+        automaticallyImplyLeading: false,
       ),
+      body: Consumer(builder: (context, SettingController controller, widget) {
+        if (controller.dataState == DataState.loading) {
+          return const Center(child: CircularProgressIndicator());
+        } else {
+          return SafeArea(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Navbar(
+                    isMobile: true,
+                  ),
+                  !searchController.isSearchBoolean
+                      ? defaultWidgetMobile()
+                      : searchWidgetMobile(),
+                ],
+              ),
+            ),
+          );
+        }
+      }),
+      endDrawer: const LoginDrawer(),
+    );
+  }
+
+  Widget WebView(PencarianController searchController) {
+    return Scaffold(
+      body: Consumer(builder: (context, SettingController controller, widget) {
+        if (controller.dataState == DataState.loading) {
+          return const Center(child: CircularProgressIndicator());
+        } else {
+          return CustomScrollView(
+            cacheExtent: 5000,
+            slivers: [
+              SliverList(
+                delegate: SliverChildListDelegate([
+                  const BannerTop(),
+                ]),
+              ),
+              SliverAppBar(
+                pinned: true,
+                floating: false,
+                collapsedHeight: 101.0,
+                automaticallyImplyLeading: false,
+                flexibleSpace: Navbar(),
+                actions: [SizedBox()],
+              ),
+              SliverList(
+                delegate: SliverChildListDelegate([
+                  !searchController.isSearchBoolean
+                      ? defaultWidget()
+                      : searchWidget(),
+                ]),
+              ),
+            ],
+          );
+        }
+      }),
       endDrawer: const LoginDrawer(),
     );
   }
@@ -113,7 +131,7 @@ class _IndexPageState extends State<IndexPage> {
     return Container(
       width: double.infinity,
       color: AppColors.whiteColor,
-      padding: const EdgeInsets.symmetric(
+      padding: EdgeInsets.symmetric(
         horizontal: 150.0,
       ),
       child: FutureBuilder(
@@ -181,7 +199,93 @@ class _IndexPageState extends State<IndexPage> {
     );
   }
 
-  Widget defaultWidget() {
+  Widget searchWidgetMobile() {
+    final searchController = context.watch<PencarianController>();
+    return Container(
+      width: double.infinity,
+      color: AppColors.whiteColor,
+      padding: EdgeInsets.symmetric(
+        horizontal: 10,
+      ),
+      child: FutureBuilder(
+        future: LayananServices.getLayananByValue(searchController.value!),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (!snapshot.hasData) {
+            return Center(
+              child: Text(
+                'Data dengan kueri ${searchController.value} tidak ditemukan',
+              ),
+            );
+          }
+
+          if (snapshot.hasData) {
+            Layanan data = snapshot.data!;
+            if (data.data!.length < 1) {
+              return Center(
+                child: Column(
+                  children: [
+                    Lottie.asset(
+                      'lottie/empty_cart.json',
+                      width: 150,
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Data tidak ditemukan',
+                      style: AppTheme.greyTextStyle.copyWith(
+                        fontSize: 14,
+                        fontWeight: AppTheme.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    PrimaryButton(
+                      onTap: () {
+                        searchController.setSearchBoolean(false);
+                      },
+                      titleButton: "KEMBALI",
+                    )
+                  ],
+                ),
+              );
+            } else {
+              return ListView.builder(
+                padding: EdgeInsets.zero,
+                itemCount: data.data!.length,
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  final LayananData layanan = data.data![index];
+
+                  print(layanan.attributes!.judul);
+                  return ItemLayananCardList(
+                    data: layanan,
+                    id: layanan.id!,
+                  );
+                },
+              );
+            }
+          }
+          return Container();
+        },
+      ),
+    );
+  }
+
+  Widget defaultWidgetMobile() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        OpeningSectionMobile(context),
+        LayananBMKGSectionMobile(),
+        LayananPopulerSectionMobile(),
+        UpdateSectionMobile(),
+        const FooterMobile(),
+      ],
+    );
+  }
+
+  Widget defaultWidget({bool isMobile = false}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -396,6 +500,10 @@ class _IndexPageState extends State<IndexPage> {
   }
 
   Widget OpeningSection(BuildContext context) {
+    final settingController = context.watch<SettingController>();
+    final setting = settingController.setting.data!.attributes!;
+    final idYoutube = YoutubePlayerController.convertUrlToId(
+        setting.homepageJumbotronVideoUrl.toString());
     return Container(
       width: double.infinity,
       color: AppColors.backgroundColor,
@@ -415,7 +523,7 @@ class _IndexPageState extends State<IndexPage> {
               ),
               child: YoutubePlayer(
                 controller: YoutubePlayerController.fromVideoId(
-                  videoId: 'Ib0YvZmOh8s',
+                  videoId: idYoutube!,
                   autoPlay: false,
                   params: const YoutubePlayerParams(
                     showFullscreenButton: true,
@@ -433,7 +541,7 @@ class _IndexPageState extends State<IndexPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Text(
-                    'LANGGAM',
+                    setting.homepageJumbotronJudulUtama.toString(),
                     style: AppTheme.blackTextStyle.copyWith(
                       fontSize: 60,
                       fontWeight: AppTheme.bold,
@@ -443,7 +551,7 @@ class _IndexPageState extends State<IndexPage> {
                     height: 12,
                   ),
                   Text(
-                    'Layanan Dalam Genggaman. BMKG Melayani berbagai penyediaan data meteorologi, klimatologi, geofisika, konsultasi dan peralatan meteorologi.',
+                    setting.homepageJumbotronIntro.toString(),
                     style: AppTheme.blackTextStyle.copyWith(
                       fontSize: 18,
                       fontWeight: AppTheme.medium,
@@ -457,8 +565,6 @@ class _IndexPageState extends State<IndexPage> {
                   ),
                   PrimaryButton(
                     onTap: () {
-                      // Application.router.navigateTo(context, Routes.layanan);
-                      // Navigator.pushNamed(context, '/layanan');
                       context.go('/layanan');
                     },
                     titleButton: 'LIHAT SEMUA LAYANAN',
@@ -473,6 +579,8 @@ class _IndexPageState extends State<IndexPage> {
   }
 
   Widget LayananBMKGSection() {
+    final settingController = context.watch<SettingController>();
+    final setting = settingController.setting.data!.attributes!;
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
@@ -485,7 +593,7 @@ class _IndexPageState extends State<IndexPage> {
       child: Column(
         children: [
           Text(
-            'LAYANAN BMKG',
+            setting.homepageLayananJudulUtama.toString(),
             style: AppTheme.whiteTextStyle.copyWith(
               fontSize: 56,
               fontWeight: AppTheme.bold,
@@ -495,8 +603,7 @@ class _IndexPageState extends State<IndexPage> {
             height: 16,
           ),
           Text(
-            'Dapatkan akses cepat layanan data meteorologi, klimatologi, geofisika, konsultasi dan penyediaan\n'
-            'peralatan meteorologi untuk berbagai kebutuhan anda.',
+            setting.homepageLayananIntro.toString(),
             style: AppTheme.whiteTextStyle,
             textAlign: TextAlign.center,
           ),
@@ -551,6 +658,322 @@ class _IndexPageState extends State<IndexPage> {
           ),
           PrimaryButton(onTap: () {}, titleButton: 'LIHAT SEMUA LAYANAN'),
         ],
+      ),
+    );
+  }
+
+  Widget OpeningSectionMobile(BuildContext context) {
+    final settingController = context.watch<SettingController>();
+    final setting = settingController.setting.data!.attributes!;
+    final idYoutube = YoutubePlayerController.convertUrlToId(
+        setting.homepageJumbotronVideoUrl.toString());
+    return Container(
+      width: double.infinity,
+      color: AppColors.backgroundColor,
+      padding: const EdgeInsets.all(
+        20.0,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: 568,
+            height: 300,
+            margin: const EdgeInsets.symmetric(vertical: 35),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: YoutubePlayer(
+              controller: YoutubePlayerController.fromVideoId(
+                videoId: idYoutube!,
+                autoPlay: false,
+                params: const YoutubePlayerParams(
+                  showFullscreenButton: true,
+                ),
+              ),
+              aspectRatio: 16 / 9,
+            ),
+          ),
+          Column(
+            children: [
+              Text(
+                setting.homepageJumbotronJudulUtama.toString(),
+                style: AppTheme.blackTextStyle.copyWith(
+                  fontSize: 60,
+                  fontWeight: AppTheme.bold,
+                ),
+              ),
+              const SizedBox(
+                height: 12,
+              ),
+              Text(
+                setting.homepageJumbotronIntro.toString(),
+                style: AppTheme.blackTextStyle.copyWith(
+                  fontSize: 18,
+                  fontWeight: AppTheme.medium,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 5,
+                softWrap: true,
+                overflow: TextOverflow.ellipsis,
+              ),
+              PrimaryButton(
+                onTap: () {
+                  context.go('/layanan');
+                },
+                titleButton: 'LIHAT SEMUA LAYANAN',
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget LayananBMKGSectionMobile() {
+    final settingController = context.watch<SettingController>();
+    final setting = settingController.setting.data!.attributes!;
+    return Container(
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        color: AppColors.darkprimaryColor,
+      ),
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        children: [
+          Text(
+            setting.homepageLayananJudulUtama.toString(),
+            style: AppTheme.whiteTextStyle.copyWith(
+              fontSize: 56,
+              fontWeight: AppTheme.bold,
+            ),
+          ),
+          const SizedBox(
+            height: 16,
+          ),
+          Text(
+            setting.homepageLayananIntro.toString(),
+            style: AppTheme.whiteTextStyle,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(
+            height: 30,
+          ),
+          SizedBox(
+            height: 234,
+            child: FutureBuilder(
+              future: LayananServices.getAllBidangLayanans(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
+
+                if (!snapshot.hasData) {
+                  return Center(
+                      child: Text('Gagal mengambil data, coba lagi',
+                          style: AppTheme.whiteTextStyle));
+                }
+                if (snapshot.hasData) {
+                  List<bidang_layanan_model.BidangLayanan> bidangLayanans =
+                      snapshot.data!;
+                  return ListView.builder(
+                    padding: EdgeInsets.zero,
+                    scrollDirection: Axis.horizontal,
+                    shrinkWrap: true,
+                    itemCount: bidangLayanans.length,
+                    itemBuilder: (context, index) {
+                      final data = bidangLayanans[index].attributes!;
+                      return InkWell(
+                        onTap: () {
+                          context.go('/layanan/${data.slug}');
+                        },
+                        child: LayananCard(
+                          index: index,
+                          imagePath:
+                              '${Constant.host}${data.gambar!.data!.attributes!.url}',
+                          titleLayanan: data.judul!,
+                          descriptionLayanan: data.intro ?? '',
+                        ),
+                      );
+                    },
+                  );
+                }
+                return Container();
+              },
+            ),
+          ),
+          const SizedBox(
+            height: 30,
+          ),
+          PrimaryButton(
+              onTap: () {
+                context.go('/layanan');
+              },
+              titleButton: 'LIHAT SEMUA LAYANAN'),
+          const SizedBox(
+            height: 20,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget UpdateSectionMobile() {
+    return Container(
+      width: double.infinity,
+      color: AppColors.whiteColor,
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        children: [
+          Text(
+            'Update Terkini',
+            style: AppTheme.blackTextStyle.copyWith(
+              fontSize: 56,
+              fontWeight: AppTheme.bold,
+            ),
+          ),
+          const SizedBox(
+            height: 16,
+          ),
+          Text(
+            'Akses informasi terkini beragam kejadian cuaca, iklim dan gempa bumi. Kami sediakan untuk anda\n'
+            'dengan mudah.',
+            style: AppTheme.greyTextStyle,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(
+            height: 15,
+          ),
+          const Icon(
+            Icons.keyboard_arrow_down_rounded,
+            size: 35,
+            color: AppColors.blackColor,
+          ),
+          const SizedBox(
+            height: 15,
+          ),
+          SizedBox(
+            height: 320,
+            child: FutureBuilder<BeritaModel>(
+              future: BeritaService.getAllBerita(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
+                if (!snapshot.hasData) {
+                  return Center(
+                      child: Text(snapshot.error.toString(),
+                          style: AppTheme.blackTextStyle));
+                }
+                if (snapshot.hasData) {
+                  List data = snapshot.data!.data as List;
+                  return ListView.builder(
+                    padding: EdgeInsets.zero,
+                    controller: _scrollController,
+                    scrollDirection: Axis.horizontal,
+                    itemCount: data.length,
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) {
+                      final BeritaData berita = data[index];
+                      return UpdateCardMobile(data: berita.attributes!);
+                    },
+                  );
+                }
+                return Container();
+              },
+            ),
+          ),
+          const SizedBox(
+            height: 30,
+          ),
+          PrimaryButton(
+              onTap: () {
+                context.go('/berita');
+              },
+              titleButton: "LIHAT SELENGKAPNYA"),
+          const SizedBox(
+            height: 20,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget LayananPopulerSectionMobile() {
+    return Container(
+      width: double.infinity,
+      color: AppColors.backgroundColor2,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
+          children: [
+            Text(
+              'Layanan Populer',
+              style: AppTheme.blackTextStyle.copyWith(
+                fontSize: 56,
+                fontWeight: AppTheme.bold,
+              ),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: FutureBuilder(
+                    future: LayananServices.getAllLayanans(page: 1),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      }
+
+                      if (!snapshot.hasData) {
+                        return Center(
+                            child: Text(snapshot.error.toString(),
+                                style: AppTheme.blackTextStyle));
+                      }
+
+                      Layanan data = snapshot.data!;
+                      return SizedBox(
+                        height: 300,
+                        child: ListView.builder(
+                          padding: EdgeInsets.zero,
+                          controller: _scrollController,
+                          scrollDirection: Axis.horizontal,
+                          itemCount: 5,
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            final LayananData layanan = data.data![index];
+                            return LayananPopulerCard(
+                              data: layanan.attributes,
+                              idProduct: layanan.id.toString(),
+                              isMobile: true,
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            PrimaryButton(
+              onTap: () {
+                context.go('/layanan');
+              },
+              titleButton: 'SELENGKAPNYA',
+            ),
+            const SizedBox(
+              height: 30,
+            ),
+          ],
+        ),
       ),
     );
   }

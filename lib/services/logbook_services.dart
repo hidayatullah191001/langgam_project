@@ -36,16 +36,12 @@ class LogbookService {
         'Authorization': 'Bearer $token',
       },
     );
-
-    print(responseBody);
-
     if (responseBody!['data'] == null) {
       return {
         'success': false,
         'error': responseBody['error']['message'],
       };
     }
-
     if (responseBody['data'].isNotEmpty) {
       return {'success': true, 'data': responseBody};
     } else {

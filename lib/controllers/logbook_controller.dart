@@ -11,7 +11,7 @@ class LogbookController extends ChangeNotifier {
   final List<String> _perihalPermohonan = ['Kalibrasi', 'Data MKG'];
   List<String> get perihalPermohonans => _perihalPermohonan;
 
-  final List<String> _statuses = ['On Process', 'Selesa'];
+  final List<String> _statuses = ['On Process', 'Selesai'];
   List<String> get statuses => _statuses;
 
   String? _selectedPerihalPermohonan;

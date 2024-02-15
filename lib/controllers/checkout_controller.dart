@@ -81,7 +81,7 @@ class CheckoutController extends ChangeNotifier {
             provinsi: provinsi,
             kota: kota,
             kecamatan: kecamatan,
-            status: "Menunggu Persetujuan",
+            status: "Permintaan Masuk",
             komersial: isKomersial,
             metadata: [
               Metadata(field: "Lokasi Pesanan", data: lokasiPesanan),

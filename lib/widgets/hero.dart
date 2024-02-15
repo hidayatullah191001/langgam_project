@@ -149,3 +149,100 @@ class HeroSectionCart extends StatelessWidget {
     );
   }
 }
+
+class HeroSectionCartMobile extends StatelessWidget {
+  String? heroPosition;
+  bool? isSuccess;
+  HeroSectionCartMobile({super.key, this.heroPosition, this.isSuccess = false});
+
+  @override
+  Widget build(BuildContext context) {
+    String currentRoute = ModalRoute.of(context)!.settings.name!;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
+      color: AppColors.primaryColor,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          TextButtonHovered(
+            text: 'KERANJANG BELANJA',
+            onTap: () {
+              if (currentRoute == '/cart/checkout') {
+                context.pop();
+              } else {
+                context.go('/cart');
+              }
+            },
+            styleBeforeHovered: heroPosition == 'KERANJANG BELANJA'
+                ? AppTheme.whiteTextStyle.copyWith(
+                    fontSize: 17,
+                    fontWeight: AppTheme.bold,
+                  )
+                : AppTheme.greyTextStyle.copyWith(
+                    fontSize: 17,
+                    fontWeight: AppTheme.bold,
+                    color: AppColors.softgreyColor,
+                  ),
+            styleHovered: AppTheme.whiteTextStyle.copyWith(
+              fontSize: 17,
+              fontWeight: AppTheme.bold,
+            ),
+          ),
+          const SizedBox(width: 5),
+          const Icon(
+            Icons.arrow_right_alt_sharp,
+            color: AppColors.softgreyColor,
+          ),
+          const SizedBox(width: 5),
+          TextButtonHovered(
+            text: 'PEMESANAN',
+            onTap: () {
+              if (isSuccess == false) {
+                if (currentRoute == '/cart') {
+                  context.go('/cart/checkout');
+                } else {
+                  context.pop();
+                }
+              }
+            },
+            styleBeforeHovered: heroPosition == 'PEMESANAN'
+                ? AppTheme.whiteTextStyle.copyWith(
+                    fontSize: 17,
+                    fontWeight: AppTheme.bold,
+                  )
+                : AppTheme.greyTextStyle.copyWith(
+                    fontSize: 17,
+                    fontWeight: AppTheme.bold,
+                    color: AppColors.softgreyColor,
+                  ),
+            styleHovered: AppTheme.whiteTextStyle.copyWith(
+              fontSize: 17,
+              fontWeight: AppTheme.bold,
+            ),
+          ),
+          const SizedBox(width: 5),
+          const Icon(
+            Icons.arrow_right_alt_sharp,
+            color: AppColors.softgreyColor,
+          ),
+          const SizedBox(width: 5),
+          Text(
+            'SELESAI',
+            style: heroPosition == 'SELESAI'
+                ? AppTheme.whiteTextStyle.copyWith(
+                    fontSize: 17,
+                    fontWeight: AppTheme.bold,
+                  )
+                : AppTheme.greyTextStyle.copyWith(
+                    fontSize: 17,
+                    fontWeight: AppTheme.bold,
+                    color: AppColors.softgreyColor,
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+}

@@ -56,12 +56,12 @@ class PermintaanController extends ChangeNotifier {
   int? get totalPendapatanSelesai => _totalPendapatanSelesai;
 
   List<String> _status = [
-    'Menunggu Persetujuan',
-    'Verifikasi Persyaratan',
-    'Menunggu Pembayaran',
-    'Verifikasi Pembayaran',
-    'Sedang Diproses',
-    'Selesai'
+    "Permintaan Masuk",
+    "Permintaan Disetujui",
+    "Permintaan Ditolak",
+    "Menunggu Pembayaran",
+    "Permintaan Telah Dibayarkan",
+    "Permintaan Selesai",
   ];
   List<String> get statuses => _status;
 
@@ -94,23 +94,24 @@ class PermintaanController extends ChangeNotifier {
     changeState(DataState.loading);
     try {
       listPermintaanModelAdmin.ListPermintaanModelAdmin menungguPersetujuan =
-          await PermintaanService.getAllPermintaanByStatus(
-              'Menunggu Persetujuan');
+          await PermintaanService.getAllPermintaanByStatus('Permintaan Masuk');
       listPermintaanModelAdmin.ListPermintaanModelAdmin verifikasiPersyaratan =
           await PermintaanService.getAllPermintaanByStatus(
-              'Verifikasi Persyaratan');
+              'Permintaan Disetujui');
       listPermintaanModelAdmin.ListPermintaanModelAdmin menungguPembayaran =
           await PermintaanService.getAllPermintaanByStatus(
-              'Menunggu Pembayaran');
+              'Permintaan Ditolak');
       listPermintaanModelAdmin.ListPermintaanModelAdmin verifikasiPembayaran =
           await PermintaanService.getAllPermintaanByStatus(
-              'Verifikasi Pembayaran');
+              'Menunggu Pembayaran');
 
       listPermintaanModelAdmin.ListPermintaanModelAdmin sedangDiproses =
-          await PermintaanService.getAllPermintaanByStatus('Sedang Diproses');
+          await PermintaanService.getAllPermintaanByStatus(
+              'Permintaan Telah Dibayarkan');
 
       listPermintaanModelAdmin.ListPermintaanModelAdmin selesai =
-          await PermintaanService.getAllPermintaanByStatus('Selesai');
+          await PermintaanService.getAllPermintaanByStatus(
+              'Permintaan Selesai');
       // Perhitungan untuk pendapatan kotor
       listPermintaanModelAdmin.ListPermintaanModelAdmin all =
           await PermintaanService.getAllPermintaan();

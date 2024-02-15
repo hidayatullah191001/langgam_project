@@ -45,7 +45,7 @@ class _BeritaPageState extends State<BeritaPage> {
                     const BannerTop(),
                   ]),
                 ),
-                const SliverAppBar(
+                SliverAppBar(
                   pinned: true,
                   floating: false,
                   collapsedHeight: 101.0,

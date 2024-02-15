@@ -12,19 +12,19 @@ class Layanan {
     if (json['data'] != null) {
       data = <LayananData>[];
       json['data'].forEach((v) {
-        data!.add(new LayananData.fromJson(v));
+        data!.add(LayananData.fromJson(v));
       });
     }
-    meta = json['meta'] != null ? new Meta.fromJson(json['meta']) : null;
+    meta = json['meta'] != null ? Meta.fromJson(json['meta']) : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
-    if (this.meta != null) {
-      data['meta'] = this.meta!.toJson();
+    if (meta != null) {
+      data['meta'] = meta!.toJson();
     }
     return data;
   }
@@ -39,12 +39,12 @@ class LayananData {
   LayananData.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     attributes = json['attributes'] != null
-        ? new LayananAttributes.fromJson(json['attributes'])
+        ? LayananAttributes.fromJson(json['attributes'])
         : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = Map<String, dynamic>();
     data['id'] = this.id;
     if (this.attributes != null) {
       data['attributes'] = this.attributes!.toJson();
@@ -87,35 +87,34 @@ class LayananAttributes {
     if (json['konten'] != null) {
       konten = <Konten>[];
       json['konten'].forEach((v) {
-        konten!.add(new Konten.fromJson(v));
+        konten!.add(Konten.fromJson(v));
       });
     }
     harga = json['harga'];
     satuan = json['satuan'];
-    gambar =
-        json['gambar'] != null ? new Gambar.fromJson(json['gambar']) : null;
+    gambar = json['gambar'] != null ? Gambar.fromJson(json['gambar']) : null;
     bidangLayanan = json['bidang_layanan'] != null
-        ? new BidangLayanan.fromJson(json['bidang_layanan']['data'])
+        ? BidangLayanan.fromJson(json['bidang_layanan']['data'])
         : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['slug'] = this.slug;
-    data['intro'] = this.intro;
-    data['createdAt'] = this.createdAt;
-    data['updatedAt'] = this.updatedAt;
-    data['judul'] = this.judul;
-    if (this.konten != null) {
-      data['konten'] = this.konten!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = Map<String, dynamic>();
+    data['slug'] = slug;
+    data['intro'] = intro;
+    data['createdAt'] = createdAt;
+    data['updatedAt'] = updatedAt;
+    data['judul'] = judul;
+    if (konten != null) {
+      data['konten'] = konten!.map((v) => v.toJson()).toList();
     }
-    data['harga'] = this.harga;
-    data['satuan'] = this.satuan;
-    if (this.gambar != null) {
-      data['gambar'] = this.gambar!.toJson();
+    data['harga'] = harga;
+    data['satuan'] = satuan;
+    if (gambar != null) {
+      data['gambar'] = gambar!.toJson();
     }
-    if (this.bidangLayanan != null) {
-      data['bidang_layanan']['data'] = this.bidangLayanan!.toJson();
+    if (bidangLayanan != null) {
+      data['bidang_layanan']['data'] = bidangLayanan!.toJson();
     }
     return data;
   }
@@ -128,14 +127,14 @@ class Meta {
 
   Meta.fromJson(Map<String, dynamic> json) {
     pagination = json['pagination'] != null
-        ? new Pagination.fromJson(json['pagination'])
+        ? Pagination.fromJson(json['pagination'])
         : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.pagination != null) {
-      data['pagination'] = this.pagination!.toJson();
+    final Map<String, dynamic> data = Map<String, dynamic>();
+    if (pagination != null) {
+      data['pagination'] = pagination!.toJson();
     }
     return data;
   }
@@ -157,11 +156,11 @@ class Pagination {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['page'] = this.page;
-    data['pageSize'] = this.pageSize;
-    data['pageCount'] = this.pageCount;
-    data['total'] = this.total;
+    final Map<String, dynamic> data = Map<String, dynamic>();
+    data['page'] = page;
+    data['pageSize'] = pageSize;
+    data['pageCount'] = pageCount;
+    data['total'] = total;
     return data;
   }
 }

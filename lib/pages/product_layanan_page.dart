@@ -18,62 +18,83 @@ class _ProductLayananPageState extends State<ProductLayananPage> {
   }
 
   int selectedPageNumber = 1;
-
+  int _selectedCategoryIndex = 0;
   @override
   Widget build(BuildContext context) {
     final searchController = context.watch<PencarianController>();
+    return LayoutBuilder(builder: (context, constraints) {
+      if (constraints.maxWidth < 1200) {
+        return MobileView(searchController, context);
+      } else {
+        return WebView(searchController);
+      }
+    });
+  }
+
+  Widget MobileView(
+      PencarianController searchController, BuildContext context) {
     return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, BoxConstraints constraints) {
-          if (constraints.maxWidth <= 1200) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Lottie.asset('lottie/maintenance.json'),
-                      Text(
-                        'Saat ini hanya tersedia untuk Website. Gunakan laptop untuk membuka',
-                        style: AppTheme.blackTextStyle.copyWith(
-                          fontSize: 18,
-                          fontWeight: AppTheme.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ]),
-              ),
-            );
-          } else {
-            return CustomScrollView(
-              slivers: [
-                SliverList(
-                  delegate: SliverChildListDelegate([
-                    const BannerTop(),
-                  ]),
-                ),
-                const SliverAppBar(
-                  pinned: true,
-                  floating: false,
-                  collapsedHeight: 101.0,
-                  automaticallyImplyLeading: false,
-                  flexibleSpace: Navbar(),
-                  actions: [SizedBox()],
-                ),
-                SliverToBoxAdapter(
-                  child: Column(
-                    children: [
-                      !searchController.isSearchBoolean
-                          ? defaultWidget()
-                          : searchWidget(),
-                    ],
+      drawerEnableOpenDragGesture: false,
+      endDrawerEnableOpenDragGesture: false,
+      appBar: AppBar(
+        title: BannerTopMobile(),
+        backgroundColor: AppColors.primaryColor,
+        iconTheme: const IconThemeData(color: AppColors.whiteColor),
+        actions: [
+          new Container(),
+        ],
+      ),
+      body: Consumer(builder: (context, SettingController controller, widget) {
+        if (controller.dataState == DataState.loading) {
+          return const Center(child: CircularProgressIndicator());
+        } else {
+          return SafeArea(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Navbar(
+                    isMobile: true,
                   ),
-                ),
+                  !searchController.isSearchBoolean
+                      ? defaultWidgetMobile()
+                      : searchWidgetMobile(),
+                ],
+              ),
+            ),
+          );
+        }
+      }),
+      endDrawer: const LoginDrawer(),
+    );
+  }
+
+  Widget WebView(PencarianController searchController) {
+    return Scaffold(
+      body: CustomScrollView(
+        slivers: [
+          SliverList(
+            delegate: SliverChildListDelegate([
+              const BannerTop(),
+            ]),
+          ),
+          SliverAppBar(
+            pinned: true,
+            floating: false,
+            collapsedHeight: 101.0,
+            automaticallyImplyLeading: false,
+            flexibleSpace: Navbar(),
+            actions: [SizedBox()],
+          ),
+          SliverToBoxAdapter(
+            child: Column(
+              children: [
+                !searchController.isSearchBoolean
+                    ? defaultWidget()
+                    : searchWidget(),
               ],
-            );
-          }
-        },
+            ),
+          ),
+        ],
       ),
       endDrawer: const LoginDrawer(),
     );
@@ -88,6 +109,19 @@ class _ProductLayananPageState extends State<ProductLayananPage> {
         ),
         ContentSection(),
         const Footer(),
+      ],
+    );
+  }
+
+  Widget defaultWidgetMobile() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        HeroSection(
+          heroTitle: title!,
+        ),
+        ContentSectionMobile(),
+        const FooterMobile(),
       ],
     );
   }
@@ -149,6 +183,79 @@ class _ProductLayananPageState extends State<ProductLayananPage> {
                 );
               },
             );
+          }
+          return Container();
+        },
+      ),
+    );
+  }
+
+  Widget searchWidgetMobile() {
+    final searchController = context.watch<PencarianController>();
+    return Container(
+      width: double.infinity,
+      color: AppColors.whiteColor,
+      padding: EdgeInsets.symmetric(
+        horizontal: 10,
+      ),
+      child: FutureBuilder(
+        future: LayananServices.getLayananByValue(searchController.value!),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (!snapshot.hasData) {
+            return Center(
+              child: Text(
+                'Data dengan kueri ${searchController.value} tidak ditemukan',
+              ),
+            );
+          }
+
+          if (snapshot.hasData) {
+            Layanan data = snapshot.data!;
+            if (data.data!.length < 1) {
+              return Center(
+                child: Column(
+                  children: [
+                    Lottie.asset(
+                      'lottie/empty_cart.json',
+                      width: 150,
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Data tidak ditemukan',
+                      style: AppTheme.greyTextStyle.copyWith(
+                        fontSize: 14,
+                        fontWeight: AppTheme.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    PrimaryButton(
+                      onTap: () {
+                        searchController.setSearchBoolean(false);
+                      },
+                      titleButton: "KEMBALI",
+                    )
+                  ],
+                ),
+              );
+            } else {
+              return ListView.builder(
+                padding: EdgeInsets.zero,
+                itemCount: data.data!.length,
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  final LayananData layanan = data.data![index];
+
+                  print(layanan.attributes!.judul);
+                  return ItemLayananCardList(
+                    data: layanan,
+                    id: layanan.id!,
+                  );
+                },
+              );
+            }
           }
           return Container();
         },
@@ -310,6 +417,149 @@ class _ProductLayananPageState extends State<ProductLayananPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget ContentSectionMobile() {
+    final controller = context.watch<LayananController>();
+    return Container(
+      width: double.infinity,
+      color: AppColors.whiteColor,
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 50.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            height: 50,
+            child: FutureBuilder(
+              future: LayananServices.getAllBidangLayanans(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                if (snapshot.hasData) {
+                  final List data = snapshot.data as List;
+
+                  bidang_layanan_model.BidangLayanan newData =
+                      bidang_layanan_model.BidangLayanan(
+                    id: 0,
+                    attributes: bidang_layanan_model.Attributes(
+                      judul: 'Semua Layanan',
+                      intro: null,
+                      slug: null,
+                      createdAt: null,
+                      updatedAt: null,
+                    ),
+                  );
+                  data.insert(0, newData);
+
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    padding: EdgeInsets.zero,
+                    scrollDirection: Axis.horizontal,
+                    itemCount: data.length,
+                    itemBuilder: (context, index) {
+                      return Row(
+                        children: [
+                          TextButtonHovered(
+                            text: data[index].attributes.judul.toString(),
+                            onTap: () {
+                              if (data[index].attributes.judul ==
+                                  'Semua Layanan') {
+                                context.go('/layanan');
+                              } else {
+                                context.go(
+                                    '/layanan/${data[index].attributes.slug}');
+                              }
+                              setState(() {
+                                _selectedCategoryIndex = index;
+                              });
+                            },
+                            styleBeforeHovered: _selectedCategoryIndex == index
+                                ? AppTheme.primaryTextStyle.copyWith(
+                                    fontWeight: AppTheme.bold,
+                                  )
+                                : AppTheme.softgreyTextStyle.copyWith(
+                                    fontWeight: AppTheme.semiBold,
+                                  ),
+                            styleHovered: AppTheme.blackTextStyle
+                                .copyWith(fontWeight: AppTheme.semiBold),
+                          ),
+                          const SizedBox(width: 15),
+                        ],
+                      );
+                    },
+                  );
+                }
+                return Container();
+              },
+            ),
+          ),
+          const SizedBox(height: 25),
+          FutureBuilder(
+            future: widget.slugBidangLayanan == null
+                ? LayananServices.getAllLayanans(page: selectedPageNumber)
+                : LayananServices.getAllLayanans(
+                    filter: true,
+                    slugBidangLayanan: widget.slugBidangLayanan,
+                    page: selectedPageNumber,
+                  ),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              }
+
+              if (!snapshot.hasData) {
+                return Center(
+                    child: Text(snapshot.error.toString(),
+                        style: AppTheme.blackTextStyle));
+              }
+
+              if (snapshot.hasData) {
+                Layanan data = snapshot.data!;
+                final meta = snapshot.data!.meta;
+                return Column(
+                  children: [
+                    ListView.builder(
+                      padding: EdgeInsets.zero,
+                      itemCount: data.data!.length,
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        final LayananData layanan = data.data![index];
+                        return ItemLayananCardList(
+                          data: layanan,
+                          id: layanan.id!,
+                          isMobile : true,
+                        );
+                      },
+                    ),
+                    data.data!.length > 0
+                        ? NumberPagination(
+                            onPageChanged: (int pageNumber) {
+                              //do somthing for selected page
+                              setState(() {
+                                selectedPageNumber = pageNumber;
+                              });
+                            },
+                            pageTotal: meta!.pagination!.pageCount!,
+                            pageInit:
+                                selectedPageNumber, // picked number when init page
+                            colorPrimary: AppColors.primaryColor,
+                            colorSub: AppColors.backgroundColor3,
+                          )
+                        : Container(),
+                  ],
+                );
+              }
+              return Container();
+            },
+          ),
+        ],
       ),
     );
   }

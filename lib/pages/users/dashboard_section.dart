@@ -79,17 +79,13 @@ class DashboardSection extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            FastButtonDasbor(context,
+            fastButtonDasbor(context,
                 title: 'Pesanan',
                 icon: Icons.file_open_outlined,
                 first: true, onTap: () {
               controller.pickMenu('Pesanan', 1);
             }),
-            // FastButtonDasbor(context,
-            //     title: 'Messages', icon: Icons.message_sharp, onTap: () {
-            //   controller.pickMenu('Messages', 2);
-            // }),
-            FastButtonDasbor(context,
+            fastButtonDasbor(context,
                 title: 'Unduhan',
                 icon: Icons.file_download_outlined,
                 last: true, onTap: () {
@@ -100,23 +96,11 @@ class DashboardSection extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // FastButtonDasbor(context,
-            //     title: 'Alamat',
-            //     icon: Icons.location_on_outlined,
-            //     first: true, onTap: () {
-            //   controller.pickMenu('Alamat', 4);
-            // }),
-            FastButtonDasbor(context,
+            fastButtonDasbor(context,
                 title: 'Detail Akun', icon: Icons.person_outlined, onTap: () {
               controller.pickMenu('Detail Akun', 5);
             }),
-            // FastButtonDasbor(context,
-            //     title: 'Attchments',
-            //     icon: Icons.file_present_outlined,
-            //     last: true, onTap: () {
-            //   controller.pickMenu('Attachments', 6);
-            // }),
-            FastButtonDasbor(
+            fastButtonDasbor(
               context,
               title: 'Logout',
               icon: Icons.logout,
@@ -124,7 +108,28 @@ class DashboardSection extends StatelessWidget {
               last: true,
               typeLogout: true,
               onTap: () {
-                Navigator.pushReplacementNamed(context, '/register');
+                controller.pickMenu(menuUser[4], 4);
+                if (menuUser[4] == 'Logout') {
+                  CoolAlert.show(
+                      context: context,
+                      type: CoolAlertType.warning,
+                      width: MediaQuery.of(context).size.width * 0.3,
+                      confirmBtnText: 'Logout',
+                      confirmBtnColor: AppColors.dangerColor,
+                      cancelBtnText: 'Batal',
+                      confirmBtnTextStyle: AppTheme.whiteTextStyle,
+                      cancelBtnTextStyle: AppTheme.darkGreyTextStyle,
+                      text: 'Kamu yakin ingin keluar dari aplikasi?',
+                      showCancelBtn: true,
+                      onConfirmBtnTap: () {
+                        authController.logout();
+                        context.replace('/');
+                        context.pop();
+                      },
+                      onCancelBtnTap: () {
+                        context.pop();
+                      }).then((value) => context.pop());
+                }
               },
             ),
           ],
@@ -132,7 +137,7 @@ class DashboardSection extends StatelessWidget {
         // Row(
         //   mainAxisAlignment: MainAxisAlignment.start,
         //   children: [
-        //     FastButtonDasbor(
+        //     fastButtonDasbor(
         //       context,
         //       title: 'Logout',
         //       icon: Icons.logout,
@@ -149,7 +154,7 @@ class DashboardSection extends StatelessWidget {
     );
   }
 
-  Widget FastButtonDasbor(
+  Widget fastButtonDasbor(
     BuildContext context, {
     bool first = false,
     bool last = false,

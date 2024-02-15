@@ -115,8 +115,12 @@ class _LayananCardState extends State<LayananCard> {
 class LayananPopulerCard extends StatefulWidget {
   final LayananAttributes? data;
   final String idProduct;
-  const LayananPopulerCard(
-      {Key? key, required this.data, required this.idProduct})
+  bool isMobile;
+  LayananPopulerCard(
+      {Key? key,
+      required this.data,
+      required this.idProduct,
+      this.isMobile = false})
       : super(key: key);
 
   @override
@@ -148,7 +152,9 @@ class _LayananPopulerCardState extends State<LayananPopulerCard> {
       onEnter: (_) => _handleHover(true),
       onExit: (_) => _handleHover(false),
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.15,
+        width: widget.isMobile
+            ? MediaQuery.of(context).size.width * 0.3
+            : MediaQuery.of(context).size.width * 0.15,
         padding: const EdgeInsets.all(12),
         margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
@@ -198,8 +204,11 @@ class _LayananPopulerCardState extends State<LayananPopulerCard> {
                             context: context,
                             builder: (BuildContext context) {
                               return Dialog(
-                                child: ModalInformationCart(
-                                    context, widget.data, widget.idProduct),
+                                child: widget.isMobile
+                                    ? ModalInformationCartMobile(
+                                        context, widget.data, widget.idProduct)
+                                    : ModalInformationCart(
+                                        context, widget.data, widget.idProduct),
                               );
                             },
                           );
@@ -257,7 +266,10 @@ class _LayananPopulerCardState extends State<LayananPopulerCard> {
   }
 
   Widget ModalInformationCart(
-      BuildContext context, dynamic data, String idProduct) {
+    BuildContext context,
+    dynamic data,
+    String idProduct,
+  ) {
     final controller = context.watch<CartController>();
     final wilayahController = context.watch<WilayahController>();
 
@@ -506,6 +518,263 @@ class _LayananPopulerCardState extends State<LayananPopulerCard> {
     );
   }
 
+  Widget ModalInformationCartMobile(
+    BuildContext context,
+    dynamic data,
+    String idProduct,
+  ) {
+    final controller = context.watch<CartController>();
+    final wilayahController = context.watch<WilayahController>();
+
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.8,
+      padding: const EdgeInsets.all(35),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 200,
+              height: 180,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                image: DecorationImage(
+                  image: NetworkImage(
+                      '${Constant.host}${data.gambar?.data?.attributes?.url.toString()}'),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  data.judul.toString(),
+                  style: AppTheme.blackTextStyle.copyWith(
+                    fontSize: 18,
+                    fontWeight: AppTheme.bold,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  data.intro.toString(),
+                  style: AppTheme.greyTextStyle.copyWith(
+                    fontSize: 14,
+                    fontWeight: AppTheme.medium,
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        controller.remover();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.withOpacity(0.1),
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(6),
+                            bottomLeft: Radius.circular(6),
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.remove,
+                          color: AppColors.primaryColor,
+                          size: 19,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      color: Colors.blue.withOpacity(0.1),
+                      child: Text(
+                        controller.itemsCount.toString(),
+                        style: AppTheme.blackTextStyle.copyWith(
+                          fontSize: 13,
+                          fontWeight: AppTheme.medium,
+                        ),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        controller.add();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.withOpacity(0.1),
+                          borderRadius: const BorderRadius.only(
+                            topRight: Radius.circular(6),
+                            bottomRight: Radius.circular(6),
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.add,
+                          color: AppColors.primaryColor,
+                          size: 19,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Total Harga', style: AppTheme.blackTextStyle),
+                    Text(
+                      AppMethods.currency(
+                          controller.total(data.harga).toString()),
+                      style: AppTheme.primaryTextStyle
+                          .copyWith(fontWeight: AppTheme.bold, fontSize: 18),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            const SizedBox(
+              height: 10,
+            ),
+            // START PROVINSI
+            DropdownButtonFormField<String>(
+              value: wilayahController.selectedProvince,
+              onChanged: (String? value) {
+                setState(() {
+                  wilayahController.setSelectedProvince(value);
+                  wilayahController.setSelectedCity(null);
+                  wilayahController.setSelectedDistrict(null);
+                });
+                if (wilayahController.selectedProvince!.isNotEmpty) {
+                  wilayahController
+                      .getAllDataCities(wilayahController.selectedProvince!);
+                }
+              },
+              decoration: InputDecoration(
+                hintStyle: AppTheme.greyTextStyle.copyWith(
+                  fontSize: 12,
+                ),
+                isDense: true,
+                border: OutlineInputBorder(
+                  borderSide:
+                      const BorderSide(color: AppColors.greyColor, width: 2),
+                  borderRadius: BorderRadius.circular(7),
+                ),
+              ),
+              items: wilayahController.provinces.map((data) {
+                return DropdownMenuItem<String>(
+                  value: data.attributes!.namaProvinsi,
+                  child: Text(data.attributes!.namaProvinsi.toString()),
+                );
+              }).toList(),
+              hint: Text('Pilih Provinsi', style: AppTheme.greyTextStyle),
+            ),
+            // END PROVINSI
+            const SizedBox(
+              height: 10,
+            ),
+            // START OF KOTAS
+            DropdownButtonFormField<String>(
+              value: wilayahController.selectedCity,
+              onChanged: (String? value) {
+                setState(() {
+                  wilayahController.setSelectedCity(value);
+                  wilayahController.setSelectedDistrict(null);
+                });
+                if (wilayahController.selectedCity!.isNotEmpty) {
+                  wilayahController
+                      .getAllDataKecamatan(wilayahController.selectedCity!);
+                }
+              },
+              decoration: InputDecoration(
+                hintStyle: AppTheme.greyTextStyle.copyWith(
+                  fontSize: 12,
+                ),
+                isDense: true,
+                border: OutlineInputBorder(
+                  borderSide:
+                      const BorderSide(color: AppColors.greyColor, width: 2),
+                  borderRadius: BorderRadius.circular(7),
+                ),
+              ),
+              items: wilayahController
+                  .getCitiesByProvince(wilayahController.selectedProvince ?? "")
+                  .map((city) {
+                return DropdownMenuItem<String>(
+                  value: city.attributes!.namaKota,
+                  child: Text(city.attributes!.namaKota.toString()),
+                );
+              }).toList(),
+              hint: Text('Pilih Kota', style: AppTheme.greyTextStyle),
+            ),
+            // END OF KOTAS
+            const SizedBox(
+              height: 10,
+            ),
+            const SizedBox(
+              height: 12,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SecondaryButton(
+                  onTap: () {
+                    context.pop();
+                  },
+                  titleButton: "BATAL",
+                ),
+                const SizedBox(width: 15),
+                PrimaryButton(
+                  onTap: () {
+                    if (user['token'] == null &&
+                        user['email'] == null &&
+                        user['id'] == null) {
+                      CoolAlert.show(
+                        context: context,
+                        width: MediaQuery.of(context).size.width * 0.3,
+                        type: CoolAlertType.error,
+                        text: 'Maaf, kamu harus login terlebih dahulu',
+                      ).then((value) => context.go('/register'));
+                    } else {
+                      final productItem = {
+                        'user': user,
+                        'product': {
+                          'id': idProduct,
+                          'judul': data.judul,
+                          'harga': data.harga,
+                          'satuan': data.satuan,
+                          'gambar': data.gambar?.data?.attributes?.url,
+                        },
+                        'provinsi': wilayahController.selectedProvince,
+                        'kota': wilayahController.selectedCity,
+                        'item': controller.itemsCount.toString(),
+                        'totalHarga': controller.totalHarga.toString(),
+                      };
+                      controller.addToCart(productItem);
+                      CoolAlert.show(
+                        context: context,
+                        width: MediaQuery.of(context).size.width * 0.3,
+                        type: CoolAlertType.success,
+                        text: 'Product berhasil ditambahkan kedalam keranjang',
+                      );
+                      wilayahController.setSelectedProvince(null);
+                      wilayahController.setSelectedCity(null);
+                    }
+                  },
+                  titleButton: 'Tambahkan Ke Keranjang',
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _handleHover(bool hover) {
     setState(() {
       isHovered = hover;
@@ -575,13 +844,77 @@ class UpdateCard extends StatelessWidget {
   }
 }
 
+class UpdateCardMobile extends StatelessWidget {
+  final BeritaAttributes data;
+  const UpdateCardMobile({Key? key, required this.data}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        context.go('/berita/${data.slug}');
+      },
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.4,
+        height: MediaQuery.of(context).size.width * 0.22,
+        margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: AppColors.whiteColor,
+          borderRadius: BorderRadius.circular(6),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 2,
+              blurRadius: 7,
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Container(
+              height: 150,
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(6), topRight: Radius.circular(6)),
+                image: DecorationImage(
+                  image: NetworkImage(
+                      '${Constant.host}${data.gambar!.data!.attributes!.url}'),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 25,
+                  horizontal: 18,
+                ),
+                child: Text(
+                  data.judul!.toString(),
+                  style: AppTheme.blackTextStyle.copyWith(
+                    fontWeight: AppTheme.bold,
+                    fontSize: 18,
+                    overflow: TextOverflow.fade,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class ItemLayananCardList extends StatefulWidget {
   final LayananData data;
   final int id;
-  const ItemLayananCardList({
+  bool isMobile;
+  ItemLayananCardList({
     super.key,
     required this.data,
     required this.id,
+    this.isMobile = false,
   });
 
   @override
@@ -618,8 +951,8 @@ class _ItemLayananCardListState extends State<ItemLayananCardList> {
           Row(
             children: [
               Container(
-                width: 300,
-                height: 200,
+                width: widget.isMobile ? 250 : 300,
+                height: widget.isMobile ? 150 : 200,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
                   image: DecorationImage(
@@ -650,41 +983,73 @@ class _ItemLayananCardListState extends State<ItemLayananCardList> {
                         fontSize: 18,
                       ),
                     ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          AppMethods.currency(
-                              widget.data.attributes!.harga.toString()),
-                          style: AppTheme.primaryTextStyle.copyWith(
-                            fontWeight: AppTheme.bold,
-                            fontSize: 18,
+                    !widget.isMobile
+                        ? Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                AppMethods.currency(
+                                    widget.data.attributes!.harga.toString()),
+                                style: AppTheme.primaryTextStyle.copyWith(
+                                  fontWeight: AppTheme.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 5,
+                              ),
+                              Text(
+                                widget.data.attributes!.satuan != null
+                                    ? widget.data.attributes!.satuan.toString()
+                                    : '/ hari',
+                                style: AppTheme.greyTextStyle.copyWith(
+                                  fontWeight: AppTheme.medium,
+                                  fontSize: 18,
+                                  color: AppColors.softgreyColor,
+                                ),
+                              ),
+                            ],
+                          )
+                        : Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                AppMethods.currency(
+                                    widget.data.attributes!.harga.toString()),
+                                style: AppTheme.primaryTextStyle.copyWith(
+                                  fontWeight: AppTheme.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 5,
+                              ),
+                              Text(
+                                widget.data.attributes!.satuan != null
+                                    ? widget.data.attributes!.satuan.toString()
+                                    : '/ hari',
+                                style: AppTheme.greyTextStyle.copyWith(
+                                  fontWeight: AppTheme.medium,
+                                  fontSize: 18,
+                                  color: AppColors.softgreyColor,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        Text(
-                          widget.data.attributes!.satuan != null
-                              ? widget.data.attributes!.satuan.toString()
-                              : '/ hari',
-                          style: AppTheme.greyTextStyle.copyWith(
-                            fontWeight: AppTheme.medium,
-                            fontSize: 18,
-                            color: AppColors.softgreyColor,
-                          ),
-                        ),
-                      ],
-                    ),
                     const SizedBox(
                       height: 10,
                     ),
-                    Text(
-                      widget.data.attributes!.intro.toString(),
-                      style: AppTheme.greyTextStyle.copyWith(
-                        fontWeight: AppTheme.medium,
-                        height: 1.5,
-                      ),
+                    !widget.isMobile
+                        ? Text(
+                            widget.data.attributes!.intro.toString(),
+                            style: AppTheme.greyTextStyle.copyWith(
+                              fontWeight: AppTheme.medium,
+                              height: 1.5,
+                            ),
+                          )
+                        : Container(),
+                    const SizedBox(
+                      height: 10,
                     ),
                     PrimaryButton(
                       onTap: () {
@@ -692,10 +1057,15 @@ class _ItemLayananCardListState extends State<ItemLayananCardList> {
                           context: context,
                           builder: (BuildContext context) {
                             return Dialog(
-                              child: ModalInformationCart(
-                                  context,
-                                  widget.data.attributes!,
-                                  widget.id.toString()),
+                              child: widget.isMobile
+                                  ? ModalInformationCartMobile(
+                                      context,
+                                      widget.data.attributes!,
+                                      widget.id.toString())
+                                  : ModalInformationCart(
+                                      context,
+                                      widget.data.attributes!,
+                                      widget.id.toString()),
                             );
                           },
                         );
@@ -711,13 +1081,17 @@ class _ItemLayananCardListState extends State<ItemLayananCardList> {
             ],
           ),
           Divider(),
+          const SizedBox(width: 15),
         ],
       ),
     );
   }
 
   Widget ModalInformationCart(
-      BuildContext context, dynamic data, String idProduct) {
+    BuildContext context,
+    dynamic data,
+    String idProduct,
+  ) {
     final controller = context.watch<CartController>();
     final wilayahController = context.watch<WilayahController>();
 
@@ -956,6 +1330,260 @@ class _ItemLayananCardListState extends State<ItemLayananCardList> {
                 }
               },
               titleButton: 'Tambahkan Ke Keranjang',
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget ModalInformationCartMobile(
+      BuildContext context, dynamic data, String idProduct) {
+    final controller = context.watch<CartController>();
+    final wilayahController = context.watch<WilayahController>();
+
+    return Container(
+      width: MediaQuery.of(context).size.width * 0.8,
+      padding: const EdgeInsets.all(35),
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 200,
+              height: 180,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                image: DecorationImage(
+                  image: NetworkImage(
+                      '${Constant.host}${data.gambar?.data?.attributes?.url.toString()}'),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  data.judul.toString(),
+                  style: AppTheme.blackTextStyle.copyWith(
+                    fontSize: 18,
+                    fontWeight: AppTheme.bold,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  data.intro.toString(),
+                  style: AppTheme.greyTextStyle.copyWith(
+                    fontSize: 14,
+                    fontWeight: AppTheme.medium,
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        controller.remover();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.withOpacity(0.1),
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(6),
+                            bottomLeft: Radius.circular(6),
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.remove,
+                          color: AppColors.primaryColor,
+                          size: 19,
+                        ),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      color: Colors.blue.withOpacity(0.1),
+                      child: Text(
+                        controller.itemsCount.toString(),
+                        style: AppTheme.blackTextStyle.copyWith(
+                          fontSize: 13,
+                          fontWeight: AppTheme.medium,
+                        ),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        controller.add();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.withOpacity(0.1),
+                          borderRadius: const BorderRadius.only(
+                            topRight: Radius.circular(6),
+                            bottomRight: Radius.circular(6),
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.add,
+                          color: AppColors.primaryColor,
+                          size: 19,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Total Harga', style: AppTheme.blackTextStyle),
+                    Text(
+                      AppMethods.currency(
+                          controller.total(data.harga).toString()),
+                      style: AppTheme.primaryTextStyle
+                          .copyWith(fontWeight: AppTheme.bold, fontSize: 18),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            const SizedBox(
+              height: 10,
+            ),
+            // START PROVINSI
+            DropdownButtonFormField<String>(
+              value: wilayahController.selectedProvince,
+              onChanged: (String? value) {
+                setState(() {
+                  wilayahController.setSelectedProvince(value);
+                  wilayahController.setSelectedCity(null);
+                  wilayahController.setSelectedDistrict(null);
+                });
+                if (wilayahController.selectedProvince!.isNotEmpty) {
+                  wilayahController
+                      .getAllDataCities(wilayahController.selectedProvince!);
+                }
+              },
+              decoration: InputDecoration(
+                hintStyle: AppTheme.greyTextStyle.copyWith(
+                  fontSize: 12,
+                ),
+                isDense: true,
+                border: OutlineInputBorder(
+                  borderSide:
+                      const BorderSide(color: AppColors.greyColor, width: 2),
+                  borderRadius: BorderRadius.circular(7),
+                ),
+              ),
+              items: wilayahController.provinces.map((data) {
+                return DropdownMenuItem<String>(
+                  value: data.attributes!.namaProvinsi,
+                  child: Text(data.attributes!.namaProvinsi.toString()),
+                );
+              }).toList(),
+              hint: Text('Pilih Provinsi', style: AppTheme.greyTextStyle),
+            ),
+            // END PROVINSI
+            const SizedBox(
+              height: 10,
+            ),
+            // START OF KOTAS
+            DropdownButtonFormField<String>(
+              value: wilayahController.selectedCity,
+              onChanged: (String? value) {
+                setState(() {
+                  wilayahController.setSelectedCity(value);
+                  wilayahController.setSelectedDistrict(null);
+                });
+                if (wilayahController.selectedCity!.isNotEmpty) {
+                  wilayahController
+                      .getAllDataKecamatan(wilayahController.selectedCity!);
+                }
+              },
+              decoration: InputDecoration(
+                hintStyle: AppTheme.greyTextStyle.copyWith(
+                  fontSize: 12,
+                ),
+                isDense: true,
+                border: OutlineInputBorder(
+                  borderSide:
+                      const BorderSide(color: AppColors.greyColor, width: 2),
+                  borderRadius: BorderRadius.circular(7),
+                ),
+              ),
+              items: wilayahController
+                  .getCitiesByProvince(wilayahController.selectedProvince ?? "")
+                  .map((city) {
+                return DropdownMenuItem<String>(
+                  value: city.attributes!.namaKota,
+                  child: Text(city.attributes!.namaKota.toString()),
+                );
+              }).toList(),
+              hint: Text('Pilih Kota', style: AppTheme.greyTextStyle),
+            ),
+            // END OF KOTAS
+            const SizedBox(
+              height: 10,
+            ),
+            const SizedBox(
+              height: 12,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SecondaryButton(
+                  onTap: () {
+                    context.pop();
+                  },
+                  titleButton: "BATAL",
+                ),
+                const SizedBox(width: 15),
+                PrimaryButton(
+                  onTap: () {
+                    if (user['token'] == null &&
+                        user['email'] == null &&
+                        user['id'] == null) {
+                      CoolAlert.show(
+                        context: context,
+                        width: MediaQuery.of(context).size.width * 0.3,
+                        type: CoolAlertType.error,
+                        text: 'Maaf, kamu harus login terlebih dahulu',
+                      ).then((value) => context.go('/register'));
+                    } else {
+                      final productItem = {
+                        'user': user,
+                        'product': {
+                          'id': idProduct,
+                          'judul': data.judul,
+                          'harga': data.harga,
+                          'satuan': data.satuan,
+                          'gambar': data.gambar?.data?.attributes?.url,
+                        },
+                        'provinsi': wilayahController.selectedProvince,
+                        'kota': wilayahController.selectedCity,
+                        'item': controller.itemsCount.toString(),
+                        'totalHarga': controller.totalHarga.toString(),
+                      };
+                      controller.addToCart(productItem);
+                      CoolAlert.show(
+                        context: context,
+                        width: MediaQuery.of(context).size.width * 0.3,
+                        type: CoolAlertType.success,
+                        text: 'Product berhasil ditambahkan kedalam keranjang',
+                      );
+                      wilayahController.setSelectedProvince(null);
+                      wilayahController.setSelectedCity(null);
+                    }
+                  },
+                  titleButton: 'Tambahkan Ke Keranjang',
+                ),
+              ],
             ),
           ],
         ),

@@ -25,6 +25,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => BantuanController()),
         ChangeNotifierProvider(create: (_) => LogbookController()),
         ChangeNotifierProvider(create: (_) => PencarianController()),
+        ChangeNotifierProvider(create: (_) => SettingController()),
       ],
       child: MyApp(),
     ),

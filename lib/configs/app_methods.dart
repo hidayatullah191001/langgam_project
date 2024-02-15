@@ -85,4 +85,12 @@ class AppMethods {
       text: text,
     );
   }
+
+  static void openLinkNewTab(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url, forceWebView: true);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
 }

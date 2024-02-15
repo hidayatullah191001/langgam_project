@@ -83,10 +83,6 @@ class PesananSection extends StatelessWidget {
               );
             }
             if (snapshot.hasData) {
-              // permintaanController
-              //     .setPermintaanFromFutureBuilder(snapshot.data);
-              // final permintaan = permintaanController.permintaan;
-
               ListPermintaanModel model = snapshot.data as ListPermintaanModel;
 
               return ListView.builder(
@@ -287,68 +283,53 @@ class _DetailPesananSectionState extends State<DetailPesananSection> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (status == "Menunggu Persetujuan") ...[
-                StatusWidget(
-                    message:
-                        'Saat ini pesanan berstatus $status. Harap upload surat permintaan terlebih dahulu untuk melanjutkan proses menunggu persetujuan'),
-              ] else if (status == "Verifikasi Persyaratan") ...[
+              if (status == "Permintaan Masuk") ...[
                 const StatusWidget(
                     message:
-                        'Saat ini pesanan berstatus Menunggu Persetujuan. Harap upload surat permintaan terlebih dahulu untuk melanjutkan proses menunggu persetujuan'),
-                StatusWidget(
-                    message: 'Pesanan memasuki tahapan $status oleh admin'),
-              ] else if (status == "Menunggu Pembayaran") ...[
+                        'Permintaan anda berhasil kami terima. Harap upload surat permintaan terlebih dahulu untuk melanjutkan proses.'),
+              ] else if (status == "Permintaan Disetujui") ...[
                 const StatusWidget(
                     message:
-                        'Saat ini pesanan berstatus Menunggu Persetujuan. Harap upload surat permintaan terlebih dahulu untuk melanjutkan proses menunggu persetujuan'),
+                        'Saat ini pesanan berstatus Permintaan Masuk. Harap upload surat permintaan terlebih dahulu untuk melanjutkan proses'),
+                const StatusWidget(
+                    message: 'Permintaan anda telah disetujui oleh admin'),
+              ] else if (status == "Permintaan Ditolak") ...[
                 const StatusWidget(
                     message:
-                        'Pesanan memasuki tahapan Verifikasi Persyaratan oleh admin'),
+                        'Saat ini pesanan berstatus Permintaan Masuk. Harap upload surat permintaan terlebih dahulu untuk melanjutkan proses'),
+                const StatusWidget(
+                    message: 'Permintaan anda telah ditolak oleh admin'),
+              ] else if (status == "Menunggu pembayaran") ...[
+                const StatusWidget(
+                    message:
+                        'Permintaan anda berhasil kami terima. Harap upload surat permintaan terlebih dahulu untuk melanjutkan proses'),
+                const StatusWidget(
+                    message: 'Permintaan anda telah disetujui oleh admin'),
                 StatusWidget(
                     message:
                         'Pesanan sekarang berstatus $status. Silahkan upload bukti pembayaran dengan kode billing yang telah diberikan'),
-              ] else if (status == "Verifikasi Pembayaran") ...[
+              ] else if (status == "Permintaan Telah Dibayarkan") ...[
                 const StatusWidget(
                     message:
-                        'Saat ini pesanan berstatus Menunggu Persetujuan. Harap upload surat permintaan terlebih dahulu untuk melanjutkan proses menunggu persetujuan'),
+                        'Permintaan anda berhasil kami terima. Harap upload surat permintaan terlebih dahulu untuk melanjutkan proses'),
+                const StatusWidget(
+                    message: 'Permintaan anda telah disetujui oleh admin'),
                 const StatusWidget(
                     message:
-                        'Pesanan memasuki tahapan Verifikasi Persyartan oleh admin'),
+                        'Pesanan sekarang berstatus Menunggu Pembayaran. Silahkan upload bukti pembayaran dengan kode billing yang telah diberikan'),
+                StatusWidget(message: 'Status $status'),
+              ] else if (status == "Permintaan Selesai") ...[
                 const StatusWidget(
                     message:
-                        'Pesanan sekarang berstatus Menuggu Pembayaran. Silahkan upload bukti pembayaran dengan kode billing yang telah diberikan'),
-                StatusWidget(
-                    message: 'Pesanan memasuk tahapan $status oleh admin'),
-              ] else if (status == "Sedang Diproses") ...[
+                        'Permintaan anda berhasil kami terima. Harap upload surat permintaan terlebih dahulu untuk melanjutkan proses'),
+                const StatusWidget(
+                    message: 'Permintaan anda telah disetujui oleh admin'),
                 const StatusWidget(
                     message:
-                        'Saat ini pesanan berstatus Menunggu Persetujuan. Harap upload surat permintaan terlebih dahulu untuk melanjutkan proses menunggu persetujuan'),
+                        'Pesanan sekarang berstatus Menunggu Pembayaran. Silahkan upload bukti pembayaran dengan kode billing yang telah diberikan'),
                 const StatusWidget(
-                    message:
-                        'Pesanan memasuki tahapan Verifikasi Persyaratan oleh admin'),
-                const StatusWidget(
-                    message:
-                        'Pesanan sekarang berstatus Menuggu Pembayaran. Silahkan upload bukti pembayaran dengan kode billing yang telah diberikan'),
-                const StatusWidget(
-                    message:
-                        'Pesanan memasuki tahapan Verifikasi Pembayaran oleh admin'),
-                StatusWidget(message: 'Pesanan $status oleh admin'),
-              ] else if (status == "Selesai") ...[
-                const StatusWidget(
-                    message:
-                        'Saat ini pesanan berstatus Menunggu Persetujuan. Harap upload surat permintaan terlebih dahulu untuk melanjutkan proses menunggu persetujuan'),
-                const StatusWidget(
-                    message:
-                        'Pesanan memasuki tahapan Verifikasi Persyaratan oleh admin'),
-                const StatusWidget(
-                    message:
-                        'Pesanan sekarang berstatus Menuggu Pembayaran. Silahkan upload bukti pembayaran dengan kode billing yang telah diberikan'),
-                const StatusWidget(
-                    message:
-                        'Pesanan memasuki tahapan Verifikasi Pembayaran oleh admin'),
-                const StatusWidget(
-                    message: 'Pesanan Sedang Diproses oleh admin'),
-                StatusWidget(message: 'Pesanan telah $status'),
+                    message: 'Status Permintaan Telah Dibayarkan'),
+                StatusWidget(message: '$status'),
               ]
             ],
           ),
@@ -455,8 +436,6 @@ class _DetailPesananSectionState extends State<DetailPesananSection> {
           ],
         ),
         const SizedBox(height: 30),
-        Text('File: coba.pdf', style: AppTheme.greyTextStyle),
-        const SizedBox(height: 15),
         Text(
           'ALAMAT PENAGIHAN',
           style: AppTheme.blackTextStyle.copyWith(
@@ -871,11 +850,13 @@ class _DetailPesananSectionState extends State<DetailPesananSection> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                title,
-                style: AppTheme.blackTextStyle.copyWith(
-                  fontWeight: AppTheme.bold,
-                  letterSpacing: 1.1,
+              Expanded(
+                child: Text(
+                  title,
+                  style: AppTheme.blackTextStyle.copyWith(
+                    fontWeight: AppTheme.bold,
+                    letterSpacing: 1.1,
+                  ),
                 ),
               ),
               Text(

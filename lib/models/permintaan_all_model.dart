@@ -23,12 +23,12 @@ class PermintaanAllModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
-    if (this.meta != null) {
-      data['meta'] = this.meta!.toJson();
+    if (meta != null) {
+      data['meta'] = meta!.toJson();
     }
     return data;
   }
@@ -43,15 +43,15 @@ class PermintaanAllData {
   PermintaanAllData.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     attributes = json['attributes'] != null
-        ? new PermintaanAllAttributes.fromJson(json['attributes'])
+        ? PermintaanAllAttributes.fromJson(json['attributes'])
         : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    if (this.attributes != null) {
-      data['attributes'] = this.attributes!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    if (attributes != null) {
+      data['attributes'] = attributes!.toJson();
     }
     return data;
   }
@@ -146,71 +146,71 @@ class PermintaanAllAttributes {
     if (json['metadata'] != null) {
       metadata = <Metadata>[];
       json['metadata'].forEach((v) {
-        metadata!.add(new Metadata.fromJson(v));
+        metadata!.add(Metadata.fromJson(v));
       });
     }
     if (json['komentar'] != null) {
       komentar = <Komentar>[];
       json['komentar'].forEach((v) {
-        komentar!.add(new Komentar.fromJson(v));
+        komentar!.add(Komentar.fromJson(v));
       });
     }
     customerUser = json['customer_user'] != null
-        ? new CustomerUser.fromJson(json['customer_user'])
+        ? CustomerUser.fromJson(json['customer_user'])
         : null;
     operatorUser = json['operator_user'] != null
-        ? new OperatorUser.fromJson(json['operator_user'])
+        ? OperatorUser.fromJson(json['operator_user'])
         : null;
     layanan = json['layanan'] != null
-        ? new Layanan.fromJson(json['layanan']['data'])
+        ? Layanan.fromJson(json['layanan']['data'])
         : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['nama'] = this.nama;
-    data['email'] = this.email;
-    data['telepon'] = this.telepon;
-    data['perusahaan'] = this.perusahaan;
-    data['alamat'] = this.alamat;
-    data['kecamatan'] = this.kecamatan;
-    data['kota'] = this.kota;
-    data['provinsi'] = this.provinsi;
-    data['status'] = this.status;
-    data['kuantitas'] = this.kuantitas;
-    data['komersial'] = this.komersial;
-    data['createdAt'] = this.createdAt;
-    data['updatedAt'] = this.updatedAt;
-    data['harga'] = this.harga;
-    data['total'] = this.total;
-    data['kode_billing'] = this.kodeBilling;
-    data['nomor_permintaan'] = this.nomorPermintaan;
-    if (this.suratPermintaan != null) {
-      data['surat_permintaan'] = this.suratPermintaan!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['nama'] = nama;
+    data['email'] = email;
+    data['telepon'] = telepon;
+    data['perusahaan'] = perusahaan;
+    data['alamat'] = alamat;
+    data['kecamatan'] = kecamatan;
+    data['kota'] = kota;
+    data['provinsi'] = provinsi;
+    data['status'] = status;
+    data['kuantitas'] = kuantitas;
+    data['komersial'] = komersial;
+    data['createdAt'] = createdAt;
+    data['updatedAt'] = updatedAt;
+    data['harga'] = harga;
+    data['total'] = total;
+    data['kode_billing'] = kodeBilling;
+    data['nomor_permintaan'] = nomorPermintaan;
+    if (suratPermintaan != null) {
+      data['surat_permintaan'] = suratPermintaan!.toJson();
     }
-    if (this.billingPembayaran != null) {
-      data['billing_pembayaran'] = this.billingPembayaran!.toJson();
+    if (billingPembayaran != null) {
+      data['billing_pembayaran'] = billingPembayaran!.toJson();
     }
-    if (this.buktiPembayaran != null) {
-      data['bukti_pembayaran'] = this.buktiPembayaran!.toJson();
+    if (buktiPembayaran != null) {
+      data['bukti_pembayaran'] = buktiPembayaran!.toJson();
     }
-    if (this.dokumenPermintaan != null) {
-      data['dokumen_permintaan'] = this.dokumenPermintaan!.toJson();
+    if (dokumenPermintaan != null) {
+      data['dokumen_permintaan'] = dokumenPermintaan!.toJson();
     }
-    if (this.metadata != null) {
-      data['metadata'] = this.metadata!.map((v) => v.toJson()).toList();
+    if (metadata != null) {
+      data['metadata'] = metadata!.map((v) => v.toJson()).toList();
     }
-    if (this.komentar != null) {
-      data['komentar'] = this.komentar!.map((v) => v.toJson()).toList();
+    if (komentar != null) {
+      data['komentar'] = komentar!.map((v) => v.toJson()).toList();
     }
-    if (this.customerUser != null) {
-      data['customer_user'] = this.customerUser!.toJson();
+    if (customerUser != null) {
+      data['customer_user'] = customerUser!.toJson();
     }
-    if (this.operatorUser != null) {
-      data['operator_user'] = this.operatorUser!.toJson();
+    if (operatorUser != null) {
+      data['operator_user'] = operatorUser!.toJson();
     }
-    if (this.layanan != null) {
-      data['layanan'] = this.layanan!.toJson();
+    if (layanan != null) {
+      data['layanan'] = layanan!.toJson();
     }
     return data;
   }
@@ -230,10 +230,10 @@ class Metadata {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['field'] = this.field;
-    data['data'] = this.data;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['field'] = field;
+    data['data'] = data;
     return data;
   }
 }
@@ -245,14 +245,14 @@ class Meta {
 
   Meta.fromJson(Map<String, dynamic> json) {
     pagination = json['pagination'] != null
-        ? new Pagination.fromJson(json['pagination'])
+        ? Pagination.fromJson(json['pagination'])
         : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.pagination != null) {
-      data['pagination'] = this.pagination!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (pagination != null) {
+      data['pagination'] = pagination!.toJson();
     }
     return data;
   }
@@ -274,11 +274,11 @@ class Pagination {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['page'] = this.page;
-    data['pageSize'] = this.pageSize;
-    data['pageCount'] = this.pageCount;
-    data['total'] = this.total;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['page'] = page;
+    data['pageSize'] = pageSize;
+    data['pageCount'] = pageCount;
+    data['total'] = total;
     return data;
   }
 }
@@ -295,9 +295,9 @@ class Komentar {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['comment'] = this.comment;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['comment'] = comment;
     return data;
   }
 }

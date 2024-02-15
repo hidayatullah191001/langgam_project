@@ -22,6 +22,7 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
     getDataUser();
     context.read<WilayahController>().getAllDataProvinces();
     context.read<LayananController>().getLayananBySlug(widget.slug);
+    context.read<SettingController>().getSettingWeb();
   }
 
   getDataUser() async {
@@ -36,64 +37,84 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
     final layananController = context.watch<LayananController>();
     final searchController = context.watch<PencarianController>();
 
-    return Scaffold(
-      body: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-        if (constraints.maxWidth <= 1200) {
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Lottie.asset('lottie/maintenance.json'),
-                    Text(
-                      'Saat ini hanya tersedia untuk Website. Gunakan laptop untuk membuka',
-                      style: AppTheme.blackTextStyle.copyWith(
-                        fontSize: 18,
-                        fontWeight: AppTheme.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ]),
-            ),
-          );
-        } else {
-          if (layananController.layanan == null) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          } else {
-            return CustomScrollView(
-              slivers: [
-                SliverList(
-                  delegate: SliverChildListDelegate([
-                    const BannerTop(),
-                  ]),
-                ),
-                const SliverAppBar(
-                  pinned: true,
-                  floating: false,
-                  collapsedHeight: 101.0,
-                  automaticallyImplyLeading: false,
-                  flexibleSpace: Navbar(),
-                  actions: [SizedBox()],
-                ),
-                SliverToBoxAdapter(
-                  child: Column(
-                    children: [
-                      !searchController.isSearchBoolean
-                          ? defaultWidget()
-                          : searchWidget(),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          }
+    return Consumer(
+      builder: (context, SettingController controller, widget) {
+        if (controller.dataState == DataState.loading) {
+          return Center(child: CircularProgressIndicator());
         }
-      }),
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth < 1200) {
+              return MobileView(searchController, context);
+            } else {
+              return WebView(layananController, searchController);
+            }
+          },
+        );
+      },
+    );
+  }
+
+  Widget MobileView(
+      PencarianController searchController, BuildContext context) {
+    return Scaffold(
+      drawerEnableOpenDragGesture: false,
+      endDrawerEnableOpenDragGesture: false,
+      appBar: AppBar(
+        title: BannerTopMobile(),
+        backgroundColor: AppColors.primaryColor,
+        iconTheme: const IconThemeData(color: AppColors.whiteColor),
+        actions: [
+          new Container(),
+        ],
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Navbar(
+                isMobile: true,
+              ),
+              !searchController.isSearchBoolean
+                  ? defaultWidgetMobile()
+                  : searchWidgetMobile(),
+            ],
+          ),
+        ),
+      ),
+      endDrawer: const LoginDrawer(),
+    );
+  }
+
+  Widget WebView(LayananController layananController,
+      PencarianController searchController) {
+    return Scaffold(
+      body: CustomScrollView(
+        slivers: [
+          SliverList(
+            delegate: SliverChildListDelegate([
+              const BannerTop(),
+            ]),
+          ),
+          SliverAppBar(
+            pinned: true,
+            floating: false,
+            collapsedHeight: 101.0,
+            automaticallyImplyLeading: false,
+            flexibleSpace: Navbar(),
+            actions: [SizedBox()],
+          ),
+          SliverToBoxAdapter(
+            child: Column(
+              children: [
+                !searchController.isSearchBoolean
+                    ? defaultWidget()
+                    : searchWidget(),
+              ],
+            ),
+          ),
+        ],
+      ),
       endDrawer: const LoginDrawer(),
     );
   }
@@ -104,6 +125,16 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
       children: [
         ContentSection(),
         const Footer(),
+      ],
+    );
+  }
+
+  Widget defaultWidgetMobile() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        ContentSectionMobile(),
+        const FooterMobile(),
       ],
     );
   }
@@ -164,6 +195,80 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                 );
               },
             );
+          }
+          return Container();
+        },
+      ),
+    );
+  }
+
+  Widget searchWidgetMobile() {
+    final searchController = context.watch<PencarianController>();
+    return Container(
+      width: double.infinity,
+      color: AppColors.whiteColor,
+      padding: EdgeInsets.symmetric(
+        horizontal: 10,
+      ),
+      child: FutureBuilder(
+        future: LayananServices.getLayananByValue(searchController.value!),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (!snapshot.hasData) {
+            return Center(
+              child: Text(
+                'Data dengan kueri ${searchController.value} tidak ditemukan',
+              ),
+            );
+          }
+
+          if (snapshot.hasData) {
+            Layanan data = snapshot.data!;
+            if (data.data!.length < 1) {
+              return Center(
+                child: Column(
+                  children: [
+                    Lottie.asset(
+                      'lottie/empty_cart.json',
+                      width: 150,
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Data tidak ditemukan',
+                      style: AppTheme.greyTextStyle.copyWith(
+                        fontSize: 14,
+                        fontWeight: AppTheme.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    PrimaryButton(
+                      onTap: () {
+                        searchController.setSearchBoolean(false);
+                      },
+                      titleButton: "KEMBALI",
+                    )
+                  ],
+                ),
+              );
+            } else {
+              return ListView.builder(
+                padding: EdgeInsets.zero,
+                itemCount: data.data!.length,
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  final LayananData layanan = data.data![index];
+
+                  print(layanan.attributes!.judul);
+                  return ItemLayananCardList(
+                    data: layanan,
+                    id: layanan.id!,
+                    isMobile: true,
+                  );
+                },
+              );
+            }
           }
           return Container();
         },
@@ -465,13 +570,310 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
     );
   }
 
-  Widget ModalInformationLocation(BuildContext context) {
+  Widget ContentSectionMobile() {
+    final controller = context.watch<LayananController>();
+    final cartController = context.watch<CartController>();
+    return Container(
+      width: double.infinity,
+      color: AppColors.whiteColor,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(
+              left: 20,
+              right: 20,
+              top: 15,
+            ),
+            child: Row(
+              children: [
+                TextButtonHovered(
+                  text: 'Beranda',
+                  onTap: () {
+                    context.go('/');
+                  },
+                  styleBeforeHovered: AppTheme.greyTextStyle,
+                  styleHovered: AppTheme.blackTextStyle.copyWith(
+                    fontWeight: AppTheme.semiBold,
+                    fontSize: 14,
+                  ),
+                ),
+                Text(' / ', style: AppTheme.greyTextStyle),
+                TextButtonHovered(
+                  text: controller
+                      .layanan!.attributes!.bidangLayanan!.attributes!.judul!,
+                  onTap: () {
+                    context.go(
+                        '/layanan/${controller.layanan!.attributes!.bidangLayanan!.attributes!.slug!}');
+                    ;
+                  },
+                  styleBeforeHovered: AppTheme.greyTextStyle,
+                  styleHovered: AppTheme.blackTextStyle.copyWith(
+                    fontWeight: AppTheme.semiBold,
+                    fontSize: 14,
+                  ),
+                ),
+                Text(' / ', style: AppTheme.greyTextStyle),
+                Expanded(
+                  child: Text(
+                    controller.layanan!.attributes!.judul.toString(),
+                    style: AppTheme.blackTextStyle.copyWith(
+                      fontWeight: AppTheme.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.only(
+              top: 15,
+              bottom: 50,
+              left: 20,
+              right: 20,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  height: 360,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    image: DecorationImage(
+                      image: NetworkImage(
+                          '${Constant.host}${controller.layanan!.attributes!.gambar!.data!.attributes!.url}'),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Column(
+                  children: [
+                    Text(
+                      controller.layanan!.attributes!.judul.toString(),
+                      style: AppTheme.blackTextStyle.copyWith(
+                        fontSize: 50,
+                        fontWeight: AppTheme.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          AppMethods.currency(cartController
+                              .total(controller.layanan!.attributes!.harga!)
+                              .toString()),
+                          style: AppTheme.primaryTextStyle.copyWith(
+                            fontSize: 18,
+                            fontWeight: AppTheme.bold,
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          controller.layanan!.attributes!.satuan.toString(),
+                          style: AppTheme.greyTextStyle.copyWith(
+                            fontSize: 18,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Text(
+                      controller.layanan!.attributes!.intro.toString(),
+                      style: AppTheme.greyTextStyle.copyWith(
+                        fontSize: 14,
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            InkWell(
+                              onTap: () {
+                                cartController.remover();
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.blue.withOpacity(0.1),
+                                  borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(6),
+                                    bottomLeft: Radius.circular(6),
+                                  ),
+                                ),
+                                child: const Icon(
+                                  Icons.remove,
+                                  color: AppColors.primaryColor,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.all(11),
+                              color: Colors.blue.withOpacity(0.1),
+                              child: Text(
+                                cartController.itemsCount.toString(),
+                                style: AppTheme.blackTextStyle.copyWith(
+                                  fontSize: 14,
+                                  fontWeight: AppTheme.medium,
+                                ),
+                              ),
+                            ),
+                            InkWell(
+                              onTap: () {
+                                cartController.add();
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.blue.withOpacity(0.1),
+                                  borderRadius: const BorderRadius.only(
+                                    topRight: Radius.circular(6),
+                                    bottomRight: Radius.circular(6),
+                                  ),
+                                ),
+                                child: const Icon(
+                                  Icons.add,
+                                  color: AppColors.primaryColor,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(width: 15),
+                        Expanded(
+                          child: PrimaryButton(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return Dialog(
+                                    child: ModalInformationLocation(context,
+                                        isMobile: true),
+                                  );
+                                },
+                              );
+                            },
+                            titleButton: 'TAMBAH KE KERANJANG',
+                          ),
+                        ),
+                        const SizedBox(width: 15),
+                      ],
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+          Divider(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Column(
+                children: [
+                  stateDesk == 'DESKRIPSI'
+                      ? Container(
+                          width: 50,
+                          height: 3,
+                          color: AppColors.primaryColor,
+                        )
+                      : const SizedBox(height: 3),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  TextButtonHovered(
+                    text: 'DESKRIPSI',
+                    onTap: () {
+                      setState(() {
+                        stateDesk = 'DESKRIPSI';
+                      });
+                    },
+                    styleBeforeHovered: stateDesk == 'DESKRIPSI'
+                        ? AppTheme.blackTextStyle.copyWith(
+                            fontSize: 18,
+                            fontWeight: AppTheme.bold,
+                          )
+                        : AppTheme.greyTextStyle.copyWith(
+                            fontSize: 18,
+                            fontWeight: AppTheme.bold,
+                          ),
+                    styleHovered: AppTheme.blackTextStyle.copyWith(
+                      fontSize: 18,
+                      fontWeight: AppTheme.bold,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 24),
+              Column(
+                children: [
+                  stateDesk == 'SYARAT & KETENTUAN'
+                      ? Container(
+                          width: 50,
+                          height: 3,
+                          color: AppColors.primaryColor,
+                        )
+                      : const SizedBox(height: 3),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  TextButtonHovered(
+                    text: 'SYARAT & KETENTUAN',
+                    onTap: () {
+                      setState(() {
+                        stateDesk = 'SYARAT & KETENTUAN';
+                      });
+                    },
+                    styleBeforeHovered: stateDesk == 'SYARAT & KETENTUAN'
+                        ? AppTheme.blackTextStyle.copyWith(
+                            fontSize: 18,
+                            fontWeight: AppTheme.bold,
+                          )
+                        : AppTheme.greyTextStyle.copyWith(
+                            fontSize: 18,
+                            fontWeight: AppTheme.bold,
+                          ),
+                    styleHovered: AppTheme.blackTextStyle.copyWith(
+                      fontSize: 18,
+                      fontWeight: AppTheme.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 15),
+          stateDesk == 'DESKRIPSI'
+              ? ContentDeskripsi(isMobile: true)
+              : ContentSyaratKetentuan(isMobile: true),
+          // Divider(),
+          // UlasanSection(),
+          Divider(),
+          ProdukTerkaitSectionMobile(),
+        ],
+      ),
+    );
+  }
+
+  Widget ModalInformationLocation(BuildContext context,
+      {bool isMobile = false}) {
     final controller = context.watch<CartController>();
     final wilayahController = context.watch<WilayahController>();
     final layananController = context.watch<LayananController>();
 
     return Container(
-      width: MediaQuery.of(context).size.width * 0.5,
+      width: isMobile
+          ? MediaQuery.of(context).size.width * 0.8
+          : MediaQuery.of(context).size.width * 0.5,
       padding: const EdgeInsets.all(35),
       child: SingleChildScrollView(
         child: Column(
@@ -614,7 +1016,7 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
     final String bidangLayananId =
         controller.layanan!.attributes!.bidangLayanan!.id.toString();
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 150, vertical: 50.0),
+      padding: EdgeInsets.symmetric(horizontal: 150, vertical: 50.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -635,7 +1037,6 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
           const SizedBox(height: 20),
           SizedBox(
             width: double.infinity,
-            // height: MediaQuery.of(context).size.height * 0.5,
             height: 300,
             child: FutureBuilder(
               future:
@@ -659,7 +1060,6 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
 
                   return ListView.builder(
                     padding: EdgeInsets.zero,
-                    physics: NeverScrollableScrollPhysics(),
                     scrollDirection: Axis.horizontal,
                     shrinkWrap: true,
                     itemCount: data.data!.length >= 4 ? 4 : data.data!.length,
@@ -667,6 +1067,129 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                       final layanan = data.data![index];
                       return Container(
                         width: MediaQuery.of(context).size.width * 0.19,
+                        padding: EdgeInsets.only(
+                          left: index == 0 ? 0 : 8,
+                          right: index == 3 ? 0 : 8,
+                        ),
+                        child: Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                height: 150,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: NetworkImage(
+                                        '${Constant.host}${layanan.attributes!.gambar!.data!.attributes!.url ?? ''}'),
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                layanan.attributes!.judul.toString(),
+                                style: AppTheme.blackTextStyle
+                                    .copyWith(fontWeight: AppTheme.bold),
+                              ),
+                              const SizedBox(height: 20),
+                              Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      AppMethods.currency(
+                                          layanan.attributes!.harga.toString()),
+                                      style: AppTheme.primaryTextStyle.copyWith(
+                                        fontWeight: AppTheme.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 5),
+                                    Text(
+                                      layanan.attributes!.satuan.toString(),
+                                      style: AppTheme.greyTextStyle,
+                                    ),
+                                  ]),
+                              const SizedBox(height: 10),
+                              PrimaryButton(
+                                onTap: () {
+                                  context.go(
+                                      '/layanan/${layanan.attributes!.slug}');
+                                },
+                                titleButton: 'LIHAT DETAIL',
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                }
+
+                return Container();
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget ProdukTerkaitSectionMobile() {
+    final controller = context.watch<LayananController>();
+    final String bidangLayananId =
+        controller.layanan!.attributes!.bidangLayanan!.id.toString();
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 50.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Text(
+            'PRODUK TERKAIT',
+            style: AppTheme.blackTextStyle.copyWith(
+              fontWeight: AppTheme.bold,
+              fontSize: 18,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Container(
+            width: 30,
+            height: 2,
+            color: AppColors.primaryColor,
+          ),
+          const SizedBox(height: 20),
+          SizedBox(
+            width: double.infinity,
+            height: 400,
+            child: FutureBuilder(
+              future:
+                  LayananServices.getLayananByBidangLayananId(bidangLayananId),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+
+                if (!snapshot.hasData) {
+                  return Center(
+                    child: Text('Data tidak ditemukan',
+                        style: AppTheme.blackTextStyle),
+                  );
+                }
+
+                if (snapshot.hasData) {
+                  Layanan data = snapshot.data!;
+
+                  return ListView.builder(
+                    padding: EdgeInsets.zero,
+                    scrollDirection: Axis.horizontal,
+                    shrinkWrap: true,
+                    itemCount: data.data!.length >= 3 ? 3 : data.data!.length,
+                    itemBuilder: (context, index) {
+                      final layanan = data.data![index];
+                      return Container(
+                        width: MediaQuery.of(context).size.width * 0.3,
                         padding: EdgeInsets.only(
                           left: index == 0 ? 0 : 8,
                           right: index == 3 ? 0 : 8,
@@ -692,22 +1215,18 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                                   .copyWith(fontWeight: AppTheme.bold),
                             ),
                             const SizedBox(height: 20),
-                            Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    AppMethods.currency(
-                                        layanan.attributes!.harga.toString()),
-                                    style: AppTheme.primaryTextStyle.copyWith(
-                                      fontWeight: AppTheme.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 5),
-                                  Text(
-                                    layanan.attributes!.satuan.toString(),
-                                    style: AppTheme.greyTextStyle,
-                                  ),
-                                ]),
+                            Text(
+                              AppMethods.currency(
+                                  layanan.attributes!.harga.toString()),
+                              style: AppTheme.primaryTextStyle.copyWith(
+                                fontWeight: AppTheme.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 5),
+                            Text(
+                              layanan.attributes!.satuan.toString(),
+                              style: AppTheme.greyTextStyle,
+                            ),
                             const SizedBox(height: 10),
                             PrimaryButton(
                               onTap: () {
@@ -726,66 +1245,6 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                 return Container();
               },
             ),
-            // child: ListView.builder(
-            //   padding: EdgeInsets.zero,
-            //   physics: NeverScrollableScrollPhysics(),
-            //   scrollDirection: Axis.horizontal,
-            //   shrinkWrap: true,
-            //   itemCount: 4,
-            //   itemBuilder: (context, index) {
-            //     return Container(
-            //       width: MediaQuery.of(context).size.width * 0.19,
-            //       padding: EdgeInsets.only(
-            //         left: index == 0 ? 0 : 8,
-            //         right: index == 3 ? 0 : 8,
-            //       ),
-            //       child: Column(
-            //         crossAxisAlignment: CrossAxisAlignment.start,
-            //         children: [
-            //           Container(
-            //             height: 150,
-            //             decoration: BoxDecoration(
-            //               image: const DecorationImage(
-            //                 image: AssetImage('images/product-1.jpg'),
-            //                 fit: BoxFit.cover,
-            //               ),
-            //               borderRadius: BorderRadius.circular(12),
-            //             ),
-            //           ),
-            //           const SizedBox(height: 10),
-            //           Text(
-            //             'Informasi Data Cuaca Untuk Pelbuhan',
-            //             style: AppTheme.blackTextStyle
-            //                 .copyWith(fontWeight: AppTheme.bold),
-            //           ),
-            //           const SizedBox(height: 20),
-            //           Row(
-            //               mainAxisAlignment: MainAxisAlignment.start,
-            //               children: [
-            //                 Text(
-            //                   'Rp 225.000',
-            //                   style: AppTheme.primaryTextStyle.copyWith(
-            //                     fontWeight: AppTheme.bold,
-            //                   ),
-            //                 ),
-            //                 const SizedBox(width: 5),
-            //                 Text(
-            //                   '/ lokasi / hari',
-            //                   style: AppTheme.greyTextStyle,
-            //                 ),
-            //               ]),
-            //           const SizedBox(height: 10),
-            //           Expanded(
-            //             child: PrimaryButton(
-            //               onTap: () {},
-            //               titleButton: 'TAMBAHKAN KE KERANJANG',
-            //             ),
-            //           ),
-            //         ],
-            //       ),
-            //     );
-            //   },
-            // ),
           ),
         ],
       ),
@@ -917,38 +1376,39 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
     );
   }
 
-  Widget ContentDeskripsi() {
+  Widget ContentDeskripsi({bool isMobile = false}) {
     final controller = context.watch<LayananController>();
     return Container(
-      padding: const EdgeInsets.only(
-        left: 150.0,
-        right: 150.0,
+      padding: EdgeInsets.only(
+        left: isMobile ? 20 : 150.0,
+        right: isMobile ? 20 : 150.0,
         bottom: 50.0,
       ),
-      child: ListView.builder(
-        shrinkWrap: true,
-        padding: EdgeInsets.zero,
-        itemCount: controller.layanan!.attributes!.konten!.length,
-        itemBuilder: (context, index) {
-          final konten = controller.layanan!.attributes!.konten![index];
-
-          if (konten.type == 'heading') {
-            return Text(
-              konten.children![0].text!,
-              style: AppTheme.blackTextStyle
-                  .copyWith(fontSize: 24, fontWeight: AppTheme.bold),
-            );
-          } else if (konten.type == 'paragraph') {
-            return Container(
-              margin: const EdgeInsets.symmetric(vertical: 5),
-              child: Text(
-                konten.children![0].text!,
-                style: AppTheme.greyTextStyle,
-              ),
-            );
-          }
-        },
-      ),
+      child: controller.layanan!.attributes!.konten != null
+          ? ListView.builder(
+              shrinkWrap: true,
+              padding: EdgeInsets.zero,
+              itemCount: controller.layanan!.attributes!.konten!.length,
+              itemBuilder: (context, index) {
+                final konten = controller.layanan!.attributes!.konten![index];
+                if (konten.type == 'heading') {
+                  return Text(
+                    konten.children![0].text!,
+                    style: AppTheme.blackTextStyle
+                        .copyWith(fontSize: 24, fontWeight: AppTheme.bold),
+                  );
+                } else if (konten.type == 'paragraph') {
+                  return Container(
+                    margin: const EdgeInsets.symmetric(vertical: 5),
+                    child: Text(
+                      konten.children![0].text!,
+                      style: AppTheme.greyTextStyle,
+                    ),
+                  );
+                }
+              },
+            )
+          : Container(),
       // child: Column(
       //   children: [
       //     Text(
@@ -960,82 +1420,152 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
     );
   }
 
-  Widget ContentSyaratKetentuan() {
+  Widget ContentSyaratKetentuan({bool isMobile = false}) {
     return Container(
-      padding: const EdgeInsets.only(
-        left: 150.0,
-        right: 150.0,
+      padding: EdgeInsets.only(
+        left: isMobile ? 20 : 150.0,
+        right: isMobile ? 20 : 150.0,
         bottom: 50.0,
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 250,
-            height: 350,
-            decoration: BoxDecoration(
-              image: const DecorationImage(
-                image: AssetImage('images/photo.jpeg'),
-                fit: BoxFit.cover,
-              ),
-              borderRadius: BorderRadius.circular(24),
-            ),
-          ),
-          const SizedBox(width: 60),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: syaratKetentuan.map((data) {
-              final title = data['title'];
-              final items = data['items'] as List;
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: AppTheme.blackTextStyle.copyWith(
-                      fontWeight: AppTheme.bold,
-                      fontSize: 18,
+      child: !isMobile
+          ? Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 250,
+                  height: 350,
+                  decoration: BoxDecoration(
+                    image: const DecorationImage(
+                      image: AssetImage('images/photo.jpeg'),
+                      fit: BoxFit.cover,
                     ),
+                    borderRadius: BorderRadius.circular(24),
                   ),
-                  const SizedBox(height: 15),
-                  ...items.map((item) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          const Padding(
-                            padding: const EdgeInsets.only(top: 13.0),
-                            child: const Icon(
-                              Icons.circle,
-                              size: 7,
-                              color: AppColors.greyColor,
-                            ),
+                ),
+                const SizedBox(width: 60),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: syaratKetentuan.map((data) {
+                    final title = data['title'];
+                    final items = data['items'] as List;
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: AppTheme.blackTextStyle.copyWith(
+                            fontWeight: AppTheme.bold,
+                            fontSize: 18,
                           ),
-                          const SizedBox(width: 10),
-                          SizedBox(
-                            width: 500,
-                            child: Text(
-                              item,
-                              style: AppTheme.greyTextStyle.copyWith(
-                                height: 2,
-                              ),
-                              maxLines: 10,
+                        ),
+                        const SizedBox(height: 15),
+                        ...items.map((item) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 8.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                const Padding(
+                                  padding: const EdgeInsets.only(top: 13.0),
+                                  child: const Icon(
+                                    Icons.circle,
+                                    size: 7,
+                                    color: AppColors.greyColor,
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                SizedBox(
+                                  width: 500,
+                                  child: Text(
+                                    item,
+                                    style: AppTheme.greyTextStyle.copyWith(
+                                      height: 2,
+                                    ),
+                                    maxLines: 10,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
-                      ),
+                          );
+                        }).toList(),
+                        const SizedBox(height: 20),
+                      ],
                     );
                   }).toList(),
-                  const SizedBox(height: 20),
-                ],
-              );
-            }).toList(),
-          )
-        ],
-      ),
+                )
+              ],
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  height: 350,
+                  decoration: BoxDecoration(
+                    image: const DecorationImage(
+                      image: AssetImage('images/photo.jpeg'),
+                      fit: BoxFit.cover,
+                    ),
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                ),
+                const SizedBox(height: 60),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: syaratKetentuan.map((data) {
+                    final title = data['title'];
+                    final items = data['items'] as List;
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: AppTheme.blackTextStyle.copyWith(
+                            fontWeight: AppTheme.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                        const SizedBox(height: 15),
+                        ...items.map((item) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 8.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                const Padding(
+                                  padding: const EdgeInsets.only(top: 13.0),
+                                  child: const Icon(
+                                    Icons.circle,
+                                    size: 7,
+                                    color: AppColors.greyColor,
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: SizedBox(
+                                    width: 500,
+                                    child: Text(
+                                      item,
+                                      style: AppTheme.greyTextStyle.copyWith(
+                                        height: 2,
+                                      ),
+                                      maxLines: 10,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                        const SizedBox(height: 20),
+                      ],
+                    );
+                  }).toList(),
+                )
+              ],
+            ),
     );
   }
 }

@@ -11,6 +11,7 @@ import 'package:d_method/d_method.dart';
 import 'package:http/http.dart' as http;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:toastification/toastification.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 part 'api_request.dart';
 part 'app_colors.dart';

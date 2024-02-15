@@ -7,15 +7,15 @@ class OperatorUser {
   OperatorUser.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     attributes = json['attributes'] != null
-        ? new OperatorUserAttributes.fromJson(json['attributes'])
+        ? OperatorUserAttributes.fromJson(json['attributes'])
         : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    if (this.attributes != null) {
-      data['attributes'] = this.attributes!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    if (attributes != null) {
+      data['attributes'] = attributes!.toJson();
     }
     return data;
   }
@@ -50,14 +50,14 @@ class OperatorUserAttributes {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['username'] = this.username;
-    data['email'] = this.email;
-    data['provider'] = this.provider;
-    data['confirmed'] = this.confirmed;
-    data['blocked'] = this.blocked;
-    data['createdAt'] = this.createdAt;
-    data['updatedAt'] = this.updatedAt;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['username'] = username;
+    data['email'] = email;
+    data['provider'] = provider;
+    data['confirmed'] = confirmed;
+    data['blocked'] = blocked;
+    data['createdAt'] = createdAt;
+    data['updatedAt'] = updatedAt;
     return data;
   }
 }

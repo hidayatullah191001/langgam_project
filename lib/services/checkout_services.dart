@@ -51,11 +51,12 @@ class CheckoutService {
       },
     );
 
-    if (responseBody!['data'] == null)
+    if (responseBody!['data'] == null) {
       return {
         'success': false,
         'error': 'Something went wrong',
       };
+    }
 
     if (responseBody['data'].isNotEmpty) {
       return {'success': true, 'data': responseBody};

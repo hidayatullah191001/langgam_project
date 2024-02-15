@@ -10,19 +10,19 @@ class LogbookModel {
     if (json['data'] != null) {
       data = <LogbookData>[];
       json['data'].forEach((v) {
-        data!.add(new LogbookData.fromJson(v));
+        data!.add(LogbookData.fromJson(v));
       });
     }
-    meta = json['meta'] != null ? new Meta.fromJson(json['meta']) : null;
+    meta = json['meta'] != null ? Meta.fromJson(json['meta']) : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     if (this.data != null) {
       data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
-    if (this.meta != null) {
-      data['meta'] = this.meta!.toJson();
+    if (meta != null) {
+      data['meta'] = meta!.toJson();
     }
     return data;
   }
@@ -37,15 +37,15 @@ class LogbookData {
   LogbookData.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     attributes = json['attributes'] != null
-        ? new LogbookAttributes.fromJson(json['attributes'])
+        ? LogbookAttributes.fromJson(json['attributes'])
         : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    if (this.attributes != null) {
-      data['attributes'] = this.attributes!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    if (attributes != null) {
+      data['attributes'] = attributes!.toJson();
     }
     return data;
   }
@@ -89,23 +89,23 @@ class LogbookAttributes {
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
     petugas =
-        json['petugas'] != null ? new Petugas.fromJson(json['petugas']) : null;
+        json['petugas'] != null ? Petugas.fromJson(json['petugas']) : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['perihal_permohonan'] = this.perihalPermohonan;
-    data['nama_pemohon'] = this.namaPemohon;
-    data['nomor_telepon'] = this.nomorTelepon;
-    data['waktu_pengerjaan'] = this.waktuPengerjaan;
-    data['pembayaran'] = this.pembayaran;
-    data['status'] = this.status;
-    data['waktu_pengambilan'] = this.waktuPengambilan;
-    data['keterangan'] = this.keterangan;
-    data['createdAt'] = this.createdAt;
-    data['updatedAt'] = this.updatedAt;
-    if (this.petugas != null) {
-      data['petugas'] = this.petugas!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['perihal_permohonan'] = perihalPermohonan;
+    data['nama_pemohon'] = namaPemohon;
+    data['nomor_telepon'] = nomorTelepon;
+    data['waktu_pengerjaan'] = waktuPengerjaan;
+    data['pembayaran'] = pembayaran;
+    data['status'] = status;
+    data['waktu_pengambilan'] = waktuPengambilan;
+    data['keterangan'] = keterangan;
+    data['createdAt'] = createdAt;
+    data['updatedAt'] = updatedAt;
+    if (petugas != null) {
+      data['petugas'] = petugas!.toJson();
     }
     return data;
   }
@@ -118,14 +118,14 @@ class Meta {
 
   Meta.fromJson(Map<String, dynamic> json) {
     pagination = json['pagination'] != null
-        ? new Pagination.fromJson(json['pagination'])
+        ? Pagination.fromJson(json['pagination'])
         : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.pagination != null) {
-      data['pagination'] = this.pagination!.toJson();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (pagination != null) {
+      data['pagination'] = pagination!.toJson();
     }
     return data;
   }
@@ -147,11 +147,11 @@ class Pagination {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['page'] = this.page;
-    data['pageSize'] = this.pageSize;
-    data['pageCount'] = this.pageCount;
-    data['total'] = this.total;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['page'] = page;
+    data['pageSize'] = pageSize;
+    data['pageCount'] = pageCount;
+    data['total'] = total;
     return data;
   }
 }
