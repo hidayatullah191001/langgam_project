@@ -496,33 +496,33 @@ class _LoginFormState extends State<LoginForm> {
           const SizedBox(
             height: 30,
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              const Expanded(
-                child: Divider(
-                  color: AppColors.blackColor,
-                  thickness: 0.3,
-                  height: 0.3,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Text(
-                'ATAU LOGIN DENGAN',
-                style: AppTheme.blackTextStyle.copyWith(
-                  fontWeight: AppTheme.bold,
-                ),
-              ),
-              const SizedBox(width: 10),
-              const Expanded(
-                child: Divider(
-                  color: AppColors.blackColor,
-                  thickness: 0.3,
-                  height: 0.3,
-                ),
-              ),
-            ],
-          ),
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          //   children: [
+          //     const Expanded(
+          //       child: Divider(
+          //         color: AppColors.blackColor,
+          //         thickness: 0.3,
+          //         height: 0.3,
+          //       ),
+          //     ),
+          //     const SizedBox(width: 10),
+          //     Text(
+          //       'ATAU LOGIN DENGAN',
+          //       style: AppTheme.blackTextStyle.copyWith(
+          //         fontWeight: AppTheme.bold,
+          //       ),
+          //     ),
+          //     const SizedBox(width: 10),
+          //     const Expanded(
+          //       child: Divider(
+          //         color: AppColors.blackColor,
+          //         thickness: 0.3,
+          //         height: 0.3,
+          //       ),
+          //     ),
+          //   ],
+          // ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 30),
             child: SizedBox(
@@ -833,81 +833,81 @@ class _LoginFormMobileState extends State<LoginFormMobile> {
         const SizedBox(
           height: 30,
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            const Expanded(
-              child: Divider(
-                color: AppColors.blackColor,
-                thickness: 0.3,
-                height: 0.3,
-              ),
-            ),
-            const SizedBox(width: 10),
-            Text(
-              'ATAU LOGIN DENGAN',
-              style: AppTheme.blackTextStyle.copyWith(
-                fontWeight: AppTheme.bold,
-              ),
-            ),
-            const SizedBox(width: 10),
-            const Expanded(
-              child: Divider(
-                color: AppColors.blackColor,
-                thickness: 0.3,
-                height: 0.3,
-              ),
-            ),
-          ],
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 30),
-          child: SizedBox(
-            width: double.infinity,
-            child: Material(
-              color: const Color(0xff4285f4),
-              borderRadius: BorderRadius.circular(10),
-              child: InkWell(
-                onTap: () {}, // Button Login Dengan GOOGLE
-                borderRadius: BorderRadius.circular(10),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 18,
-                    vertical: 13,
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 25,
-                        height: 25,
-                        decoration: BoxDecoration(
-                          color: Colors.blueGrey[50],
-                          borderRadius: BorderRadius.circular(7),
-                          image: const DecorationImage(
-                            image: AssetImage('images/google-icon.png'),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Center(
-                          child: Text(
-                            'GOOGLE',
-                            style: AppTheme.whiteTextStyle.copyWith(
-                              fontWeight: AppTheme.medium,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
+        // Row(
+        //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        //   children: [
+        //     const Expanded(
+        //       child: Divider(
+        //         color: AppColors.blackColor,
+        //         thickness: 0.3,
+        //         height: 0.3,
+        //       ),
+        //     ),
+        //     const SizedBox(width: 10),
+        //     Text(
+        //       'ATAU LOGIN DENGAN',
+        //       style: AppTheme.blackTextStyle.copyWith(
+        //         fontWeight: AppTheme.bold,
+        //       ),
+        //     ),
+        //     const SizedBox(width: 10),
+        //     const Expanded(
+        //       child: Divider(
+        //         color: AppColors.blackColor,
+        //         thickness: 0.3,
+        //         height: 0.3,
+        //       ),
+        //     ),
+        //   ],
+        // ),
+        // Padding(
+        //   padding: const EdgeInsets.symmetric(vertical: 30),
+        //   child: SizedBox(
+        //     width: double.infinity,
+        //     child: Material(
+        //       color: const Color(0xff4285f4),
+        //       borderRadius: BorderRadius.circular(10),
+        //       child: InkWell(
+        //         onTap: () {}, // Button Login Dengan GOOGLE
+        //         borderRadius: BorderRadius.circular(10),
+        //         child: Padding(
+        //           padding: const EdgeInsets.symmetric(
+        //             horizontal: 18,
+        //             vertical: 13,
+        //           ),
+        //           child: Row(
+        //             children: [
+        //               Container(
+        //                 width: 25,
+        //                 height: 25,
+        //                 decoration: BoxDecoration(
+        //                   color: Colors.blueGrey[50],
+        //                   borderRadius: BorderRadius.circular(7),
+        //                   image: const DecorationImage(
+        //                     image: AssetImage('images/google-icon.png'),
+        //                     fit: BoxFit.cover,
+        //                   ),
+        //                 ),
+        //               ),
+        //               Expanded(
+        //                 child: Center(
+        //                   child: Text(
+        //                     'GOOGLE',
+        //                     style: AppTheme.whiteTextStyle.copyWith(
+        //                       fontWeight: AppTheme.medium,
+        //                     ),
+        //                     textAlign: TextAlign.center,
+        //                   ),
+        //                 ),
+        //               ),
+        //               const SizedBox(width: 10),
+        //             ],
+        //           ),
+        //         ),
+        //       ),
+        //     ),
+        //   ),
+        // ),
       ],
     );
   }
@@ -1069,6 +1069,7 @@ class _RegisterFormMobileState extends State<RegisterFormMobile> {
 
                 if (result['success'] == true) {
                   // ignore: use_build_context_synchronously
+                  AppMethods.successToast(context, result['message']);
                   context.replace('/');
                 } else {
                   // ignore: use_build_context_synchronously

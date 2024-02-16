@@ -21,7 +21,7 @@ class _DownloadSectionState extends State<DownloadSection> {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
-      if (constraints.maxWidth < 1200) {
+      if (constraints.maxWidth < 800) {
         return mobileView();
       } else {
         return webView();

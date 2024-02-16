@@ -24,6 +24,7 @@ import 'package:langgam_project/models/logbook_model.dart';
 
 import 'package:langgam_project/models/provinsi_model.dart';
 import 'package:langgam_project/models/setting_web_model.dart';
+import 'package:langgam_project/models/user_accound_model.dart';
 import 'package:langgam_project/services/services.dart';
 import 'package:provider/provider.dart';
 
@@ -41,3 +42,4 @@ part 'bantuan_controller.dart';
 part 'logbook_controller.dart';
 part 'search_controller.dart';
 part 'setting_controller.dart';
+part 'user_account_controller.dart';

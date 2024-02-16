@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'dart:html' as html;
 
 import 'package:d_method/d_method.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:langgam_project/configs/configs.dart';
 import 'package:langgam_project/models/berita_model.dart';
 import 'package:langgam_project/models/bidang_layanan_model.dart';
@@ -23,6 +24,9 @@ import 'package:langgam_project/models/provinsi_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:langgam_project/models/setting_web_model.dart';
 import 'package:langgam_project/models/bantuan_model.dart';
+import 'package:langgam_project/models/user_accound_model.dart';
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server/gmail.dart';
 
 part 'auth_services.dart';
 part 'layanan_services.dart';
@@ -33,3 +37,4 @@ part 'berita_services.dart';
 part 'bantuan_services.dart';
 part 'logbook_services.dart';
 part 'settings_service.dart';
+part 'user_services.dart';

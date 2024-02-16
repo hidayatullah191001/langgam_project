@@ -10,6 +10,7 @@ class CustomFormUser extends StatefulWidget {
   String? hintText;
   VoidCallback? onTap;
   TextInputType? keyboardType;
+  bool? isEnabled;
 
   CustomFormUser({
     Key? key,
@@ -22,6 +23,7 @@ class CustomFormUser extends StatefulWidget {
     this.hintText,
     this.onTap,
     this.keyboardType = TextInputType.text,
+    this.isEnabled = true,
   }) : super(key: key);
 
   @override
@@ -63,6 +65,7 @@ class _CustomFormUserState extends State<CustomFormUser> {
           onTap: widget.onTap,
           maxLines: widget.maxLines,
           keyboardType: widget.keyboardType,
+          enabled: widget.isEnabled,
           decoration: InputDecoration(
             hintText: widget.hintText,
             hintStyle: AppTheme.greyTextStyle.copyWith(
