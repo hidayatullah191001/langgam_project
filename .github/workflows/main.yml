@@ -7,7 +7,9 @@ on:
   pull_request:
     branches:
       - restapi
-
+  permissions:
+    contents: write
+    
 jobs:
   build:
     name: Build
@@ -15,7 +17,7 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     
     - name: Install Flutter
       uses: subosito/flutter-action@v1
@@ -42,7 +44,7 @@ jobs:
     
     steps:
     - name: Download artifact
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: production-files
         path: ./build
