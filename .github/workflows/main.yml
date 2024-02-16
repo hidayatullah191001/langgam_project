@@ -7,10 +7,11 @@ on:
   pull_request:
     branches:
       - restapi
+
+jobs:
   permissions:
     contents: write
-    
-jobs:
+
   build:
     name: Build
     runs-on: ubuntu-latest
