@@ -126,96 +126,21 @@ class AuthServices {
   }
 
   static Future<Map<String, dynamic>> register(SignUpFormModel value) async {
-    String activationToken =
-        generateActivationToken(); // Implementasikan fungsi ini
-    String activationLink =
-        '${Constant.apirest}/activate?token=$activationToken';
-    await sendActivationEmail(value.email!, activationLink);
-    return {};
-    // Map? responseBody = await APIRequest.post(
-    //   '${Constant.apirest}/auth/local/register',
-    //   body: value.toJson(),
-    // );
-    // if (responseBody!.isNotEmpty && responseBody['jwt'] != null) {
-    //   String email = responseBody['user']['email'].toString();
-    //   String activationToken =
-    //       generateActivationToken(); // Implementasikan fungsi ini
-    //   String activationLink =
-    //       '${Constant.apirest}/activate?token=$activationToken';
-
-    //   // Kirim email aktivasi
-    //   await sendActivationEmail(email, activationLink);
-
-    //   return {
-    //     "success": true,
-    //     "message":
-    //         "Akun berhasil didaftarkan, silahkan cek email untuk aktivasi",
-    //   };
-    // } else {
-    //   return {
-    //     "success": false,
-    //     "message": "Ada kesalahan di server, coba lagi!.",
-    //   };
-    // }
-  }
-
-  static Future<void> sendActivationEmail(
-      String recipientEmail, String activationLink) async {
-    final smtpServer = gmail('hidayatullahbp@gmail.com',
-        '#Dayat1910'); // Ganti dengan kredensial SMTP yang valid
-
-    final message = Message()
-      ..from = Address('admin@langgam.bmkg.go.id',
-          'admin@langgam.bmkg.go.id') // Ganti dengan alamat email pengirim dan nama Anda
-      ..recipients.add(recipientEmail)
-      ..subject = 'Aktivasi Akun'
-      ..text =
-          'Terima kasih atas registrasinya! Silahkan aktivasi akun Anda melalui tautan berikut: $activationLink';
-
-    try {
-      final sendReport = await send(message, smtpServer);
-      print('Message sent: ' + sendReport.toString());
-    } catch (e) {
-      print('Error occurred while sending activation email: $e');
-      // Anda dapat menangani kesalahan pengiriman email di sini sesuai kebutuhan
+    Map? responseBody = await APIRequest.post(
+      '${Constant.apirest}/auth/local/register',
+      body: value.toJson(),
+    );
+    if (responseBody!.isNotEmpty && responseBody['jwt'] != null) {
+      return {
+        "success": true,
+        "message":
+            "Akun berhasil didaftarkan, silahkan cek email untuk aktivasi",
+      };
+    } else {
+      return {
+        "success": false,
+        "message": responseBody['error']['message'],
+      };
     }
   }
-
-  // Fungsi untuk menghasilkan token aktivasi (contoh sederhana, gantilah dengan implementasi yang lebih aman)
-  static String generateActivationToken() {
-    return DateTime.now().millisecondsSinceEpoch.toRadixString(16);
-  }
-
-  static Future<void> handleGoogleSignIn() async {
-    final GoogleSignIn _googleSignIn = GoogleSignIn();
-    try {
-      // Membuka dialog login Google
-      GoogleSignInAccount? googleSignInAccount = await _googleSignIn.signIn();
-
-      if (googleSignInAccount != null) {
-        // Berhasil login, dapatkan informasi akun
-        print('User ID: ${googleSignInAccount.id}');
-        print('Display Name: ${googleSignInAccount.displayName}');
-        print('Email: ${googleSignInAccount.email}');
-        print('Profile Picture: ${googleSignInAccount.photoUrl}');
-      } else {
-        // Pembatalan login oleh pengguna
-        print('Login dibatalkan.');
-      }
-    } catch (error) {
-      print('Error during Google sign in: $error');
-    }
-  }
-
-  // static Future logout()async{
-  //    AppSession.saveUserInformation(
-  //       {
-  //         'email': responseBody['user']['email'],
-  //         'id': responseBody['user']['id'],
-  //         'username': responseBody['user']['username'],
-  //       },
-  //       token,
-  //     );
-  //     return true
-  // }
 }

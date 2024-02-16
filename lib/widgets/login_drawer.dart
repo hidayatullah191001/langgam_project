@@ -165,9 +165,7 @@ class _LoginDrawerState extends State<LoginDrawer> {
                         color: const Color(0xff4285f4),
                         borderRadius: BorderRadius.circular(10),
                         child: InkWell(
-                          onTap: () {
-                            AuthServices.handleGoogleSignIn();
-                          }, // Button Login Dengan GOOGLE
+                          onTap: () {}, // Button Login Dengan GOOGLE
                           borderRadius: BorderRadius.circular(10),
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
