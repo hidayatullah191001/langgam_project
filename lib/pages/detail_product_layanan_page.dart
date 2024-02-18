@@ -259,8 +259,6 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
                   final LayananData layanan = data.data![index];
-
-                  print(layanan.attributes!.judul);
                   return ItemLayananCardList(
                     data: layanan,
                     id: layanan.id!,

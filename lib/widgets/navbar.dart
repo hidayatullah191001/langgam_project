@@ -313,7 +313,7 @@ class _NavbarState extends State<Navbar> {
             future: BantuanService.getAllBantuan(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator());
               }
               if (snapshot.hasData) {
                 List<BantuanData> data = snapshot.data!.data!;

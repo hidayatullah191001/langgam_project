@@ -143,4 +143,61 @@ class AuthServices {
       };
     }
   }
+
+  static Future<Map<String, dynamic>> registerGoogle() async {
+    final GoogleSignIn _googleSignIn = GoogleSignIn();
+    try {
+      // Membuka dialog login Google
+      GoogleSignInAccount? googleSignInAccount = await _googleSignIn.signIn();
+
+      if (googleSignInAccount != null) {
+        // Berhasil login, dapatkan informasi akun
+        print('User ID: ${googleSignInAccount.id}');
+        print('Display Name: ${googleSignInAccount.displayName}');
+        print('Email: ${googleSignInAccount.email}');
+        print('Profile Picture: ${googleSignInAccount.photoUrl}');
+        print('Password Accound: ${googleSignInAccount.authentication}');
+        final account = {
+          "email": googleSignInAccount.email,
+          "username": googleSignInAccount.displayName,
+          "firstName": googleSignInAccount.displayName,
+          "password": "rahasia",
+          "lastName": "",
+          "blocked": "false",
+        };
+
+        Map? responseBody = await APIRequest.post(
+          '${Constant.apirest}/auth/local/register',
+          body: account,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        );
+        print(responseBody);
+        if (responseBody!.isNotEmpty && responseBody['jwt'] != null) {
+          return {
+            "success": true,
+            "message":
+                "Akun berhasil didaftarkan, silahkan cek email untuk aktivasi",
+          };
+        } else {
+          return {
+            "success": false,
+            "message": responseBody['error']['message'],
+          };
+        }
+      } else {
+        // Pembatalan login oleh pengguna
+        return {
+          "success": false,
+          "message": "Register dibatalkan pengguna",
+        };
+      }
+    } catch (error) {
+      return {
+        "success": false,
+        "message": "Error during Google sign in: $error",
+      };
+    }
+  }
 }

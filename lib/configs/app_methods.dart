@@ -29,24 +29,13 @@ class AppMethods {
         .join();
   }
 
-  // static void dangerFlushbar(BuildContext context, String title) {
-  //   Flushbar(
-  //     backgroundColor: AppColors.dangerColor,
-  //     title: 'Failed',
-  //     titleColor: AppColors.whiteColor,
-  //     message: title,
-  //     duration: const Duration(seconds: 3),
-  //     isDismissible: false,
-  //     borderRadius: BorderRadius.circular(12),
-  //   ).show(context);
-  // }
-
   static void dangerToast(BuildContext context, String title) async {
     toastification.show(
       context: context,
-      title: title,
-      primaryColor: AppColors.whiteColor,
-      backgroundColor: AppColors.dangerColor,
+      title: Text(
+        title,
+        style: AppTheme.whiteTextStyle,
+      ),
       autoCloseDuration: const Duration(seconds: 5),
       type: ToastificationType.error,
       style: ToastificationStyle.fillColored,
@@ -56,10 +45,10 @@ class AppMethods {
   static void successToast(BuildContext context, String title) async {
     toastification.show(
       context: context,
-      title: title,
+      title: Text(
+        title,
+      ),
       autoCloseDuration: const Duration(seconds: 5),
-      primaryColor: AppColors.whiteColor,
-      backgroundColor: AppColors.successColor,
       type: ToastificationType.success,
       style: ToastificationStyle.fillColored,
     );
@@ -68,10 +57,10 @@ class AppMethods {
   static void warningToast(BuildContext context, String title) async {
     toastification.show(
       context: context,
-      title: title,
+      title: Text(
+        title,
+      ),
       autoCloseDuration: const Duration(seconds: 5),
-      primaryColor: AppColors.whiteColor,
-      backgroundColor: AppColors.warningColor,
       type: ToastificationType.warning,
       style: ToastificationStyle.fillColored,
     );
@@ -87,10 +76,37 @@ class AppMethods {
   }
 
   static void openLinkNewTab(String url) async {
+    // ignore: deprecated_member_use
     if (await canLaunch(url)) {
+      // ignore: deprecated_member_use
       await launch(url, forceWebView: true);
     } else {
       throw 'Could not launch $url';
     }
   }
+
+  static String potongString({required String input, required int panjangMax}) {
+    if (input.length <= panjangMax) {
+      return input;
+    } else {
+      return input.substring(0, panjangMax - 3) + "...";
+    }
+  }
+
+  // void sendEmail(String recipientEmail, String subject, String body) async {
+  //   final smtpServer = gmail('your@gmail.com', 'your-password');
+
+  //   final message = Message()
+  //     ..from = Address('your@gmail.com', 'Your Name')
+  //     ..recipients.add(recipientEmail)
+  //     ..subject = subject
+  //     ..text = body;
+
+  //   try {
+  //     final sendReport = await send(message, smtpServer);
+  //     print('Message sent: ' + sendReport.toString());
+  //   } catch (e) {
+  //     print('Error: $e');
+  //   }
+  // }
 }

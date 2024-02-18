@@ -11,59 +11,79 @@ class _BeritaPageState extends State<BeritaPage> {
   int selectedPageNumber = 1;
   @override
   Widget build(BuildContext context) {
+    return LayoutBuilder(builder: (context, BoxConstraints constraints) {
+      if (constraints.maxWidth <= 800) {
+        return mobileView();
+      } else {
+        return webView();
+      }
+    });
+  }
+
+  Widget mobileView() {
+    final searchController = context.watch<PencarianController>();
+    return Scaffold(
+      drawerEnableOpenDragGesture: false,
+      endDrawerEnableOpenDragGesture: false,
+      appBar: AppBar(
+        title: BannerTopMobile(),
+        backgroundColor: AppColors.primaryColor,
+        iconTheme: const IconThemeData(color: AppColors.whiteColor),
+        actions: [
+          new Container(),
+        ],
+      ),
+      body: Consumer(builder: (context, SettingController controller, widget) {
+        if (controller.dataState == DataState.loading) {
+          return const Center(child: CircularProgressIndicator());
+        } else {
+          return SafeArea(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Navbar(
+                    isMobile: true,
+                  ),
+                  !searchController.isSearchBoolean
+                      ? defaultWidgetMobile()
+                      : searchWidgetMobile(),
+                ],
+              ),
+            ),
+          );
+        }
+      }),
+      endDrawer: const LoginDrawer(),
+    );
+  }
+
+  Widget webView() {
     final controller = context.watch<NavbarController>();
     final searchController = context.watch<PencarianController>();
-
     return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, BoxConstraints constraints) {
-          if (constraints.maxWidth <= 1200) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Lottie.asset('lottie/maintenance.json'),
-                      Text(
-                        'Saat ini hanya tersedia untuk Website. Gunakan laptop untuk membuka',
-                        style: AppTheme.blackTextStyle.copyWith(
-                          fontSize: 18,
-                          fontWeight: AppTheme.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ]),
-              ),
-            );
-          } else {
-            return CustomScrollView(
-              slivers: [
-                SliverList(
-                  delegate: SliverChildListDelegate([
-                    const BannerTop(),
-                  ]),
-                ),
-                SliverAppBar(
-                  pinned: true,
-                  floating: false,
-                  collapsedHeight: 101.0,
-                  automaticallyImplyLeading: false,
-                  flexibleSpace: Navbar(),
-                  actions: [SizedBox()],
-                ),
-                SliverList(
-                  delegate: SliverChildListDelegate([
-                    !searchController.isSearchBoolean
-                        ? defaultWidget(context)
-                        : searchWidget(context),
-                  ]),
-                ),
-              ],
-            );
-          }
-        },
+      body: CustomScrollView(
+        slivers: [
+          SliverList(
+            delegate: SliverChildListDelegate([
+              const BannerTop(),
+            ]),
+          ),
+          SliverAppBar(
+            pinned: true,
+            floating: false,
+            collapsedHeight: 101.0,
+            automaticallyImplyLeading: false,
+            flexibleSpace: Navbar(),
+            actions: [SizedBox()],
+          ),
+          SliverList(
+            delegate: SliverChildListDelegate([
+              !searchController.isSearchBoolean
+                  ? defaultWidget(context)
+                  : searchWidget(context),
+            ]),
+          ),
+        ],
       ),
       endDrawer: controller.selectedDrawer == 'Login'
           ? const LoginDrawer()
@@ -147,9 +167,92 @@ class _BeritaPageState extends State<BeritaPage> {
     );
   }
 
-  Widget ContentSection(BuildContext context) {
+  Widget defaultWidgetMobile() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        HeroSection(
+          heroTitle: 'Semua Berita',
+        ),
+        ContentSectionMobile(context),
+        const FooterMobile(),
+      ],
+    );
+  }
+
+  Widget searchWidgetMobile() {
+    final searchController = context.watch<PencarianController>();
     return Container(
       width: double.infinity,
+      color: AppColors.whiteColor,
+      padding: EdgeInsets.symmetric(
+        horizontal: 10,
+      ),
+      child: FutureBuilder(
+        future: LayananServices.getLayananByValue(searchController.value!),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (!snapshot.hasData) {
+            return Center(
+              child: Text(
+                'Data dengan kueri ${searchController.value} tidak ditemukan',
+              ),
+            );
+          }
+
+          if (snapshot.hasData) {
+            Layanan data = snapshot.data!;
+            if (data.data!.length < 1) {
+              return Center(
+                child: Column(
+                  children: [
+                    Lottie.asset(
+                      'lottie/empty_cart.json',
+                      width: 150,
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Data tidak ditemukan',
+                      style: AppTheme.greyTextStyle.copyWith(
+                        fontSize: 14,
+                        fontWeight: AppTheme.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    PrimaryButton(
+                      onTap: () {
+                        searchController.setSearchBoolean(false);
+                      },
+                      titleButton: "KEMBALI",
+                    )
+                  ],
+                ),
+              );
+            } else {
+              return ListView.builder(
+                padding: EdgeInsets.zero,
+                itemCount: data.data!.length,
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  final LayananData layanan = data.data![index];
+                  return ItemLayananCardList(
+                    data: layanan,
+                    id: layanan.id!,
+                  );
+                },
+              );
+            }
+          }
+          return Container();
+        },
+      ),
+    );
+  }
+
+  Widget ContentSection(BuildContext context) {
+    return Container(
       padding: const EdgeInsets.symmetric(
         vertical: 50,
         horizontal: 150,
@@ -164,9 +267,7 @@ class _BeritaPageState extends State<BeritaPage> {
             return Center(
               child: Text('Data not Found', style: AppTheme.blackTextStyle),
             );
-          }
-
-          if (snapshot.hasData) {
+          } else {
             List<BeritaData> data = snapshot.data!.data!;
             final meta = snapshot.data!.meta!;
             return Column(
@@ -190,7 +291,7 @@ class _BeritaPageState extends State<BeritaPage> {
                             selectedPageNumber = pageNumber;
                           });
                         },
-                        pageTotal: meta!.pagination!.pageCount!,
+                        pageTotal: meta.pagination!.pageCount!,
                         pageInit:
                             selectedPageNumber, // picked number when init page
                         colorPrimary: AppColors.primaryColor,
@@ -200,7 +301,61 @@ class _BeritaPageState extends State<BeritaPage> {
               ],
             );
           }
-          return Container();
+        },
+      ),
+    );
+  }
+
+  Widget ContentSectionMobile(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+        vertical: 50,
+        horizontal: 20,
+      ),
+      child: FutureBuilder(
+        future: BeritaService.getAllBerita(page: selectedPageNumber),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+          if (!snapshot.hasData) {
+            return Center(
+              child: Text('Data not Found', style: AppTheme.blackTextStyle),
+            );
+          } else {
+            List<BeritaData> data = snapshot.data!.data!;
+            final meta = snapshot.data!.meta!;
+            return Column(
+              children: [
+                ListView.builder(
+                  padding: EdgeInsets.zero,
+                  itemCount: data.length,
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) {
+                    final BeritaAttributes post = data[index].attributes!;
+                    return ItemBeritaMobile(
+                      data: post,
+                    );
+                  },
+                ),
+                data.length > 0
+                    ? NumberPagination(
+                        onPageChanged: (int pageNumber) {
+                          setState(() {
+                            selectedPageNumber = pageNumber;
+                          });
+                        },
+                        pageTotal: meta.pagination!.pageCount!,
+                        pageInit:
+                            selectedPageNumber, // picked number when init page
+                        colorPrimary: AppColors.primaryColor,
+                        colorSub: AppColors.backgroundColor3,
+                      )
+                    : Container(),
+              ],
+            );
+          }
         },
       ),
     );
@@ -222,94 +377,164 @@ class _ItemBeritaState extends State<ItemBerita> {
   Widget build(BuildContext context) {
     String urlGambar =
         '${Constant.host}${widget.data.gambar!.data!.attributes!.url}';
-    return MouseRegion(
-      onEnter: (_) => _handleHover(true),
-      onExit: (_) => _handleHover(false),
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 10),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            AnimatedPositioned(
-              duration: const Duration(milliseconds: 300),
-              top: isHovered ? 0.0 : -15.0,
-              bottom: isHovered ? 0.0 : -15.0,
-              left: isHovered ? 0.0 : -15.0,
-              right: isHovered ? 0.0 : -15.0,
-              child: Container(
-                width: 250,
-                height: 180,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  image: DecorationImage(
-                    image: NetworkImage(urlGambar ??
-                        'https://img.freepik.com/premium-vector/vector-mock-up-daily-newspaper-newspaper-template-newspaper-with-location-copy-space-newspaper-template-with-world-news-economy-business-headlines-daily-news-isolated-white-background_435184-1137.jpg'),
-                    fit: BoxFit.cover,
-                  ),
-                ),
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 250,
+            height: 180,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              image: DecorationImage(
+                image: NetworkImage(urlGambar),
+                fit: BoxFit.cover,
               ),
             ),
-            const SizedBox(width: 20),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                    Text(
-                      'Diposting oleh',
-                      style: AppTheme.greyTextStyle.copyWith(fontSize: 14),
-                    ),
-                    const SizedBox(width: 10),
-                    const CircleAvatar(
-                      radius: 15,
-                      backgroundColor: AppColors.backgroundColor3,
-                      child: Icon(
-                        Icons.person,
-                        color: AppColors.greyColor,
-                      ),
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      'Admin',
-                      style: AppTheme.greyTextStyle.copyWith(
-                        fontSize: 14,
-                      ),
-                    ),
-                  ]),
-                  const SizedBox(height: 10),
+          ),
+          const SizedBox(width: 20),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Row(mainAxisAlignment: MainAxisAlignment.start, children: [
                   Text(
-                    widget.data.judul!,
-                    style: AppTheme.blackTextStyle.copyWith(
-                      fontSize: 18,
-                      fontWeight: AppTheme.bold,
+                    'Diposting oleh',
+                    style: AppTheme.greyTextStyle.copyWith(fontSize: 14),
+                  ),
+                  const SizedBox(width: 10),
+                  const CircleAvatar(
+                    radius: 15,
+                    backgroundColor: AppColors.backgroundColor3,
+                    child: Icon(
+                      Icons.person,
+                      color: AppColors.greyColor,
                     ),
                   ),
-                  const SizedBox(height: 15),
+                  const SizedBox(width: 5),
                   Text(
-                    widget.data.intro!,
-                    style: AppTheme.greyTextStyle,
+                    'Admin',
+                    style: AppTheme.greyTextStyle.copyWith(
+                      fontSize: 14,
+                    ),
                   ),
-                  const SizedBox(height: 15),
-                  PrimaryButton(
-                    onTap: () {
-                      context.go('/berita/${widget.data.slug}');
-                    },
-                    titleButton: 'LANJUTKAN MEMBACA',
+                ]),
+                const SizedBox(height: 10),
+                Text(
+                  widget.data.judul!,
+                  style: AppTheme.blackTextStyle.copyWith(
+                    fontSize: 18,
+                    fontWeight: AppTheme.bold,
                   ),
-                  const SizedBox(height: 50),
-                ],
-              ),
-            )
-          ],
-        ),
+                ),
+                const SizedBox(height: 15),
+                Text(
+                  widget.data.intro!,
+                  style: AppTheme.greyTextStyle,
+                ),
+                const SizedBox(height: 15),
+                PrimaryButton(
+                  onTap: () {
+                    context.go('/berita/${widget.data.slug}');
+                  },
+                  titleButton: 'LANJUTKAN MEMBACA',
+                ),
+                const SizedBox(height: 50),
+              ],
+            ),
+          )
+        ],
       ),
     );
   }
+}
 
-  void _handleHover(bool hover) {
-    setState(() {
-      isHovered = hover;
-    });
+class ItemBeritaMobile extends StatefulWidget {
+  final BeritaAttributes data;
+  const ItemBeritaMobile({Key? key, required this.data}) : super(key: key);
+
+  @override
+  State<ItemBeritaMobile> createState() => _ItemBeritaStateMobile();
+}
+
+class _ItemBeritaStateMobile extends State<ItemBeritaMobile> {
+  bool isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    String urlGambar =
+        '${Constant.host}${widget.data.gambar!.data!.attributes!.url}';
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: double.infinity,
+            height: 180,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              image: DecorationImage(
+                image: NetworkImage(urlGambar),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                Text(
+                  'Diposting oleh',
+                  style: AppTheme.greyTextStyle.copyWith(fontSize: 14),
+                ),
+                const SizedBox(width: 10),
+                const CircleAvatar(
+                  radius: 15,
+                  backgroundColor: AppColors.backgroundColor3,
+                  child: Icon(
+                    Icons.person,
+                    color: AppColors.greyColor,
+                  ),
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  'Admin',
+                  style: AppTheme.greyTextStyle.copyWith(
+                    fontSize: 14,
+                  ),
+                ),
+              ]),
+              const SizedBox(height: 10),
+              Text(
+                widget.data.judul!,
+                style: AppTheme.blackTextStyle.copyWith(
+                  fontSize: 18,
+                  fontWeight: AppTheme.bold,
+                ),
+              ),
+              const SizedBox(height: 15),
+              Text(
+                AppMethods.potongString(
+                    input: widget.data.intro!, panjangMax: 50),
+                style: AppTheme.greyTextStyle,
+              ),
+              const SizedBox(height: 15),
+              PrimaryButton(
+                onTap: () {
+                  context.go('/berita/${widget.data.slug}');
+                },
+                titleButton: 'LANJUTKAN MEMBACA',
+              ),
+              const SizedBox(height: 50),
+            ],
+          )
+        ],
+      ),
+    );
   }
 }

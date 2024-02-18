@@ -247,8 +247,6 @@ class _ProductLayananPageState extends State<ProductLayananPage> {
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
                   final LayananData layanan = data.data![index];
-
-                  print(layanan.attributes!.judul);
                   return ItemLayananCardList(
                     data: layanan,
                     id: layanan.id!,
@@ -534,7 +532,7 @@ class _ProductLayananPageState extends State<ProductLayananPage> {
                         return ItemLayananCardList(
                           data: layanan,
                           id: layanan.id!,
-                          isMobile : true,
+                          isMobile: true,
                         );
                       },
                     ),

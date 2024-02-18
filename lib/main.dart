@@ -1,18 +1,15 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:langgam_project/configs/configs.dart';
 import 'package:langgam_project/controllers/controller.dart';
 import 'package:langgam_project/pages/pages.dart';
-import 'package:mailer/mailer.dart';
-import 'package:mailer/smtp_server/gmail.dart';
 import 'package:provider/provider.dart';
 
 void main() {
+  // debugPrint = (String? message, {int? wrapWidth}) => null;
+
   runApp(
-    /// Providers are above [MyApp] instead of inside it, so that tests
-    /// can use [MyApp] while mocking the providers
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => MyAccountController()),
@@ -31,7 +28,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => SettingController()),
         ChangeNotifierProvider(create: (_) => UserAccountController()),
       ],
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
@@ -82,7 +79,7 @@ final GoRouter _router = GoRouter(
               path: 'checkout',
               redirect: (context, state) async {
                 final role = await AppSession.getRoleLogin();
-                if ((role != 'customer' || role == null) &&
+                if ((role != 'customer' || role.isEmpty) &&
                     state.matchedLocation == '/cart/checkout') {
                   return '/register';
                 }
@@ -101,7 +98,6 @@ final GoRouter _router = GoRouter(
                     final String? stringDataCart =
                         await AppSession.getDataCartUser();
                     List dataCart = json.decode(stringDataCart.toString());
-                    print(isSuccess);
                     if ((role != 'customer' || role.isEmpty) &&
                         state.matchedLocation == '/cart/checkout/success') {
                       return '/register';
@@ -115,7 +111,6 @@ final GoRouter _router = GoRouter(
                     }
                   },
                   builder: (BuildContext context, GoRouterState state) {
-                    print(state.matchedLocation);
                     return CheckoutFinishPage();
                   },
                 ),
@@ -127,8 +122,6 @@ final GoRouter _router = GoRouter(
           path: 'my-account',
           redirect: (context, state) async {
             final role = await AppSession.getRoleLogin();
-            print(state.matchedLocation);
-
             if (state.matchedLocation == '/my-account') {
               if (role.isEmpty) {
                 return '/register';
@@ -176,7 +169,6 @@ final GoRouter _router = GoRouter(
               },
               redirect: (context, state) async {
                 final role = await AppSession.getRoleLogin();
-                print(role);
                 if ((role != 'authenticated' || role.isEmpty) &&
                     state.matchedLocation == '/auth/admin') {
                   return '/auth';

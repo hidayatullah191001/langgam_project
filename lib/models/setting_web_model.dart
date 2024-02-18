@@ -57,7 +57,6 @@ class SettingWebAttributes {
   String? footerTelepon;
   String? footerEmail;
   String? footerCredit;
-  // SettingWebModel? homepageJumbotronVideoThumb;
   List<Sosmed>? sosmed;
 
   SettingWebAttributes(
@@ -77,7 +76,6 @@ class SettingWebAttributes {
       this.footerTelepon,
       this.footerEmail,
       this.footerCredit,
-      // this.homepageJumbotronVideoThumb,
       this.sosmed});
 
   SettingWebAttributes.fromJson(Map<String, dynamic> json) {
@@ -97,9 +95,6 @@ class SettingWebAttributes {
     footerTelepon = json['footer_telepon'];
     footerEmail = json['footer_email'];
     footerCredit = json['footer_credit'];
-    // homepageJumbotronVideoThumb = json['homepage_jumbotron_video_thumb'] != null
-    //     ? new SettingWebModel.fromJson(json['homepage_jumbotron_video_thumb'])
-    //     : null;
     if (json['sosmed'] != null) {
       sosmed = <Sosmed>[];
       json['sosmed'].forEach((v) {
@@ -109,133 +104,29 @@ class SettingWebAttributes {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['createdAt'] = this.createdAt;
-    data['updatedAt'] = this.updatedAt;
-    data['publishedAt'] = this.publishedAt;
-    data['homepage_jumbotron_video_url'] = this.homepageJumbotronVideoUrl;
-    data['homepage_jumbotron_judul_utama'] = this.homepageJumbotronJudulUtama;
-    data['homepage_jumbotron_intro'] = this.homepageJumbotronIntro;
-    data['homepage_jumbotron_tombol_teks'] = this.homepageJumbotronTombolTeks;
-    data['homepage_jumbotron_tombol_url'] = this.homepageJumbotronTombolUrl;
-    data['homepage_layanan_judul_utama'] = this.homepageLayananJudulUtama;
-    data['homepage_layanan_intro'] = this.homepageLayananIntro;
-    data['homepage_layanan_tombol_teks'] = this.homepageLayananTombolTeks;
-    data['homepage_layanan_tombol_url'] = this.homepageLayananTombolUrl;
-    data['footer_alamat'] = this.footerAlamat;
-    data['footer_telepon'] = this.footerTelepon;
-    data['footer_email'] = this.footerEmail;
-    data['footer_credit'] = this.footerCredit;
-    // if (this.homepageJumbotronVideoThumb != null) {
-    //   data['homepage_jumbotron_video_thumb'] =
-    //       this.homepageJumbotronVideoThumb!.toJson();
-    // }
-    if (this.sosmed != null) {
-      data['sosmed'] = this.sosmed!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['createdAt'] = createdAt;
+    data['updatedAt'] = updatedAt;
+    data['publishedAt'] = publishedAt;
+    data['homepage_jumbotron_video_url'] = homepageJumbotronVideoUrl;
+    data['homepage_jumbotron_judul_utama'] = homepageJumbotronJudulUtama;
+    data['homepage_jumbotron_intro'] = homepageJumbotronIntro;
+    data['homepage_jumbotron_tombol_teks'] = homepageJumbotronTombolTeks;
+    data['homepage_jumbotron_tombol_url'] = homepageJumbotronTombolUrl;
+    data['homepage_layanan_judul_utama'] = homepageLayananJudulUtama;
+    data['homepage_layanan_intro'] = homepageLayananIntro;
+    data['homepage_layanan_tombol_teks'] = homepageLayananTombolTeks;
+    data['homepage_layanan_tombol_url'] = homepageLayananTombolUrl;
+    data['footer_alamat'] = footerAlamat;
+    data['footer_telepon'] = footerTelepon;
+    data['footer_email'] = footerEmail;
+    data['footer_credit'] = footerCredit;
+    if (sosmed != null) {
+      data['sosmed'] = sosmed!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
-
-// class SettingWebData {
-//   int? id;
-//   SettingWebAttributes? attributes;
-
-//   SettingWebData({this.id, this.attributes});
-
-//   SettingWebData.fromJson(Map<String, dynamic> json) {
-//     id = json['id'];
-//     attributes = json['attributes'] != null
-//         ? new SettingWebAttributes.fromJson(json['attributes'])
-//         : null;
-//   }
-
-//   Map<String, dynamic> toJson() {
-//     final Map<String, dynamic> data = new Map<String, dynamic>();
-//     data['id'] = this.id;
-//     if (this.attributes != null) {
-//       data['attributes'] = this.attributes!.toJson();
-//     }
-//     return data;
-//   }
-// }
-
-// class Attributes {
-//   String? name;
-//   Null? alternativeText;
-//   Null? caption;
-//   Null? width;
-//   Null? height;
-//   Null? formats;
-//   String? hash;
-//   String? ext;
-//   String? mime;
-//   double? size;
-//   String? url;
-//   Null? previewUrl;
-//   String? provider;
-//   Null? providerMetadata;
-//   String? createdAt;
-//   String? updatedAt;
-
-//   Attributes(
-//       {this.name,
-//       this.alternativeText,
-//       this.caption,
-//       this.width,
-//       this.height,
-//       this.formats,
-//       this.hash,
-//       this.ext,
-//       this.mime,
-//       this.size,
-//       this.url,
-//       this.previewUrl,
-//       this.provider,
-//       this.providerMetadata,
-//       this.createdAt,
-//       this.updatedAt});
-
-//   Attributes.fromJson(Map<String, dynamic> json) {
-//     name = json['name'];
-//     alternativeText = json['alternativeText'];
-//     caption = json['caption'];
-//     width = json['width'];
-//     height = json['height'];
-//     formats = json['formats'];
-//     hash = json['hash'];
-//     ext = json['ext'];
-//     mime = json['mime'];
-//     size = json['size'];
-//     url = json['url'];
-//     previewUrl = json['previewUrl'];
-//     provider = json['provider'];
-//     providerMetadata = json['provider_metadata'];
-//     createdAt = json['createdAt'];
-//     updatedAt = json['updatedAt'];
-//   }
-
-//   Map<String, dynamic> toJson() {
-//     final Map<String, dynamic> data = new Map<String, dynamic>();
-//     data['name'] = this.name;
-//     data['alternativeText'] = this.alternativeText;
-//     data['caption'] = this.caption;
-//     data['width'] = this.width;
-//     data['height'] = this.height;
-//     data['formats'] = this.formats;
-//     data['hash'] = this.hash;
-//     data['ext'] = this.ext;
-//     data['mime'] = this.mime;
-//     data['size'] = this.size;
-//     data['url'] = this.url;
-//     data['previewUrl'] = this.previewUrl;
-//     data['provider'] = this.provider;
-//     data['provider_metadata'] = this.providerMetadata;
-//     data['createdAt'] = this.createdAt;
-//     data['updatedAt'] = this.updatedAt;
-//     return data;
-//   }
-// }
 
 class Sosmed {
   int? id;
@@ -251,10 +142,10 @@ class Sosmed {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['name'] = this.name;
-    data['url'] = this.url;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['name'] = name;
+    data['url'] = url;
     return data;
   }
 }

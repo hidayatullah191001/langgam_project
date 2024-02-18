@@ -9,12 +9,12 @@ class LayananServices {
 
     if (filter == false) {
       responseBody = await APIRequest.gets(
-        '${Constant.apirest}/layanans?populate=*&pagination[page]=$page',
+        '${Constant.apirest}/layanans?populate=*&pagination[page]=$page&sort[0]=createdAt:desc',
       );
     } else {
       if (slugBidangLayanan != null) {
         responseBody = await APIRequest.gets(
-          '${Constant.apirest}/layanans?populate=gambar&filters[bidang_layanan][slug][$filters]=$slugBidangLayanan&pagination[page]=$page',
+          '${Constant.apirest}/layanans?populate=gambar&filters[bidang_layanan][slug][$filters]=$slugBidangLayanan&pagination[page]=$page&sort[0]=createdAt:desc',
         );
       }
     }
@@ -33,7 +33,7 @@ class LayananServices {
   static Future<Layanan> getLayananById(String id) async {
     try {
       Map? responseBody = await APIRequest.gets(
-        '${Constant.apirest}/layanans/$id?populate=*',
+        '${Constant.apirest}/layanans/$id?populate=*&sort[0]=createdAt:desc',
       );
       if (responseBody!['data'] != null) {
         return Layanan.fromJson(responseBody as Map<String, dynamic>);
@@ -49,7 +49,7 @@ class LayananServices {
     try {
       String filters = "\$eq";
       Map? responseBody = await APIRequest.gets(
-        '${Constant.apirest}/layanans?populate=*&filters[slug][$filters]=$slug',
+        '${Constant.apirest}/layanans?populate=*&filters[slug][$filters]=$slug&sort[0]=createdAt:desc',
       );
       if (responseBody!['data'] != null) {
         return Layanan.fromJson(responseBody as Map<String, dynamic>);
@@ -84,7 +84,7 @@ class LayananServices {
     try {
       String filters = "\$contains";
       Map? responseBody = await APIRequest.gets(
-        '${Constant.apirest}/layanans?populate=*&filters[judul][$filters]=$value',
+        '${Constant.apirest}/layanans?populate=*&filters[judul][$filters]=$value&sort[0]=createdAt:desc',
       );
       if (responseBody!['data'] != null) {
         return Layanan.fromJson(responseBody as Map<String, dynamic>);

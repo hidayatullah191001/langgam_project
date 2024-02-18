@@ -10,12 +10,12 @@ class PelayananMasukSection extends StatefulWidget {
 class _PelayananMasukSectionState extends State<PelayananMasukSection> {
   List<String> status = [
     'Semua Permintaan',
-    'Menunggu Persetujuan',
-    'Verifikasi Persyaratan',
+    'Permintaan Masuk',
+    'Permintaan Disetujui',
+    'Permintaan Ditolak',
     'Menunggu Pembayaran',
-    'Verifikasi Pembayaran',
-    'Sedang Diproses',
-    'Selesai',
+    'Permintaan Telah Dibayarkan',
+    'Permintaan Selesai',
   ];
 
   String _selectedStatus = 'Semua Permintaan';
@@ -34,7 +34,7 @@ class _PelayananMasukSectionState extends State<PelayananMasukSection> {
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          if (constraints.maxWidth < 800) {
+          if (constraints.maxWidth < 1200) {
             return MobileView(context);
           } else {
             return WebView(context);
@@ -226,7 +226,8 @@ class _PelayananMasukSectionState extends State<PelayananMasukSection> {
           child: FutureBuilder(
             future: _selectedStatus == 'Semua Permintaan'
                 ? PermintaanService.getAllPermintaan(page: selectedPageNumber)
-                : PermintaanService.getAllPermintaanByStatus(_selectedStatus),
+                : PermintaanService.getAllPermintaanByStatus(_selectedStatus,
+                    page: selectedPageNumber),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());

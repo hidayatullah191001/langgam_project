@@ -1,14 +1,13 @@
 part of 'controller.dart';
 
 class SettingController extends ChangeNotifier {
-  SettingWebModel? _setting;
-  SettingWebModel get setting => _setting!;
+  SettingWebModel _setting = SettingWebModel();
+  SettingWebModel get setting => _setting;
 
   DataState dataState = DataState.loading;
 
   void changeState(DataState state) {
     dataState = state;
-    notifyListeners();
   }
 
   void getSettingWeb() async {
@@ -17,8 +16,10 @@ class SettingController extends ChangeNotifier {
       SettingWebModel data = await SettingService.getSettingApp();
       _setting = data;
       changeState(DataState.filled);
+      notifyListeners();
     } catch (e) {
       changeState(DataState.error);
+      notifyListeners();
     }
   }
 }

@@ -9,11 +9,12 @@ class BannerTop extends StatefulWidget {
 
 class _BannerTopState extends State<BannerTop> {
   Map<String, dynamic> user = {};
+
   @override
   void initState() {
     getDataUser();
-    context.read<SettingController>().getSettingWeb();
     super.initState();
+    context.read<SettingController>().getSettingWeb();
   }
 
   getDataUser() async {
@@ -80,15 +81,6 @@ class _BannerTopState extends State<BannerTop> {
                   );
                 }),
               ],
-            ),
-            const SizedBox(
-              width: 24,
-            ),
-            Text(
-              'BMKG Langgam Buka Jam : 08.00 - 21.00 Senin - Sabtu',
-              style: AppTheme.whiteTextStyle.copyWith(
-                fontSize: 12,
-              ),
             ),
             const Spacer(),
             Builder(builder: (context) {

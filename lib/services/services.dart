@@ -25,8 +25,6 @@ import 'package:http/http.dart' as http;
 import 'package:langgam_project/models/setting_web_model.dart';
 import 'package:langgam_project/models/bantuan_model.dart';
 import 'package:langgam_project/models/user_accound_model.dart';
-import 'package:mailer/mailer.dart';
-import 'package:mailer/smtp_server/gmail.dart';
 
 part 'auth_services.dart';
 part 'layanan_services.dart';

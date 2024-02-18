@@ -8,7 +8,6 @@ class IndexPage extends StatefulWidget {
 }
 
 class _IndexPageState extends State<IndexPage> {
-  late YoutubePlayerController controlleryt;
   var isHovered = false;
   ScrollController _scrollController = ScrollController();
 
@@ -40,20 +39,17 @@ class _IndexPageState extends State<IndexPage> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.watch<NavbarController>();
-    final searchController = context.watch<PencarianController>();
-
     return LayoutBuilder(builder: (context, BoxConstraints constraints) {
       if (constraints.maxWidth < 1200) {
-        return MobileView(searchController, context);
+        return MobileView(context);
       } else {
-        return WebView(searchController);
+        return WebView();
       }
     });
   }
 
-  Widget MobileView(
-      PencarianController searchController, BuildContext context) {
+  Widget MobileView(BuildContext context) {
+    final searchController = context.watch<PencarianController>();
     return Scaffold(
       drawerEnableOpenDragGesture: false,
       endDrawerEnableOpenDragGesture: false,
@@ -89,7 +85,9 @@ class _IndexPageState extends State<IndexPage> {
     );
   }
 
-  Widget WebView(PencarianController searchController) {
+  Widget WebView() {
+    final searchController = context.watch<PencarianController>();
+
     return Scaffold(
       body: Consumer(builder: (context, SettingController controller, widget) {
         if (controller.dataState == DataState.loading) {
@@ -183,8 +181,6 @@ class _IndexPageState extends State<IndexPage> {
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
                   final LayananData layanan = data.data![index];
-
-                  print(layanan.attributes!.judul);
                   return ItemLayananCardList(
                     data: layanan,
                     id: layanan.id!,
@@ -256,8 +252,6 @@ class _IndexPageState extends State<IndexPage> {
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
                   final LayananData layanan = data.data![index];
-
-                  print(layanan.attributes!.judul);
                   return ItemLayananCardList(
                     data: layanan,
                     id: layanan.id!,
@@ -279,7 +273,6 @@ class _IndexPageState extends State<IndexPage> {
         OpeningSectionMobile(context),
         LayananBMKGSectionMobile(),
         LayananPopulerSectionMobile(),
-        UpdateSectionMobile(),
         const FooterMobile(),
       ],
     );
@@ -292,7 +285,6 @@ class _IndexPageState extends State<IndexPage> {
         OpeningSection(context),
         LayananBMKGSection(),
         LayananPopulerSection(),
-        UpdateSection(),
         const Footer(),
       ],
     );
@@ -379,7 +371,7 @@ class _IndexPageState extends State<IndexPage> {
         child: Column(
           children: [
             Text(
-              'Layanan Populer',
+              'Layanan Terbaru',
               style: AppTheme.blackTextStyle.copyWith(
                 fontSize: 56,
                 fontWeight: AppTheme.bold,
@@ -388,51 +380,51 @@ class _IndexPageState extends State<IndexPage> {
             const SizedBox(
               height: 20,
             ),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              decoration: BoxDecoration(
-                color: Color(0xfff7f7f7),
-                borderRadius: BorderRadius.circular(15),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'TERBARU',
-                    style: AppTheme.primaryTextStyle.copyWith(
-                      fontWeight: AppTheme.semiBold,
-                    ),
-                  ),
-                  const SizedBox(width: 24),
-                  Text(
-                    'POPULER',
-                    style: AppTheme.blackTextStyle.copyWith(
-                      fontWeight: AppTheme.semiBold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            // Container(
+            //   width: double.infinity,
+            //   padding: const EdgeInsets.symmetric(vertical: 16),
+            //   decoration: BoxDecoration(
+            //     color: Color(0xfff7f7f7),
+            //     borderRadius: BorderRadius.circular(15),
+            //   ),
+            //   child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.center,
+            //     children: [
+            //       Text(
+            //         'TERBARU',
+            //         style: AppTheme.primaryTextStyle.copyWith(
+            //           fontWeight: AppTheme.semiBold,
+            //         ),
+            //       ),
+            //       const SizedBox(width: 24),
+            //       Text(
+            //         'POPULER',
+            //         style: AppTheme.blackTextStyle.copyWith(
+            //           fontWeight: AppTheme.semiBold,
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
             const SizedBox(
               height: 20,
             ),
             Row(
               children: [
-                InkWell(
-                  onTap: _scrollToBefore,
-                  child: const CircleAvatar(
-                    radius: 23,
-                    backgroundColor: AppColors.primaryColor,
-                    child: Icon(
-                      Icons.keyboard_arrow_left_rounded,
-                      size: 30,
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  width: 20,
-                ),
+                // InkWell(
+                //   onTap: _scrollToBefore,
+                //   child: const CircleAvatar(
+                //     radius: 23,
+                //     backgroundColor: AppColors.primaryColor,
+                //     child: Icon(
+                //       Icons.keyboard_arrow_left_rounded,
+                //       size: 30,
+                //     ),
+                //   ),
+                // ),
+                // const SizedBox(
+                //   width: 20,
+                // ),
                 Expanded(
                   child: FutureBuilder(
                     future: LayananServices.getAllLayanans(page: 1),
@@ -468,20 +460,20 @@ class _IndexPageState extends State<IndexPage> {
                     },
                   ),
                 ),
-                const SizedBox(
-                  width: 20,
-                ),
-                InkWell(
-                  onTap: _scrollToNext,
-                  child: const CircleAvatar(
-                    radius: 23,
-                    backgroundColor: AppColors.primaryColor,
-                    child: Icon(
-                      Icons.keyboard_arrow_right_rounded,
-                      size: 30,
-                    ),
-                  ),
-                ),
+                // const SizedBox(
+                //   width: 20,
+                // ),
+                // InkWell(
+                //   onTap: _scrollToNext,
+                //   child: const CircleAvatar(
+                //     radius: 23,
+                //     backgroundColor: AppColors.primaryColor,
+                //     child: Icon(
+                //       Icons.keyboard_arrow_right_rounded,
+                //       size: 30,
+                //     ),
+                //   ),
+                // ),
               ],
             ),
             const SizedBox(
@@ -506,74 +498,71 @@ class _IndexPageState extends State<IndexPage> {
         setting.homepageJumbotronVideoUrl.toString());
     return Container(
       width: double.infinity,
-      color: AppColors.backgroundColor,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 150.0,
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              width: 568,
-              height: 400,
-              margin: const EdgeInsets.symmetric(vertical: 35),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
+      decoration: BoxDecoration(
+        color: AppColors.backgroundColor,
+      ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 150.0,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: 568,
+            height: 400,
+            margin: const EdgeInsets.symmetric(vertical: 35),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: YoutubePlayer(
+              controller: YoutubePlayerController.fromVideoId(
+                videoId: idYoutube!,
+                autoPlay: false,
               ),
-              child: YoutubePlayer(
-                controller: YoutubePlayerController.fromVideoId(
-                  videoId: idYoutube!,
-                  autoPlay: false,
-                  params: const YoutubePlayerParams(
-                    showFullscreenButton: true,
+              aspectRatio: 16 / 9,
+            ),
+          ),
+          const SizedBox(
+            width: 25,
+          ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Text(
+                  setting.homepageJumbotronJudulUtama.toString(),
+                  style: AppTheme.blackTextStyle.copyWith(
+                    fontSize: 60,
+                    fontWeight: AppTheme.bold,
                   ),
                 ),
-                aspectRatio: 16 / 9,
-              ),
+                const SizedBox(
+                  height: 12,
+                ),
+                Text(
+                  setting.homepageJumbotronIntro.toString(),
+                  style: AppTheme.blackTextStyle.copyWith(
+                    fontSize: 18,
+                    fontWeight: AppTheme.medium,
+                  ),
+                  maxLines: 5,
+                  softWrap: true,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                PrimaryButton(
+                  onTap: () {
+                    context.go('/layanan');
+                  },
+                  titleButton: 'LIHAT SEMUA LAYANAN',
+                ),
+              ],
             ),
-            const SizedBox(
-              width: 25,
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Text(
-                    setting.homepageJumbotronJudulUtama.toString(),
-                    style: AppTheme.blackTextStyle.copyWith(
-                      fontSize: 60,
-                      fontWeight: AppTheme.bold,
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 12,
-                  ),
-                  Text(
-                    setting.homepageJumbotronIntro.toString(),
-                    style: AppTheme.blackTextStyle.copyWith(
-                      fontSize: 18,
-                      fontWeight: AppTheme.medium,
-                    ),
-                    maxLines: 5,
-                    softWrap: true,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  PrimaryButton(
-                    onTap: () {
-                      context.go('/layanan');
-                    },
-                    titleButton: 'LIHAT SEMUA LAYANAN',
-                  ),
-                ],
-              ),
-            )
-          ],
-        ),
+          )
+        ],
       ),
     );
   }
@@ -676,23 +665,15 @@ class _IndexPageState extends State<IndexPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Container(
-            width: 568,
-            height: 300,
-            margin: const EdgeInsets.symmetric(vertical: 35),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: YoutubePlayer(
-              controller: YoutubePlayerController.fromVideoId(
-                videoId: idYoutube!,
-                autoPlay: false,
-                params: const YoutubePlayerParams(
-                  showFullscreenButton: true,
-                ),
+          YoutubePlayer(
+            controller: YoutubePlayerController.fromVideoId(
+              videoId: idYoutube!,
+              autoPlay: false,
+              params: const YoutubePlayerParams(
+                showFullscreenButton: true,
               ),
-              aspectRatio: 16 / 9,
             ),
+            aspectRatio: 16 / 9,
           ),
           Column(
             children: [

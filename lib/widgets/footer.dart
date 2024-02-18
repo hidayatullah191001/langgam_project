@@ -17,7 +17,7 @@ class _FooterState extends State<Footer> {
   @override
   Widget build(BuildContext context) {
     final settingController = context.watch<SettingController>();
-    final setting = settingController.setting.data!.attributes!;
+    final setting = settingController.setting.data?.attributes!;
     return Container(
       width: double.infinity,
       color: AppColors.footerprimaryColor,
@@ -62,7 +62,7 @@ class _FooterState extends State<Footer> {
                             SizedBox(
                               width: 300,
                               child: Text(
-                                setting.footerAlamat.toString(),
+                                setting!.footerAlamat.toString(),
                                 style: AppTheme.whiteTextStyle.copyWith(
                                   fontSize: 14,
                                   height: 2,
@@ -148,77 +148,84 @@ class _FooterState extends State<Footer> {
                                   shrinkWrap: true,
                                   itemBuilder: (context, index) {
                                     final BeritaData berita = data[index];
-                                    return Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            Container(
-                                              width: 100,
-                                              height: 80,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                image: DecorationImage(
-                                                  image: NetworkImage(
-                                                      '${Constant.host}${berita.attributes!.gambar!.data!.attributes!.url.toString()}'),
-                                                  fit: BoxFit.cover,
+                                    return InkWell(
+                                      onTap: () {
+                                        context.go(
+                                            '/berita/${berita.attributes!.slug}');
+                                      },
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              Container(
+                                                width: 100,
+                                                height: 80,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                  image: DecorationImage(
+                                                    image: NetworkImage(
+                                                        '${Constant.host}${berita.attributes!.gambar!.data!.attributes!.url.toString()}'),
+                                                    fit: BoxFit.cover,
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                            const SizedBox(width: 12),
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                SizedBox(
-                                                  width: 200,
-                                                  child: Text(
-                                                    berita.attributes!.judul
-                                                        .toString(),
-                                                    style: AppTheme
-                                                        .whiteTextStyle
-                                                        .copyWith(
-                                                      fontWeight:
-                                                          AppTheme.medium,
+                                              const SizedBox(width: 12),
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  SizedBox(
+                                                    width: 200,
+                                                    child: Text(
+                                                      berita.attributes!.judul
+                                                          .toString(),
+                                                      style: AppTheme
+                                                          .whiteTextStyle
+                                                          .copyWith(
+                                                        fontWeight:
+                                                            AppTheme.medium,
+                                                      ),
+                                                      maxLines: 5,
+                                                      softWrap: true,
                                                     ),
-                                                    maxLines: 5,
-                                                    softWrap: true,
                                                   ),
-                                                ),
-                                                const SizedBox(height: 12),
-                                                SizedBox(
-                                                  width: 200,
-                                                  child: Text(
-                                                    'Dibuat pada ${AppMethods.date(berita.attributes!.createdAt!)}',
-                                                    style: AppTheme
-                                                        .softgreyTextStyle
-                                                        .copyWith(fontSize: 14),
-                                                    maxLines: 5,
-                                                    softWrap: true,
+                                                  const SizedBox(height: 12),
+                                                  SizedBox(
+                                                    width: 200,
+                                                    child: Text(
+                                                      'Dibuat pada ${AppMethods.date(berita.attributes!.createdAt!)}',
+                                                      style: AppTheme
+                                                          .softgreyTextStyle
+                                                          .copyWith(
+                                                              fontSize: 14),
+                                                      maxLines: 5,
+                                                      softWrap: true,
+                                                    ),
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(
-                                          height: 10,
-                                        ),
-                                        Center(
-                                          child: Container(
-                                            width: 300,
-                                            height: 1,
-                                            color: const Color(0xff355796),
+                                                ],
+                                              ),
+                                            ],
                                           ),
-                                        ),
-                                        const SizedBox(
-                                          height: 10,
-                                        ),
-                                      ],
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                          Center(
+                                            child: Container(
+                                              width: 300,
+                                              height: 1,
+                                              color: const Color(0xff355796),
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            height: 10,
+                                          ),
+                                        ],
+                                      ),
                                     );
                                   },
                                 );
@@ -253,7 +260,6 @@ class _FooterState extends State<Footer> {
                             }
                             if (snapshot.hasData) {
                               List<BantuanData> data = snapshot.data!.data!;
-
                               return SizedBox(
                                 width: 200,
                                 height: 150,
@@ -264,14 +270,11 @@ class _FooterState extends State<Footer> {
                                   itemBuilder: (context, index) {
                                     final BantuanAttributes bantuan =
                                         data[index].attributes!;
-                                    return Expanded(
-                                      child: TextButtonHovered(
-                                        onTap: () {
-                                          context
-                                              .go('/bantuan/${bantuan.slug}');
-                                        },
-                                        text: bantuan.judul.toString(),
-                                      ),
+                                    return TextButtonHovered(
+                                      onTap: () {
+                                        context.go('/bantuan/${bantuan.slug}');
+                                      },
+                                      text: bantuan.judul.toString(),
                                     );
                                   },
                                 ),
@@ -469,14 +472,11 @@ class _FooterMobileState extends State<FooterMobile> {
                                   itemBuilder: (context, index) {
                                     final BantuanAttributes bantuan =
                                         data[index].attributes!;
-                                    return Expanded(
-                                      child: TextButtonHovered(
-                                        onTap: () {
-                                          context
-                                              .go('/bantuan/${bantuan.slug}');
-                                        },
-                                        text: bantuan.judul.toString(),
-                                      ),
+                                    return TextButtonHovered(
+                                      onTap: () {
+                                        context.go('/bantuan/${bantuan.slug}');
+                                      },
+                                      text: bantuan.judul.toString(),
                                     );
                                   },
                                 ),

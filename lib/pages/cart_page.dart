@@ -261,8 +261,6 @@ class _CartPageState extends State<CartPage> {
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
                   final LayananData layanan = data.data![index];
-
-                  print(layanan.attributes!.judul);
                   return ItemLayananCardList(
                     data: layanan,
                     id: layanan.id!,
@@ -297,32 +295,30 @@ class _CartPageState extends State<CartPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           carts.length == 0
-              ? Expanded(
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Lottie.asset(
-                          'lottie/empty_cart.json',
-                          width: 150,
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Lottie.asset(
+                        'lottie/empty_cart.json',
+                        width: 150,
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Keranjang kamu masih kosong',
+                        style: AppTheme.greyTextStyle.copyWith(
+                          fontSize: 14,
+                          fontWeight: AppTheme.bold,
                         ),
-                        const SizedBox(height: 10),
-                        Text(
-                          'Keranjang kamu masih kosong',
-                          style: AppTheme.greyTextStyle.copyWith(
-                            fontSize: 14,
-                            fontWeight: AppTheme.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 15),
-                        PrimaryButton(
-                          onTap: () {
-                            context.go('/layanan');
-                          },
-                          titleButton: 'LIHAT SEMUA LAYANAN',
-                        )
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 15),
+                      PrimaryButton(
+                        onTap: () {
+                          context.go('/layanan');
+                        },
+                        titleButton: 'LIHAT SEMUA LAYANAN',
+                      )
+                    ],
                   ),
                 )
               : Expanded(
