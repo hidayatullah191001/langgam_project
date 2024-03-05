@@ -1,15 +1,27 @@
 part of 'services.dart';
 
 class PermintaanService {
-  static Future<ListPermintaanModel> getAllPermintaanCustomer() async {
+  static Future<ListPermintaanModel> getAllPermintaanCustomer(
+      {int? page, int? pageSize}) async {
     Map? userLogin = await AppSession.getUserInformation();
     final emailUser = userLogin['email'];
     final token = userLogin['token'];
     String filters = "\$eq";
+    Map? responseBody = {};
 
-    Map? responseBody = await APIRequest.gets(
-      '${Constant.apirest}/permintaans?populate=*&filters[customer_user][email][$filters]=$emailUser',
-    );
+    if (page == null && pageSize == null) {
+      responseBody = await APIRequest.gets(
+          '${Constant.apirest}/permintaans?populate=*&filters[customer_user][email][$filters]=$emailUser&sort[0]=createdAt:desc&',
+          headers: {
+            'Authorization': 'Bearer $token',
+          });
+    } else {
+      responseBody = await APIRequest.gets(
+          '${Constant.apirest}/permintaans?populate=*&filters[customer_user][email][$filters]=$emailUser&pagination[page]=$page&sort[0]=createdAt:desc&pagination[pageSize]=$pageSize',
+          headers: {
+            'Authorization': 'Bearer $token',
+          });
+    }
 
     if (responseBody == null) throw "Data kosong";
 
@@ -20,14 +32,15 @@ class PermintaanService {
     }
   }
 
-  static Future<ListPermintaanModelAdmin> getAllPermintaan({int? page}) async {
+  static Future<ListPermintaanModelAdmin> getAllPermintaan(
+      {int? page, int? pageSize}) async {
     final String token = await AppSession.getToken();
     String filters = "\$eq";
     Map? responseBody = {};
 
-    if (page != null) {
+    if (page != null && pageSize != null) {
       responseBody = await APIRequest.gets(
-        '${Constant.apirest}/permintaans?populate=*&pagination[page]=$page',
+        '${Constant.apirest}/permintaans?populate=*&pagination[page]=$page&sort[0]=createdAt:desc&pagination[pageSize]=$pageSize',
         headers: {'Authorization': 'Bearer $token'},
       );
     } else {
@@ -84,13 +97,14 @@ class PermintaanService {
     }
   }
 
-  static Future<ListPermintaanModel> getAllDokumenPermintaanCustomer() async {
+  static Future<ListPermintaanModel> getAllDokumenPermintaanCustomer(
+      {int? page, int? pageSize}) async {
     final Map user = await AppSession.getUserInformation();
 
     String filters = "\$eq";
 
     Map? responseBody = await APIRequest.gets(
-      '${Constant.apirest}/permintaans?populate=dokumen_permintaan&populate=customer_user&filters[status][$filters]=Selesai&filters[customer_user][id][$filters]=${user['id']}',
+      '${Constant.apirest}/permintaans?populate=dokumen_permintaan&populate=customer_user&filters[status][$filters]=Selesai&filters[customer_user][id][$filters]=${user['id']}&sort[0]=createdAt:desc&pagination[page]=$page&pagination[pageSize]=$pageSize',
       headers: {'Authorization': 'Bearer ${user['token']}'},
     );
 
@@ -105,15 +119,16 @@ class PermintaanService {
 
   static Future<ListPermintaanModelAdmin> getAllPermintaanByStatus(
       String status,
-      {int? page}) async {
+      {int? page,
+      int? pageSize}) async {
     final String token = await AppSession.getToken();
 
     String filters = "\$eq";
     Map? responseBody = {};
 
-    if (page != null) {
+    if (page != null && pageSize != null) {
       responseBody = await APIRequest.gets(
-        '${Constant.apirest}/permintaans?populate=*&filters[status][$filters]=$status&pagination[page]=$page',
+        '${Constant.apirest}/permintaans?populate=*&filters[status][$filters]=$status&pagination[page]=$page&sort[0]=createdAt:desc&pagination[pageSize]=$pageSize',
         headers: {'Authorization': 'Bearer $token'},
       );
     } else {
@@ -168,7 +183,7 @@ class PermintaanService {
   }
 
   static Future<ListPermintaanModelAdmin> getAllPermintaanByDate(
-      {String? startDate, String? finishDate, int? page}) async {
+      {String? startDate, String? finishDate, int? page, int? pageSize}) async {
     final String token = await AppSession.getToken();
     // 2024-01-12
     String gte = "\$gte";
@@ -185,8 +200,8 @@ class PermintaanService {
           "filters[createdAt][$gte]=$startDate&filters[createdAt][$lte]=$finishDate";
     }
 
-    if (page != null) {
-      pagination = "pagination[page]=$page";
+    if (page != null && pageSize != null) {
+      pagination = "pagination[page]=$page&pagination[pageSize]=$pageSize";
     } else {
       pagination = "";
     }

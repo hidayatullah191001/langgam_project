@@ -8,7 +8,6 @@ class BantuanController extends ChangeNotifier {
 
   void changeState(DataState state) {
     dataState = state;
-    notifyListeners();
   }
 
   void getBantuanBySlug(String slug) async {
@@ -17,8 +16,10 @@ class BantuanController extends ChangeNotifier {
       final BantuanModel data = await BantuanService.getBantuanBySlug(slug);
       _bantuan = data;
       changeState(DataState.filled);
+      notifyListeners();
     } catch (e) {
       changeState(DataState.error);
+      notifyListeners();
     }
   }
 }

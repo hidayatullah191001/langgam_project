@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cool_alert/cool_alert.dart';
+import 'package:d_method/d_method.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';

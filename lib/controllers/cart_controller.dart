@@ -51,6 +51,7 @@ class CartController extends ChangeNotifier {
   void addToCart(Map<String, dynamic> product) {
     _cartList.add(product);
     AppSession.saveDataCartUser(_cartList);
+    _itemsCount = 1;
     notifyListeners();
   }
 
@@ -126,13 +127,16 @@ class CartController extends ChangeNotifier {
   total(int harga) {
     int total = harga * _itemsCount;
     _totalHarga = total;
-    notifyListeners();
     return total;
   }
 
   void getDataCart() async {
     final String? stringDataCart = await AppSession.getDataCartUser();
-    List dataCart = json.decode(stringDataCart.toString());
-    _cartList = dataCart;
+    if (stringDataCart != null) {
+      List dataCart = json.decode(stringDataCart.toString());
+      _cartList = dataCart;
+    } else {
+      _cartList = [];
+    }
   }
 }

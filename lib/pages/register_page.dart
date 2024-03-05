@@ -32,15 +32,7 @@ class _RegisterPageState extends State<RegisterPage> {
         backgroundColor: AppColors.primaryColor,
         iconTheme: IconThemeData(color: AppColors.whiteColor),
         actions: [
-          Builder(
-            builder: (context) => // Ensure Scaffold is in context
-                IconButton(
-                    icon: Icon(
-                      Icons.login,
-                      color: AppColors.whiteColor,
-                    ),
-                    onPressed: () => Scaffold.of(context).openEndDrawer()),
-          ),
+          Container(),
         ],
       ),
       body: Consumer(builder: (context, SettingController controller, widget) {
@@ -181,7 +173,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return Container(
       width: double.infinity,
       color: AppColors.whiteColor,
-      padding: EdgeInsets.symmetric(
+      padding: const EdgeInsets.symmetric(
         horizontal: 10,
       ),
       child: FutureBuilder(
@@ -236,6 +228,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   return ItemLayananCardList(
                     data: layanan,
                     id: layanan.id!,
+                    isMobile: true,
                   );
                 },
               );
@@ -454,24 +447,10 @@ class _LoginFormState extends State<LoginForm> {
                 if (!EmailValidator.validate(emailController.text)) {
                   AppMethods.dangerToast(
                       context, 'Email yang kamu masukkan tidak valid');
-
-                  // CoolAlert.show(
-                  //   context: context,
-                  //   width: MediaQuery.of(context).size.width * 0.3,
-                  //   type: CoolAlertType.error,
-                  //   text: 'Email yang kamu masukkan tidak valid',
-                  // );
                 } else if (emailController.text.isEmpty ||
                     passwordController.text.isEmpty) {
                   AppMethods.dangerToast(
                       context, 'Email dan password tidak boleh kosong');
-
-                  // CoolAlert.show(
-                  //   context: context,
-                  //   width: MediaQuery.of(context).size.width * 0.3,
-                  //   type: CoolAlertType.error,
-                  //   text: 'Email dan password tidak boleh kosong',
-                  // );
                 } else {
                   final model = SignInFormModel(
                     identifier: emailController.text,
@@ -481,7 +460,7 @@ class _LoginFormState extends State<LoginForm> {
 
                   if (result['success'] == true) {
                     // ignore: use_build_context_synchronously
-                    context.replace('/');
+                    context.pop('/');
                   } else {
                     // ignore: use_build_context_synchronously
                     AppMethods.dangerToast(context, result['message']);
@@ -521,54 +500,54 @@ class _LoginFormState extends State<LoginForm> {
           //     ),
           //   ],
           // ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 30),
-            child: SizedBox(
-              width: double.infinity,
-              child: Material(
-                color: const Color(0xff4285f4),
-                borderRadius: BorderRadius.circular(10),
-                child: InkWell(
-                  onTap: () {}, // Button Login Dengan GOOGLE
-                  borderRadius: BorderRadius.circular(10),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 18,
-                      vertical: 13,
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 25,
-                          height: 25,
-                          decoration: BoxDecoration(
-                            color: Colors.blueGrey[50],
-                            borderRadius: BorderRadius.circular(7),
-                            image: const DecorationImage(
-                              image: AssetImage('images/google-icon.png'),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Center(
-                            child: Text(
-                              'GOOGLE',
-                              style: AppTheme.whiteTextStyle.copyWith(
-                                fontWeight: AppTheme.medium,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
+          // Padding(
+          //   padding: const EdgeInsets.symmetric(vertical: 30),
+          //   child: SizedBox(
+          //     width: double.infinity,
+          //     child: Material(
+          //       color: const Color(0xff4285f4),
+          //       borderRadius: BorderRadius.circular(10),
+          //       child: InkWell(
+          //         onTap: () {}, // Button Login Dengan GOOGLE
+          //         borderRadius: BorderRadius.circular(10),
+          //         child: Padding(
+          //           padding: const EdgeInsets.symmetric(
+          //             horizontal: 18,
+          //             vertical: 13,
+          //           ),
+          //           child: Row(
+          //             children: [
+          //               Container(
+          //                 width: 25,
+          //                 height: 25,
+          //                 decoration: BoxDecoration(
+          //                   color: Colors.blueGrey[50],
+          //                   borderRadius: BorderRadius.circular(7),
+          //                   image: const DecorationImage(
+          //                     image: AssetImage('images/google-icon.png'),
+          //                     fit: BoxFit.cover,
+          //                   ),
+          //                 ),
+          //               ),
+          //               Expanded(
+          //                 child: Center(
+          //                   child: Text(
+          //                     'GOOGLE',
+          //                     style: AppTheme.whiteTextStyle.copyWith(
+          //                       fontWeight: AppTheme.medium,
+          //                     ),
+          //                     textAlign: TextAlign.center,
+          //                   ),
+          //                 ),
+          //               ),
+          //               const SizedBox(width: 10),
+          //             ],
+          //           ),
+          //         ),
+          //       ),
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );
@@ -606,197 +585,111 @@ class _RegisterFormState extends State<RegisterForm> {
           const SizedBox(
             height: 20,
           ),
-          // Row(
-          //   children: [
-          //     Flexible(
-          //       child: CustomFormUser(
-          //         controller: firstNameController,
-          //         title: 'First Name ',
-          //         isMandatory: true,
-          //       ),
-          //     ),
-          //     const SizedBox(width: 10),
-          //     Flexible(
-          //       child: CustomFormUser(
-          //         controller: lastNameController,
-          //         title: 'Last Name ',
-          //         isMandatory: true,
-          //       ),
-          //     ),
-          //   ],
-          // ),
-          // const SizedBox(height: 10),
-          // CustomFormUser(
-          //   controller: usernameController,
-          //   title: 'Username ',
-          //   isMandatory: true,
-          // ),
-          // const SizedBox(height: 10),
-          // CustomFormUser(
-          //   controller: emailController,
-          //   title: 'Email ',
-          //   isMandatory: true,
-          // ),
-          // const SizedBox(height: 10),
-          // Row(
-          //   children: [
-          //     Flexible(
-          //       child: CustomFormUser(
-          //         controller: passwordController,
-          //         title: 'Password ',
-          //         isMandatory: true,
-          //         isObscure: true,
-          //       ),
-          //     ),
-          //     const SizedBox(width: 10),
-          //     Flexible(
-          //       child: CustomFormUser(
-          //         controller: repeatPasswordController,
-          //         title: 'Repeat Password ',
-          //         isMandatory: true,
-          //         isObscure: true,
-          //       ),
-          //     ),
-          //   ],
-          // ),
-          // const SizedBox(
-          //   height: 5,
-          // ),
-          // Text(
-          //   'Tautan untuk mengatur kata sandi baru akan dikirim ke alamat e-mail Anda.',
-          //   style: AppTheme.greyTextStyle.copyWith(height: 1.5),
-          // ),
-          // const SizedBox(
-          //   height: 20,
-          // ),
-          // SizedBox(
-          //   width: double.infinity,
-          //   child: PrimaryButton(
-          //     onTap: () async {
-          //       if (!EmailValidator.validate(emailController.text)) {
-          //         AppMethods.dangerToast(
-          //             context, 'Email yang kamu masukkan tidak valid');
-          //         // CoolAlert.show(
-          //         //   context: context,
-          //         //   width: MediaQuery.of(context).size.width * 0.3,
-          //         //   type: CoolAlertType.error,
-          //         //   text: 'Email yang kamu masukkan tidak valid',
-          //         // );
-          //       } else if (firstNameController.text.isEmpty ||
-          //           lastNameController.text.isEmpty ||
-          //           usernameController.text.isEmpty ||
-          //           emailController.text.isEmpty ||
-          //           passwordController.text.isEmpty) {
-          //         AppMethods.dangerToast(
-          //             context, 'Field mandatory harus diisi');
-
-          //         // CoolAlert.show(
-          //         //   context: context,
-          //         //   width: MediaQuery.of(context).size.width * 0.3,
-          //         //   type: CoolAlertType.error,
-          //         //   text: 'Field mandatory harus diisi',
-          //         // );
-          //       } else if (passwordController.text.length < 8) {
-          //         // CoolAlert.show(
-          //         //   context: context,
-          //         //   width: MediaQuery.of(context).size.width * 0.3,
-          //         //   type: CoolAlertType.error,
-          //         //   text: 'Password min 8 Char',
-          //         //   onConfirmBtnTap: () {
-          //         //     Navigator.pop(context);
-          //         //   },
-          //         // );
-          //         AppMethods.dangerToast(context, 'Password min 8 Char');
-          //       } else if (passwordController.text !=
-          //           repeatPasswordController.text) {
-          //         // CoolAlert.show(
-          //         //   context: context,
-          //         //   width: MediaQuery.of(context).size.width * 0.3,
-          //         //   type: CoolAlertType.error,
-          //         //   text: 'Password tidak sama, coba lagi',
-          //         //   onConfirmBtnTap: () {
-          //         //     Navigator.pop(context);
-          //         //   },
-          //         // );
-          //         AppMethods.dangerToast(
-          //             context, 'Password tidak sama, coba lagi!');
-          //       } else {
-          //         final model = SignUpFormModel(
-          //           blocked: "false",
-          //           email: emailController.text,
-          //           firstName: firstNameController.text,
-          //           lastName: lastNameController.text,
-          //           password: passwordController.text,
-          //           username: usernameController.text,
-          //         );
-          //         final result = await controller.registerUser(model);
-
-          //         if (result['success'] == true) {
-          //           // ignore: use_build_context_synchronously
-          //           context.replace('/');
-          //         } else {
-          //           // ignore: use_build_context_synchronously
-          //           AppMethods.dangerToast(context, result['message']);
-          //         }
-          //       }
-          //     },
-          //     titleButton: 'DAFTAR',
-          //   ),
-          // ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 30),
-            child: SizedBox(
-              width: double.infinity,
-              child: Material(
-                color: const Color(0xff4285f4),
-                borderRadius: BorderRadius.circular(10),
-                child: InkWell(
-                  onTap: () async {
-                    final result = await AuthServices.registerGoogle();
-                    if (result['success'] == true) {
-                      AppMethods.successToast(context, result['message']);
-                      context.replace('/');
-                    } else {
-                      AppMethods.dangerToast(context, result['message']);
-                    }
-                  }, // Button Login Dengan GOOGLE
-                  borderRadius: BorderRadius.circular(10),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 18,
-                      vertical: 13,
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 25,
-                          height: 25,
-                          decoration: BoxDecoration(
-                            color: Colors.blueGrey[50],
-                            borderRadius: BorderRadius.circular(7),
-                            image: const DecorationImage(
-                              image: AssetImage('images/google-icon.png'),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Center(
-                            child: Text(
-                              'GOOGLE',
-                              style: AppTheme.whiteTextStyle.copyWith(
-                                fontWeight: AppTheme.medium,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                      ],
-                    ),
-                  ),
+          Row(
+            children: [
+              Flexible(
+                child: CustomFormUser(
+                  controller: firstNameController,
+                  title: 'First Name ',
+                  isMandatory: true,
                 ),
               ),
+              const SizedBox(width: 10),
+              Flexible(
+                child: CustomFormUser(
+                  controller: lastNameController,
+                  title: 'Last Name ',
+                  isMandatory: true,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          CustomFormUser(
+            controller: usernameController,
+            title: 'Username ',
+            isMandatory: true,
+          ),
+          const SizedBox(height: 10),
+          CustomFormUser(
+            controller: emailController,
+            title: 'Email ',
+            isMandatory: true,
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Flexible(
+                child: CustomFormUser(
+                  controller: passwordController,
+                  title: 'Password ',
+                  isMandatory: true,
+                  isObscure: true,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Flexible(
+                child: CustomFormUser(
+                  controller: repeatPasswordController,
+                  title: 'Repeat Password ',
+                  isMandatory: true,
+                  isObscure: true,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 5,
+          ),
+          Text(
+            'Tautan untuk mengatur kata sandi baru akan dikirim ke alamat e-mail Anda.',
+            style: AppTheme.greyTextStyle.copyWith(height: 1.5),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          SizedBox(
+            width: double.infinity,
+            child: PrimaryButton(
+              onTap: () async {
+                if (!EmailValidator.validate(emailController.text)) {
+                  AppMethods.dangerToast(
+                      context, 'Email yang kamu masukkan tidak valid');
+                } else if (firstNameController.text.isEmpty ||
+                    lastNameController.text.isEmpty ||
+                    usernameController.text.isEmpty ||
+                    emailController.text.isEmpty ||
+                    passwordController.text.isEmpty) {
+                  AppMethods.dangerToast(
+                      context, 'Field mandatory harus diisi');
+                } else if (passwordController.text.length < 8) {
+                  AppMethods.dangerToast(context, 'Password min 8 Char');
+                } else if (passwordController.text !=
+                    repeatPasswordController.text) {
+                  AppMethods.dangerToast(
+                      context, 'Password tidak sama, coba lagi!');
+                } else {
+                  final model = SignUpFormModel(
+                    blocked: "false",
+                    confirmed: "true",
+                    email: emailController.text,
+                    firstName: firstNameController.text,
+                    lastName: lastNameController.text,
+                    password: passwordController.text,
+                    username: usernameController.text,
+                  );
+                  final result = await controller.registerUser(model);
+
+                  if (result['success'] == true) {
+                    // ignore: use_build_context_synchronously
+                    context.pop('/');
+                  } else {
+                    // ignore: use_build_context_synchronously
+                    AppMethods.dangerToast(context, result['message']);
+                  }
+                }
+              },
+              titleButton: 'DAFTAR',
             ),
           ),
           const SizedBox(
@@ -997,198 +890,110 @@ class _RegisterFormMobileState extends State<RegisterFormMobile> {
         const SizedBox(
           height: 20,
         ),
-        // Row(
-        //   children: [
-        //     Flexible(
-        //       child: CustomFormUser(
-        //         controller: firstNameController,
-        //         title: 'First Name ',
-        //         isMandatory: true,
-        //       ),
-        //     ),
-        //     const SizedBox(width: 10),
-        //     Flexible(
-        //       child: CustomFormUser(
-        //         controller: lastNameController,
-        //         title: 'Last Name ',
-        //         isMandatory: true,
-        //       ),
-        //     ),
-        //   ],
-        // ),
-        // const SizedBox(height: 10),
-        // CustomFormUser(
-        //   controller: usernameController,
-        //   title: 'Username ',
-        //   isMandatory: true,
-        // ),
-        // const SizedBox(height: 10),
-        // CustomFormUser(
-        //   controller: emailController,
-        //   title: 'Email ',
-        //   isMandatory: true,
-        // ),
-        // const SizedBox(height: 10),
-        // Row(
-        //   children: [
-        //     Flexible(
-        //       child: CustomFormUser(
-        //         controller: passwordController,
-        //         title: 'Password ',
-        //         isMandatory: true,
-        //         isObscure: true,
-        //       ),
-        //     ),
-        //     const SizedBox(width: 10),
-        //     Flexible(
-        //       child: CustomFormUser(
-        //         controller: repeatPasswordController,
-        //         title: 'Repeat Password ',
-        //         isMandatory: true,
-        //         isObscure: true,
-        //       ),
-        //     ),
-        //   ],
-        // ),
-        // const SizedBox(
-        //   height: 5,
-        // ),
-        // Text(
-        //   'Tautan untuk mengatur kata sandi baru akan dikirim ke alamat e-mail Anda.',
-        //   style: AppTheme.greyTextStyle.copyWith(height: 1.5),
-        // ),
-        // const SizedBox(
-        //   height: 20,
-        // ),
-        // SizedBox(
-        //   width: double.infinity,
-        //   child: PrimaryButton(
-        //     onTap: () async {
-        //       if (!EmailValidator.validate(emailController.text)) {
-        //         AppMethods.dangerToast(
-        //             context, 'Email yang kamu masukkan tidak valid');
-        //         // CoolAlert.show(
-        //         //   context: context,
-        //         //   width: MediaQuery.of(context).size.width * 0.3,
-        //         //   type: CoolAlertType.error,
-        //         //   text: 'Email yang kamu masukkan tidak valid',
-        //         // );
-        //       } else if (firstNameController.text.isEmpty ||
-        //           lastNameController.text.isEmpty ||
-        //           usernameController.text.isEmpty ||
-        //           emailController.text.isEmpty ||
-        //           passwordController.text.isEmpty) {
-        //         AppMethods.dangerToast(context, 'Field mandatory harus diisi');
-
-        //         // CoolAlert.show(
-        //         //   context: context,
-        //         //   width: MediaQuery.of(context).size.width * 0.3,
-        //         //   type: CoolAlertType.error,
-        //         //   text: 'Field mandatory harus diisi',
-        //         // );
-        //       } else if (passwordController.text.length < 8) {
-        //         // CoolAlert.show(
-        //         //   context: context,
-        //         //   width: MediaQuery.of(context).size.width * 0.3,
-        //         //   type: CoolAlertType.error,
-        //         //   text: 'Password min 8 Char',
-        //         //   onConfirmBtnTap: () {
-        //         //     Navigator.pop(context);
-        //         //   },
-        //         // );
-        //         AppMethods.dangerToast(context, 'Password min 8 Char');
-        //       } else if (passwordController.text !=
-        //           repeatPasswordController.text) {
-        //         // CoolAlert.show(
-        //         //   context: context,
-        //         //   width: MediaQuery.of(context).size.width * 0.3,
-        //         //   type: CoolAlertType.error,
-        //         //   text: 'Password tidak sama, coba lagi',
-        //         //   onConfirmBtnTap: () {
-        //         //     Navigator.pop(context);
-        //         //   },
-        //         // );
-        //         AppMethods.dangerToast(
-        //             context, 'Password tidak sama, coba lagi!');
-        //       } else {
-        //         final model = SignUpFormModel(
-        //           blocked: "false",
-        //           email: emailController.text,
-        //           firstName: firstNameController.text,
-        //           lastName: lastNameController.text,
-        //           password: passwordController.text,
-        //           username: usernameController.text,
-        //         );
-        //         final result = await controller.registerUser(model);
-
-        //         if (result['success'] == true) {
-        //           // ignore: use_build_context_synchronously
-        //           AppMethods.successToast(context, result['message']);
-        //           context.replace('/');
-        //         } else {
-        //           // ignore: use_build_context_synchronously
-        //           AppMethods.dangerToast(context, result['message']);
-        //         }
-        //       }
-        //     },
-        //     titleButton: 'DAFTAR',
-        //   ),
-        // ),
-
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 30),
-          child: SizedBox(
-            width: double.infinity,
-            child: Material(
-              color: const Color(0xff4285f4),
-              borderRadius: BorderRadius.circular(10),
-              child: InkWell(
-                onTap: () async {
-                  final result = await AuthServices.registerGoogle();
-                  if (result['success'] == true) {
-                    AppMethods.successToast(context, result['message']);
-                    context.replace('/');
-                  } else {
-                    AppMethods.dangerToast(context, result['message']);
-                  }
-                }, // Button Login Dengan GOOGLE
-                borderRadius: BorderRadius.circular(10),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 18,
-                    vertical: 13,
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 25,
-                        height: 25,
-                        decoration: BoxDecoration(
-                          color: Colors.blueGrey[50],
-                          borderRadius: BorderRadius.circular(7),
-                          image: const DecorationImage(
-                            image: AssetImage('images/google-icon.png'),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Center(
-                          child: Text(
-                            'GOOGLE',
-                            style: AppTheme.whiteTextStyle.copyWith(
-                              fontWeight: AppTheme.medium,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                    ],
-                  ),
-                ),
+        Row(
+          children: [
+            Flexible(
+              child: CustomFormUser(
+                controller: firstNameController,
+                title: 'First Name ',
+                isMandatory: true,
               ),
             ),
+            const SizedBox(width: 10),
+            Flexible(
+              child: CustomFormUser(
+                controller: lastNameController,
+                title: 'Last Name ',
+                isMandatory: true,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        CustomFormUser(
+          controller: usernameController,
+          title: 'Username ',
+          isMandatory: true,
+        ),
+        const SizedBox(height: 10),
+        CustomFormUser(
+          controller: emailController,
+          title: 'Email ',
+          isMandatory: true,
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            Flexible(
+              child: CustomFormUser(
+                controller: passwordController,
+                title: 'Password ',
+                isMandatory: true,
+                isObscure: true,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Flexible(
+              child: CustomFormUser(
+                controller: repeatPasswordController,
+                title: 'Repeat Password ',
+                isMandatory: true,
+                isObscure: true,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(
+          height: 5,
+        ),
+        Text(
+          'Tautan untuk mengatur kata sandi baru akan dikirim ke alamat e-mail Anda.',
+          style: AppTheme.greyTextStyle.copyWith(height: 1.5),
+        ),
+        const SizedBox(
+          height: 20,
+        ),
+        SizedBox(
+          width: double.infinity,
+          child: PrimaryButton(
+            onTap: () async {
+              if (!EmailValidator.validate(emailController.text)) {
+                AppMethods.dangerToast(
+                    context, 'Email yang kamu masukkan tidak valid');
+              } else if (firstNameController.text.isEmpty ||
+                  lastNameController.text.isEmpty ||
+                  usernameController.text.isEmpty ||
+                  emailController.text.isEmpty ||
+                  passwordController.text.isEmpty) {
+                AppMethods.dangerToast(context, 'Field mandatory harus diisi');
+              } else if (passwordController.text.length < 8) {
+                AppMethods.dangerToast(context, 'Password min 8 Char');
+              } else if (passwordController.text !=
+                  repeatPasswordController.text) {
+                AppMethods.dangerToast(
+                    context, 'Password tidak sama, coba lagi!');
+              } else {
+                final model = SignUpFormModel(
+                  blocked: "false",
+                  confirmed: "true",
+                  email: emailController.text,
+                  firstName: firstNameController.text,
+                  lastName: lastNameController.text,
+                  password: passwordController.text,
+                  username: usernameController.text,
+                );
+                final result = await controller.registerUser(model);
+
+                if (result['success'] == true) {
+                  // ignore: use_build_context_synchronously
+                  context.replace('/');
+                } else {
+                  // ignore: use_build_context_synchronously
+                  AppMethods.dangerToast(context, result['message']);
+                }
+              }
+            },
+            titleButton: 'DAFTAR',
           ),
         ),
         const SizedBox(

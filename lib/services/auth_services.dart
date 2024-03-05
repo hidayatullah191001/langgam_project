@@ -108,20 +108,20 @@ class AuthServices {
         } else {
           return {
             "success": false,
-            "message": "Akun kamu tidak memiliki akses ke halaman admin",
+            "message": responseBody['error']['message'],
           };
         }
       } else {
         return {
           "success": false,
-          "message": "Email atau password salah, coba lagi",
+          "message": responseBody['error']['message'],
         };
       }
     }
 
     return {
       "success": false,
-      "message": "Something went wrong",
+      "message": responseBody['error']['message'],
     };
   }
 
@@ -130,12 +130,46 @@ class AuthServices {
       '${Constant.apirest}/auth/local/register',
       body: value.toJson(),
     );
-    if (responseBody!.isNotEmpty && responseBody['jwt'] != null) {
-      return {
-        "success": true,
-        "message":
-            "Akun berhasil didaftarkan, silahkan cek email untuk aktivasi",
-      };
+
+    if (responseBody!.isNotEmpty) {
+      if (responseBody['jwt'] != null) {
+        String token = responseBody['jwt'].toString();
+        String email = responseBody['user']['email'].toString();
+        String id = responseBody['user']['id'].toString();
+        String username = responseBody['user']['username'].toString();
+        String role = responseBody['user']['role']['type'].toString();
+
+        if (role == 'customer') {
+          Map user = {
+            'username': username,
+            'email': email,
+            'id': id,
+            'role': role,
+          };
+          if (responseBody['blocked'] == true) {
+            return {
+              "success": false,
+              "message": "Akun anda belum diaktivasi, silahkan hubungi admin",
+            };
+          } else {
+            AppSession.saveUserInformation(user, token);
+            return {
+              "success": true,
+              "message": "Berhasil daftar",
+            };
+          }
+        } else {
+          return {
+            "success": false,
+            "message": "Akun kamu tidak memiliki akses ke halaman ini"
+          };
+        }
+      } else {
+        return {
+          "success": false,
+          "message": "Email atau password salah, coba lagi",
+        };
+      }
     } else {
       return {
         "success": false,
@@ -152,11 +186,6 @@ class AuthServices {
 
       if (googleSignInAccount != null) {
         // Berhasil login, dapatkan informasi akun
-        print('User ID: ${googleSignInAccount.id}');
-        print('Display Name: ${googleSignInAccount.displayName}');
-        print('Email: ${googleSignInAccount.email}');
-        print('Profile Picture: ${googleSignInAccount.photoUrl}');
-        print('Password Accound: ${googleSignInAccount.authentication}');
         final account = {
           "email": googleSignInAccount.email,
           "username": googleSignInAccount.displayName,
@@ -173,7 +202,6 @@ class AuthServices {
             "Content-Type": "application/json",
           },
         );
-        print(responseBody);
         if (responseBody!.isNotEmpty && responseBody['jwt'] != null) {
           return {
             "success": true,

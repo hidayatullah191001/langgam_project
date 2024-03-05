@@ -92,7 +92,7 @@ class CheckoutController extends ChangeNotifier {
             harga: data['product']['harga'],
             kuantitas: int.parse(data['item']),
             layanan: data['product']['id'].toString(),
-            total: cartController.getTotalHargaAllItem(),
+            total: int.parse(data['totalHarga']),
             nomorPermintaan: AppMethods.generateOrderString(14),
           ),
         );

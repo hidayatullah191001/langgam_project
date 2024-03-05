@@ -10,6 +10,8 @@ class IndexPage extends StatefulWidget {
 class _IndexPageState extends State<IndexPage> {
   var isHovered = false;
   ScrollController _scrollController = ScrollController();
+  bool webView = true;
+  bool webViewJs = true;
 
   @override
   void initState() {
@@ -39,89 +41,90 @@ class _IndexPageState extends State<IndexPage> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, BoxConstraints constraints) {
-      if (constraints.maxWidth < 1200) {
-        return MobileView(context);
-      } else {
-        return WebView();
-      }
-    });
+    return LayoutBuilder(
+      builder: (context, BoxConstraints constraints) {
+        if (constraints.maxWidth < 1200) {
+          return MobileView(context);
+        } else {
+          return WebView();
+        }
+      },
+    );
   }
 
   Widget MobileView(BuildContext context) {
     final searchController = context.watch<PencarianController>();
-    return Scaffold(
-      drawerEnableOpenDragGesture: false,
-      endDrawerEnableOpenDragGesture: false,
-      appBar: AppBar(
-        title: BannerTopMobile(),
-        backgroundColor: AppColors.primaryColor,
-        actions: [
-          Container(),
-        ],
-        automaticallyImplyLeading: false,
-      ),
-      body: Consumer(builder: (context, SettingController controller, widget) {
-        if (controller.dataState == DataState.loading) {
-          return const Center(child: CircularProgressIndicator());
-        } else {
-          return SafeArea(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Navbar(
-                    isMobile: true,
-                  ),
-                  !searchController.isSearchBoolean
-                      ? defaultWidgetMobile()
-                      : searchWidgetMobile(),
-                ],
-              ),
+    final settingController = context.watch<SettingController>();
+
+    if (settingController.dataState == DataState.loading) {
+      return const Center(child: CircularProgressIndicator());
+    } else {
+      return Scaffold(
+        drawerEnableOpenDragGesture: false,
+        endDrawerEnableOpenDragGesture: false,
+        appBar: AppBar(
+          title: BannerTopMobile(),
+          backgroundColor: AppColors.primaryColor,
+          actions: [
+            Container(),
+          ],
+          automaticallyImplyLeading: false,
+        ),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Navbar(
+                  isMobile: true,
+                ),
+                !searchController.isSearchBoolean
+                    ? defaultWidgetMobile()
+                    : searchWidgetMobile(),
+              ],
             ),
-          );
-        }
-      }),
-      endDrawer: const LoginDrawer(),
-    );
+          ),
+        ),
+        endDrawer: const LoginDrawer(),
+      );
+    }
   }
 
   Widget WebView() {
     final searchController = context.watch<PencarianController>();
+    final settingController = context.watch<SettingController>();
 
-    return Scaffold(
-      body: Consumer(builder: (context, SettingController controller, widget) {
-        if (controller.dataState == DataState.loading) {
-          return const Center(child: CircularProgressIndicator());
-        } else {
-          return CustomScrollView(
-            cacheExtent: 5000,
-            slivers: [
-              SliverList(
-                delegate: SliverChildListDelegate([
-                  const BannerTop(),
-                ]),
-              ),
-              SliverAppBar(
-                pinned: true,
-                floating: false,
-                collapsedHeight: 101.0,
-                automaticallyImplyLeading: false,
-                flexibleSpace: Navbar(),
-                actions: [SizedBox()],
-              ),
-              SliverList(
-                delegate: SliverChildListDelegate([
-                  !searchController.isSearchBoolean
-                      ? defaultWidget()
-                      : searchWidget(),
-                ]),
-              ),
-            ],
-          );
-        }
-      }),
-      endDrawer: const LoginDrawer(),
-    );
+    if (settingController.dataState == DataState.loading) {
+      return const Center(child: CircularProgressIndicator());
+    } else {
+      return Scaffold(
+        body: CustomScrollView(
+          cacheExtent: 5000,
+          slivers: [
+            SliverList(
+              delegate: SliverChildListDelegate([
+                const BannerTop(),
+              ]),
+            ),
+            SliverAppBar(
+              pinned: true,
+              floating: false,
+              collapsedHeight: 101.0,
+              automaticallyImplyLeading: false,
+              flexibleSpace: Navbar(),
+              actions: [SizedBox()],
+            ),
+            SliverList(
+              delegate: SliverChildListDelegate([
+                !searchController.isSearchBoolean
+                    ? defaultWidget()
+                    : searchWidget(),
+              ]),
+            ),
+          ],
+        ),
+        endDrawer: const LoginDrawer(),
+      );
+    }
   }
 
   Widget searchWidget() {
@@ -255,6 +258,7 @@ class _IndexPageState extends State<IndexPage> {
                   return ItemLayananCardList(
                     data: layanan,
                     id: layanan.id!,
+                    isMobile: true,
                   );
                 },
               );
@@ -496,6 +500,7 @@ class _IndexPageState extends State<IndexPage> {
     final setting = settingController.setting.data!.attributes!;
     final idYoutube = YoutubePlayerController.convertUrlToId(
         setting.homepageJumbotronVideoUrl.toString());
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -508,19 +513,11 @@ class _IndexPageState extends State<IndexPage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
-            width: 568,
-            height: 400,
             margin: const EdgeInsets.symmetric(vertical: 35),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
             ),
-            child: YoutubePlayer(
-              controller: YoutubePlayerController.fromVideoId(
-                videoId: idYoutube!,
-                autoPlay: false,
-              ),
-              aspectRatio: 16 / 9,
-            ),
+            child: _buildWebViewX(idYoutube!),
           ),
           const SizedBox(
             width: 25,
@@ -564,6 +561,32 @@ class _IndexPageState extends State<IndexPage> {
           )
         ],
       ),
+    );
+  }
+
+  Widget _buildWebViewX(String id, {bool isMobile = false}) {
+    String initialContent = "";
+
+    if (isMobile) {
+      initialContent =
+          '<iframe width ="300" height="200" src="https://www.youtube.com/embed/$id" frameborder="0"  allowfullscreen></iframe>';
+    } else {
+      initialContent =
+          '<iframe width="568" height="400" src="https://www.youtube.com/embed/$id" frameborder="0"  allowfullscreen></iframe>';
+    }
+
+    late WebViewXController webviewController;
+
+    return WebViewX(
+      key: const ValueKey('webviewx'),
+      initialContent: initialContent,
+      width: isMobile ? 320 : 600,
+      height: isMobile ? 230 : 500,
+      initialSourceType: SourceType.html,
+      onWebViewCreated: (controller) => webviewController = controller,
+      navigationDelegate: (navigation) {
+        return NavigationDecision.navigate;
+      },
     );
   }
 
@@ -665,22 +688,14 @@ class _IndexPageState extends State<IndexPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          YoutubePlayer(
-            controller: YoutubePlayerController.fromVideoId(
-              videoId: idYoutube!,
-              autoPlay: false,
-              params: const YoutubePlayerParams(
-                showFullscreenButton: true,
-              ),
-            ),
-            aspectRatio: 16 / 9,
-          ),
+          _buildWebViewX(idYoutube!, isMobile: true),
+          const SizedBox(height: 10),
           Column(
             children: [
               Text(
                 setting.homepageJumbotronJudulUtama.toString(),
                 style: AppTheme.blackTextStyle.copyWith(
-                  fontSize: 60,
+                  fontSize: 32,
                   fontWeight: AppTheme.bold,
                 ),
               ),
@@ -690,13 +705,16 @@ class _IndexPageState extends State<IndexPage> {
               Text(
                 setting.homepageJumbotronIntro.toString(),
                 style: AppTheme.blackTextStyle.copyWith(
-                  fontSize: 18,
+                  fontSize: 14,
                   fontWeight: AppTheme.medium,
                 ),
                 textAlign: TextAlign.center,
                 maxLines: 5,
                 softWrap: true,
                 overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(
+                height: 12,
               ),
               PrimaryButton(
                 onTap: () {
@@ -728,7 +746,7 @@ class _IndexPageState extends State<IndexPage> {
           Text(
             setting.homepageLayananJudulUtama.toString(),
             style: AppTheme.whiteTextStyle.copyWith(
-              fontSize: 56,
+              fontSize: 32,
               fontWeight: AppTheme.bold,
             ),
           ),
@@ -737,7 +755,9 @@ class _IndexPageState extends State<IndexPage> {
           ),
           Text(
             setting.homepageLayananIntro.toString(),
-            style: AppTheme.whiteTextStyle,
+            style: AppTheme.whiteTextStyle.copyWith(
+              fontSize: 14,
+            ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(
@@ -749,7 +769,7 @@ class _IndexPageState extends State<IndexPage> {
               future: LayananServices.getAllBidangLayanans(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 }
 
                 if (!snapshot.hasData) {
@@ -888,58 +908,52 @@ class _IndexPageState extends State<IndexPage> {
       width: double.infinity,
       color: AppColors.backgroundColor2,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
         child: Column(
           children: [
             Text(
               'Layanan Populer',
               style: AppTheme.blackTextStyle.copyWith(
-                fontSize: 56,
+                fontSize: 32,
                 fontWeight: AppTheme.bold,
               ),
             ),
             const SizedBox(
               height: 20,
             ),
-            Row(
-              children: [
-                Expanded(
-                  child: FutureBuilder(
-                    future: LayananServices.getAllLayanans(page: 1),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
-                      }
+            FutureBuilder(
+              future: LayananServices.getAllLayanans(page: 1),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
 
-                      if (!snapshot.hasData) {
-                        return Center(
-                            child: Text(snapshot.error.toString(),
-                                style: AppTheme.blackTextStyle));
-                      }
+                if (!snapshot.hasData) {
+                  return Center(
+                      child: Text(snapshot.error.toString(),
+                          style: AppTheme.blackTextStyle));
+                }
 
-                      Layanan data = snapshot.data!;
-                      return SizedBox(
-                        height: 300,
-                        child: ListView.builder(
-                          padding: EdgeInsets.zero,
-                          controller: _scrollController,
-                          scrollDirection: Axis.horizontal,
-                          itemCount: 5,
-                          shrinkWrap: true,
-                          itemBuilder: (context, index) {
-                            final LayananData layanan = data.data![index];
-                            return LayananPopulerCard(
-                              data: layanan.attributes,
-                              idProduct: layanan.id.toString(),
-                              isMobile: true,
-                            );
-                          },
-                        ),
+                Layanan data = snapshot.data!;
+                return SizedBox(
+                  height: 300,
+                  child: ListView.builder(
+                    padding: EdgeInsets.zero,
+                    controller: _scrollController,
+                    scrollDirection: Axis.horizontal,
+                    itemCount: 5,
+                    shrinkWrap: true,
+                    itemBuilder: (context, index) {
+                      final LayananData layanan = data.data![index];
+                      return LayananPopulerCard(
+                        data: layanan.attributes,
+                        idProduct: layanan.id.toString(),
+                        isMobile: true,
                       );
                     },
                   ),
-                ),
-              ],
+                );
+              },
             ),
             const SizedBox(
               height: 20,
@@ -958,4 +972,17 @@ class _IndexPageState extends State<IndexPage> {
       ),
     );
   }
+}
+
+class _WidgetFactory extends WidgetFactory {
+  @override
+  final bool webView;
+
+  @override
+  final bool webViewJs;
+
+  _WidgetFactory({
+    required this.webView,
+    required this.webViewJs,
+  });
 }

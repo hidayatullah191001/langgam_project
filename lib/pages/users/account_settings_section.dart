@@ -47,10 +47,10 @@ class _AccountSettingsSectionState extends State<AccountSettingsSection> {
               // ),
               // const SizedBox(height: 20),
               CustomFormUser(
-                controller  : controller.usernameController,
+                controller: controller.usernameController,
                 title: 'Username',
                 isMandatory: true,
-                isEnabled : false,
+                isEnabled: false,
               ),
               Text(
                 'Nama ini yang akan ditampilkan di bagian akun',
@@ -62,10 +62,10 @@ class _AccountSettingsSectionState extends State<AccountSettingsSection> {
                 height: 20,
               ),
               CustomFormUser(
-                controller : controller.emailController,
+                controller: controller.emailController,
                 title: 'Alamat email',
                 isMandatory: true,
-                isEnabled : false,
+                isEnabled: false,
               ),
               const SizedBox(height: 30),
               // Text(

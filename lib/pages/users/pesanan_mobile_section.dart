@@ -1,13 +1,13 @@
 part of '../pages.dart';
 
-class PesananSection extends StatefulWidget {
-  const PesananSection({Key? key}) : super(key: key);
+class PesananMobileSection extends StatefulWidget {
+  const PesananMobileSection({Key? key}) : super(key: key);
 
   @override
-  State<PesananSection> createState() => _PesananSectionState();
+  State<PesananMobileSection> createState() => _PesananMobileSectionState();
 }
 
-class _PesananSectionState extends State<PesananSection> {
+class _PesananMobileSectionState extends State<PesananMobileSection> {
   int selectedPageNumber = 1;
   int selectedPageSize = 10;
 
@@ -15,185 +15,134 @@ class _PesananSectionState extends State<PesananSection> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Text('Entries', style: AppTheme.greyTextStyle),
-            const SizedBox(width: 5),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.1,
-              child: DropdownButtonFormField<String>(
-                value: selectedPageSize.toString(),
-                onChanged: (String? value) {
-                  setState(() {
-                    selectedPageSize = int.parse(value!);
-                  });
-                },
-                decoration: InputDecoration(
-                  hintStyle: AppTheme.greyTextStyle.copyWith(
-                    fontSize: 12,
-                  ),
-                  isDense: true,
-                  contentPadding:
-                      const EdgeInsets.symmetric(vertical: 7, horizontal: 10),
-                  border: OutlineInputBorder(
-                    borderSide:
-                        const BorderSide(color: AppColors.greyColor, width: 2),
-                    borderRadius: BorderRadius.circular(7),
+    return FutureBuilder(
+      future: PermintaanService.getAllPermintaanCustomer(
+          page: selectedPageNumber, pageSize: selectedPageSize),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (!snapshot.hasData) {
+          return Center(
+            child: Column(
+              children: [
+                Lottie.asset(
+                  'lottie/empty_cart.json',
+                  width: 150,
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'Kamu belum ada memiliki pesanan',
+                  style: AppTheme.greyTextStyle.copyWith(
+                    fontSize: 14,
+                    fontWeight: AppTheme.bold,
                   ),
                 ),
-                items: _pageSize.map((data) {
-                  return DropdownMenuItem<String>(
-                    value: data.toString(),
-                    child: Text(data.toString()),
-                  );
-                }).toList(),
-              ),
+              ],
             ),
-          ],
-        ),
-        const SizedBox(height: 20),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'PESANAN',
-              style: AppTheme.blackTextStyle.copyWith(
-                fontWeight: AppTheme.bold,
-                fontSize: 18,
-              ),
-            ),
-            const SizedBox(width: 10),
-            Text(
-              'TANGGAL',
-              style: AppTheme.blackTextStyle.copyWith(
-                fontWeight: AppTheme.bold,
-                fontSize: 18,
-              ),
-            ),
-            const SizedBox(width: 10),
-            Text(
-              'STATUS',
-              style: AppTheme.blackTextStyle.copyWith(
-                fontWeight: AppTheme.bold,
-                fontSize: 18,
-              ),
-            ),
-            const SizedBox(width: 30),
-            Text(
-              'TOTAL',
-              style: AppTheme.blackTextStyle.copyWith(
-                fontWeight: AppTheme.bold,
-                fontSize: 18,
-              ),
-            ),
-            const SizedBox(width: 40),
-            Text(
-              'AKSI',
-              style: AppTheme.blackTextStyle.copyWith(
-                fontWeight: AppTheme.bold,
-                fontSize: 18,
-              ),
-            ),
-          ],
-        ),
-        const Divider(),
-
-        // Disini List Item Pesanan
-
-        FutureBuilder(
-          future: PermintaanService.getAllPermintaanCustomer(
-              page: selectedPageNumber, pageSize: selectedPageSize),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (!snapshot.hasData) {
-              return Center(
-                child: Column(
-                  children: [
-                    Lottie.asset(
-                      'lottie/empty_cart.json',
-                      width: 150,
+          );
+        }
+        if (snapshot.hasData) {
+          ListPermintaanModel model = snapshot.data as ListPermintaanModel;
+          final meta = model.meta!;
+          if (model.data!.isEmpty) {
+            return Center(
+              child: Column(
+                children: [
+                  Lottie.asset(
+                    'lottie/empty_cart.json',
+                    width: 150,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Kamu belum ada memiliki pesanan',
+                    style: AppTheme.greyTextStyle.copyWith(
+                      fontSize: 14,
+                      fontWeight: AppTheme.bold,
                     ),
-                    const SizedBox(height: 10),
-                    Text(
-                      'Kamu belum ada memiliki pesanan',
-                      style: AppTheme.greyTextStyle.copyWith(
-                        fontSize: 14,
-                        fontWeight: AppTheme.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }
-            if (snapshot.hasData) {
-              ListPermintaanModel model = snapshot.data as ListPermintaanModel;
-              final meta = model.meta!;
-
-              if (model.data!.isEmpty) {
-                return Center(
-                  child: Column(
-                    children: [
-                      Lottie.asset(
-                        'lottie/empty_cart.json',
-                        width: 150,
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        'Kamu belum ada memiliki pesanan',
-                        style: AppTheme.greyTextStyle.copyWith(
-                          fontSize: 14,
-                          fontWeight: AppTheme.bold,
+                  ),
+                ],
+              ),
+            );
+          }
+          return Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text('Entries', style: AppTheme.greyTextStyle),
+                  const SizedBox(width: 5),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.25,
+                    child: DropdownButtonFormField<String>(
+                      value: selectedPageSize.toString(),
+                      onChanged: (String? value) {
+                        setState(() {
+                          selectedPageSize = int.parse(value!);
+                        });
+                      },
+                      decoration: InputDecoration(
+                        hintStyle: AppTheme.greyTextStyle.copyWith(
+                          fontSize: 12,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 7, horizontal: 10),
+                        isDense: true,
+                        border: OutlineInputBorder(
+                          borderSide: const BorderSide(
+                              color: AppColors.greyColor, width: 2),
+                          borderRadius: BorderRadius.circular(7),
                         ),
                       ),
-                    ],
+                      items: _pageSize.map((data) {
+                        return DropdownMenuItem<String>(
+                          value: data.toString(),
+                          child: Text(data.toString()),
+                        );
+                      }).toList(),
+                    ),
                   ),
-                );
-              }
-              return Column(
-                children: [
-                  ListView.builder(
-                    padding: EdgeInsets.zero,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: model.data!.length,
-                    itemBuilder: (context, index) {
-                      return ItemPesanan(pesananUser: model.data![index]);
-                    },
-                  ),
-                  model.data!.isNotEmpty
-                      ? NumberPagination(
-                          onPageChanged: (int pageNumber) {
-                            //do somthing for selected page
-                            setState(() {
-                              selectedPageNumber = pageNumber;
-                            });
-                          },
-                          pageTotal: meta.pagination!.pageCount!,
-                          pageInit:
-                              selectedPageNumber, // picked number when init page
-                          colorPrimary: AppColors.primaryColor,
-                          colorSub: AppColors.backgroundColor3,
-                        )
-                      : Container(),
                 ],
-              );
-            }
-            return Container();
-          },
-        ),
-      ],
+              ),
+              const SizedBox(height: 20),
+              const Divider(),
+              ListView.builder(
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: model.data!.length,
+                itemBuilder: (context, index) {
+                  return ItemPesananMobile(pesananUser: model.data![index]);
+                },
+              ),
+              const SizedBox(height: 15),
+              model.data!.isNotEmpty
+                  ? NumberPagination(
+                      onPageChanged: (int pageNumber) {
+                        //do somthing for selected page
+                        setState(() {
+                          selectedPageNumber = pageNumber;
+                        });
+                      },
+                      pageTotal: meta.pagination!.pageCount!,
+                      pageInit:
+                          selectedPageNumber, // picked number when init page
+                      colorPrimary: AppColors.primaryColor,
+                      colorSub: AppColors.backgroundColor3,
+                    )
+                  : Container(),
+            ],
+          );
+        }
+        return Container();
+      },
     );
   }
 }
 
-class ItemPesanan extends StatelessWidget {
+class ItemPesananMobile extends StatelessWidget {
   final Data pesananUser;
-  const ItemPesanan({super.key, required this.pesananUser});
+  const ItemPesananMobile({super.key, required this.pesananUser});
 
   @override
   Widget build(BuildContext context) {
@@ -206,53 +155,47 @@ class ItemPesanan extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            SizedBox(
-              width: 90,
-              child: InkWell(
-                child: Text(
-                  '#${pesananUser.attributes!.nomorPermintaan ?? " ---"}',
-                  style: AppTheme.primaryTextStyle.copyWith(
-                    fontWeight: AppTheme.bold,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                InkWell(
+                  child: Text(
+                    'Pesanan : #${pesananUser.attributes!.nomorPermintaan ?? " ---"}',
+                    style: AppTheme.primaryTextStyle.copyWith(
+                      fontWeight: AppTheme.bold,
+                      fontSize: 14,
+                    ),
                   ),
                 ),
-              ),
-            ),
-            SizedBox(
-              width: 120,
-              child: Text(
-                AppMethods.date(pesananUser.attributes!.createdAt.toString()),
-                style: AppTheme.softgreyTextStyle,
-                textAlign: TextAlign.center,
-              ),
-            ),
-            SizedBox(
-              width: 100,
-              child: Text(
-                pesananUser.attributes!.status.toString(),
-                style: pesananUser.attributes!.status == 'Selesai'
-                    ? AppTheme.greenTextStyle
-                    : AppTheme.redTextStyle,
-                textAlign: TextAlign.center,
-              ),
-            ),
-            SizedBox(
-              width: 100,
-              child: RichText(
-                textAlign: TextAlign.center,
-                text: TextSpan(
-                  text:
-                      'Rp ${AppMethods.currency(pesananUser.attributes!.total.toString())}',
-                  style: AppTheme.primaryTextStyle.copyWith(
-                    fontWeight: AppTheme.bold,
-                  ),
-                  children: [
-                    TextSpan(
-                        text:
-                            ' untuk ${pesananUser.attributes!.kuantitas.toString()} item',
-                        style: AppTheme.softgreyTextStyle),
-                  ],
+                Text(
+                  'Tanggal : ${AppMethods.date(pesananUser.attributes!.createdAt!)}',
+                  style: AppTheme.softgreyTextStyle,
+                  textAlign: TextAlign.center,
                 ),
-              ),
+                Text(
+                  'Status : ${pesananUser.attributes!.status!}',
+                  style: pesananUser.attributes!.status == 'Selesai'
+                      ? AppTheme.greenTextStyle
+                      : AppTheme.redTextStyle,
+                  textAlign: TextAlign.center,
+                ),
+                RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    text:
+                        'Rp ${AppMethods.currency(pesananUser.attributes!.total.toString())}',
+                    style: AppTheme.primaryTextStyle.copyWith(
+                      fontWeight: AppTheme.bold,
+                    ),
+                    children: [
+                      TextSpan(
+                          text:
+                              ' untuk ${pesananUser.attributes!.kuantitas.toString()} item',
+                          style: AppTheme.softgreyTextStyle),
+                    ],
+                  ),
+                ),
+              ],
             ),
             PrimaryButton(
               titleButton: 'LIHAT',
@@ -264,20 +207,24 @@ class ItemPesanan extends StatelessWidget {
             ),
           ],
         ),
+        const SizedBox(height: 5),
         const Divider(),
+        const SizedBox(height: 5),
       ],
     );
   }
 }
 
-class DetailPesananSection extends StatefulWidget {
-  const DetailPesananSection({super.key});
+class DetailPesananSectionMobile extends StatefulWidget {
+  const DetailPesananSectionMobile({super.key});
 
   @override
-  State<DetailPesananSection> createState() => _DetailPesananSectionState();
+  State<DetailPesananSectionMobile> createState() =>
+      _DetailPesananSectionMobileState();
 }
 
-class _DetailPesananSectionState extends State<DetailPesananSection> {
+class _DetailPesananSectionMobileState
+    extends State<DetailPesananSectionMobile> {
   Map<String, dynamic> user = {};
   bool isDataCartLoaded = false;
   // File? _selectedDocument;
@@ -466,25 +413,25 @@ class _DetailPesananSectionState extends State<DetailPesananSection> {
             const Divider(),
           ],
         ),
-        ItemDetailPesanan(
+        ItemDetailPesananMobile(
           title:
               '${permintaanController.dataPermintaan.attributes!.layanan!.attributes!.judul} x ${permintaanController.dataPermintaan.attributes!.kuantitas}',
           price: AppMethods.currency(
               permintaanController.dataPermintaan.attributes!.total.toString()),
         ),
-        ItemDetailPesanan(
+        ItemDetailPesananMobile(
           title: 'Tipe Pesanan',
           price:
               permintaanController.dataPermintaan.attributes!.komersial == true
                   ? 'Komersial'
                   : 'Free',
         ),
-        ItemDetailPesanan(
+        ItemDetailPesananMobile(
           title: 'Lokasi Pesanan:',
           price:
               '${permintaanController.dataPermintaan.attributes!.metadata![0].data}',
         ),
-        ItemDetailPesanan(
+        ItemDetailPesananMobile(
           title: 'Catatan User:',
           price:
               '${permintaanController.dataPermintaan.attributes!.metadata![1].data}',
@@ -927,7 +874,8 @@ class _DetailPesananSectionState extends State<DetailPesananSection> {
     );
   }
 
-  Widget ItemDetailPesanan({required String title, required String price}) {
+  Widget ItemDetailPesananMobile(
+      {required String title, required String price}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -948,11 +896,13 @@ class _DetailPesananSectionState extends State<DetailPesananSection> {
                   ),
                 ),
               ),
-              Text(
-                price,
-                style: AppTheme.primaryTextStyle.copyWith(
-                  fontWeight: AppTheme.bold,
-                  letterSpacing: 1.1,
+              Expanded(
+                child: Text(
+                  price,
+                  style: AppTheme.primaryTextStyle.copyWith(
+                    fontWeight: AppTheme.bold,
+                    letterSpacing: 1.1,
+                  ),
                 ),
               ),
             ],
@@ -964,9 +914,9 @@ class _DetailPesananSectionState extends State<DetailPesananSection> {
   }
 }
 
-class StatusWidget extends StatelessWidget {
+class StatusWidgetMobile extends StatelessWidget {
   final String message;
-  const StatusWidget({
+  const StatusWidgetMobile({
     super.key,
     required this.message,
   });

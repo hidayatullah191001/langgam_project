@@ -176,7 +176,7 @@ final GoRouter _router = GoRouter(
                   return '/auth/admin';
                 }
               },
-            )
+            ),
           ],
         ),
         GoRoute(

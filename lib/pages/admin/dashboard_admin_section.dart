@@ -17,34 +17,43 @@ class _DashboardAdminSectionState extends State<DashboardAdminSection> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 20, right: 40),
-      padding: const EdgeInsets.all(30),
-      decoration: BoxDecoration(
-        color: AppColors.whiteColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Consumer<PermintaanController>(
-        builder: (context, PermintaanController permintaanController, child) {
-          if (permintaanController.dataState == DataState.loading) {
-            return Center(child: CircularProgressIndicator());
-          }
+    return Consumer<PermintaanController>(
+      builder: (context, PermintaanController permintaanController, child) {
+        if (permintaanController.dataState == DataState.loading) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-          if (permintaanController.dataState == DataState.error) {
-            return Center(child: Text('Something went wrong'));
-          }
-          return LayoutBuilder(
-            builder: (context, constraints) {
-              if (constraints.maxWidth < 600) {
-                return MobileView(permintaanController);
-              } else {
-                return WebView(permintaanController);
-              }
-            },
-          );
-        },
-      ),
+        if (permintaanController.dataState == DataState.error) {
+          return const Center(child: Text('Something went wrong'));
+        }
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth < 800) {
+              return Container(
+                width: double.infinity,
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.all(10),
+                child: MobileView(
+                  permintaanController,
+                ),
+              );
+            } else {
+              return Container(
+                width: double.infinity,
+                margin: const EdgeInsets.only(bottom: 20, right: 40),
+                padding: const EdgeInsets.all(30),
+                decoration: BoxDecoration(
+                  color: AppColors.whiteColor,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: WebView(
+                  permintaanController,
+                ),
+              );
+            }
+          },
+        );
+      },
     );
   }
 
@@ -61,71 +70,62 @@ class _DashboardAdminSectionState extends State<DashboardAdminSection> {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 30),
-        CountStatusWidget(
+        CountStatusWidgetMobile(
           backgroundColor: AppColors.infoColor,
           icon: Icons.file_copy,
           count: permintaanController.countMenungguPersetujuan.toString(),
           status: 'Permintaan Masuk',
         ),
         const SizedBox(height: 20),
-        CountStatusWidget(
+        CountStatusWidgetMobile(
           backgroundColor: AppColors.successColor,
           icon: Icons.check,
           count: permintaanController.countVerifikasiPersyaratan.toString(),
           status: 'Permintaan Disetujui',
         ),
         const SizedBox(height: 20),
-        CountStatusWidget(
+        CountStatusWidgetMobile(
           backgroundColor: AppColors.dangerColor,
           icon: Icons.close,
           count: permintaanController.countMenungguPembayaran.toString(),
           status: 'Permintaan Ditolak',
         ),
         const SizedBox(height: 20),
-        CountStatusWidget(
+        CountStatusWidgetMobile(
           backgroundColor: AppColors.primaryColor,
           icon: Icons.inventory_outlined,
           count: permintaanController.countVerifikasiPembayaran.toString(),
           status: 'Menunggu Pembayaran',
         ),
         const SizedBox(height: 20),
-        CountStatusWidget(
+        CountStatusWidgetMobile(
           backgroundColor: AppColors.softgreyColor,
           icon: Icons.list_alt_rounded,
           count: permintaanController.countSedangDiproses.toString(),
           status: 'Pembayaran Telah Dibayarkan',
         ),
         const SizedBox(height: 20),
-        CountStatusWidget(
+        CountStatusWidgetMobile(
           backgroundColor: AppColors.successColor,
           icon: Icons.check_circle_outline_rounded,
           count: permintaanController.countSelesai.toString(),
           status: 'Permintaan Selesai',
         ),
         const SizedBox(height: 20),
-        CountStatusWidget(
+        CountStatusWidgetMobile(
           backgroundColor: AppColors.warningColor,
           icon: Icons.woo_commerce_rounded,
           count: permintaanController.countKomersial.toString(),
           status: 'Komersial',
         ),
         const SizedBox(height: 20),
-        CountStatusWidget(
-          backgroundColor: AppColors.dangerColor,
-          icon: Icons.attach_money_sharp,
-          fontSize: 20,
-          count: AppMethods.currency(
-              permintaanController.totalPendapatanKotor.toString()),
-          status: 'Total Pendapatan Kotor',
-        ),
-        const SizedBox(height: 20),
-        CountStatusWidget(
+        CountStatusWidgetMobile(
           backgroundColor: AppColors.successColor,
           icon: Icons.money,
           fontSize: 20,
           count: AppMethods.currency(
               permintaanController.totalPendapatanSelesai.toString()),
-          status: 'Total Pendapatan Selesai',
+          status: 'Total PNBP',
         ),
         const SizedBox(height: 20),
         Container(
@@ -197,10 +197,11 @@ class _DashboardAdminSectionState extends State<DashboardAdminSection> {
                       );
                     }
                     return ListView.builder(
-                      physics: NeverScrollableScrollPhysics(),
+                      physics: const NeverScrollableScrollPhysics(),
                       padding: EdgeInsets.zero,
                       shrinkWrap: true,
-                      itemCount: 5,
+                      itemCount:
+                          model.data!.length > 5 ? 5 : model.data!.length,
                       itemBuilder: (context, index) {
                         return ItemPesananAdminMobileWidget(
                           pesananUser: model.data![index],
@@ -300,21 +301,11 @@ class _DashboardAdminSectionState extends State<DashboardAdminSection> {
                 ),
                 const SizedBox(width: 20),
                 CountStatusWidget(
-                  backgroundColor: AppColors.dangerColor,
-                  icon: Icons.attach_money_sharp,
-                  fontSize: 20,
-                  count: AppMethods.currency(
-                      permintaanController.totalPendapatanKotor.toString()),
-                  status: 'Total Pendapatan Kotor',
-                ),
-                const SizedBox(width: 20),
-                CountStatusWidget(
                   backgroundColor: AppColors.successColor,
                   icon: Icons.money,
-                  fontSize: 20,
                   count: AppMethods.currency(
                       permintaanController.totalPendapatanSelesai.toString()),
-                  status: 'Total Pendapatan Selesai',
+                  status: 'Total PNBP',
                 ),
               ],
             ),
@@ -388,10 +379,11 @@ class _DashboardAdminSectionState extends State<DashboardAdminSection> {
                           );
                         }
                         return ListView.builder(
-                          physics: NeverScrollableScrollPhysics(),
+                          physics: const NeverScrollableScrollPhysics(),
                           padding: EdgeInsets.zero,
                           shrinkWrap: true,
-                          itemCount: 5,
+                          itemCount:
+                              model.data!.length > 5 ? 5 : model.data!.length,
                           itemBuilder: (context, index) {
                             return ItemPesananAdminWidget(
                               pesananUser: model.data![index],
@@ -470,6 +462,67 @@ class CountStatusWidget extends StatelessWidget {
             )
           ],
         ),
+      ),
+    );
+  }
+}
+
+class CountStatusWidgetMobile extends StatelessWidget {
+  final IconData icon;
+  final Color backgroundColor;
+  final String count;
+  final String status;
+  double? fontSize;
+  CountStatusWidgetMobile({
+    super.key,
+    required this.icon,
+    required this.backgroundColor,
+    required this.count,
+    required this.status,
+    this.fontSize = 30,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
+      decoration: BoxDecoration(
+        color: backgroundColor.withOpacity(0.6),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Icon(
+            icon,
+            color: AppColors.whiteColor,
+            size: 40,
+          ),
+          const SizedBox(width: 30),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  count,
+                  style: AppTheme.whiteTextStyle.copyWith(
+                    fontSize: fontSize,
+                    fontWeight: AppTheme.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                Text(
+                  status,
+                  style: AppTheme.whiteTextStyle.copyWith(
+                    fontWeight: AppTheme.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          )
+        ],
       ),
     );
   }

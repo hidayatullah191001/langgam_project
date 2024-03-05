@@ -10,7 +10,11 @@ class SettingController extends ChangeNotifier {
     dataState = state;
   }
 
-  void getSettingWeb() async {
+  setSettingWeb(SettingWebModel data) {
+    _setting = data;
+  }
+
+  Future getSettingWeb() async {
     changeState(DataState.loading);
     try {
       SettingWebModel data = await SettingService.getSettingApp();

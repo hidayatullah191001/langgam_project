@@ -11,7 +11,6 @@ class UserAccountController extends ChangeNotifier {
 
   void changeState(DataState state) {
     dataState = state;
-    notifyListeners();
   }
 
   void getUserInformation() async {
@@ -22,8 +21,12 @@ class UserAccountController extends ChangeNotifier {
       usernameController.text = data.username.toString();
       emailController.text = data.email.toString();
       changeState(DataState.filled);
+
+      notifyListeners();
     } catch (e) {
       changeState(DataState.error);
+
+      notifyListeners();
     }
   }
 }

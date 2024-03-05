@@ -5,6 +5,7 @@ class SignUpFormModel {
   final String? email;
   final String? password;
   final String? blocked;
+  final String? confirmed;
 
   SignUpFormModel({
     this.firstName,
@@ -13,6 +14,7 @@ class SignUpFormModel {
     this.email,
     this.password,
     this.blocked,
+    this.confirmed,
   });
 
   Map<String, dynamic> toJson() {
@@ -22,6 +24,7 @@ class SignUpFormModel {
       'username': username,
       'email': email,
       'blocked': blocked,
+      'confirmed': confirmed,
       'password': password,
     };
   }

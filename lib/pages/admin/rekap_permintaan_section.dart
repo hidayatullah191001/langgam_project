@@ -10,6 +10,7 @@ class RekapPermintaanSection extends StatefulWidget {
 class _RekapPermintaanSectionState extends State<RekapPermintaanSection> {
   TextEditingController startDateController = TextEditingController();
   TextEditingController finishDateController = TextEditingController();
+  TextEditingController countDataController = TextEditingController();
   bool isSubmit = false;
 
   List<String> status = [
@@ -25,14 +26,6 @@ class _RekapPermintaanSectionState extends State<RekapPermintaanSection> {
   String _selectedStatus = 'Semua Permintaan';
   int _selectedIndex = 0;
   int selectedPageNumber = 1;
-
-  // final List<Map<String, dynamic>> data = <Map<String, dynamic>>[
-  //   {'name': 'Isaque', 'phone': '22 2777-2339', 'age': '32'},
-  //   {'name': 'Joe', 'phone': '22 2777-2339', 'age': '32'},
-  //   {'name': 'Leo', 'phone': '22 2777-2339', 'age': '32'},
-  //   {'name': 'Tiago', 'phone': '22 2777-2339', 'age': '32'},
-  //   {'name': 'Jon', 'phone': '22 2777-2339', 'age': '32'},
-  // ];
 
   Future<void> toXLSX(
       List<listPermintaanModelAdmin.PermintaanAdminData> data) async {
@@ -92,24 +85,50 @@ class _RekapPermintaanSectionState extends State<RekapPermintaanSection> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 20, right: 40),
-      padding: const EdgeInsets.all(30),
-      decoration: BoxDecoration(
-        color: AppColors.whiteColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          if (constraints.maxWidth < 800) {
-            return MobileView(context);
-          } else {
-            return WebView(context);
-          }
-        },
-      ),
-    );
+    return LayoutBuilder(builder: (context, constraints) {
+      bool mobile = false;
+      if (constraints.maxWidth < 800) {
+        mobile = true;
+      } else {
+        mobile == false;
+      }
+      return Container(
+        width: double.infinity,
+        margin: EdgeInsets.only(bottom: 20, right: mobile ? 10 : 40),
+        padding: EdgeInsets.all(mobile ? 20 : 30),
+        decoration: BoxDecoration(
+          color: AppColors.whiteColor,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth < 800) {
+              return Container(
+                width: double.infinity,
+                margin: const EdgeInsets.only(bottom: 20),
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppColors.whiteColor,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: MobileView(context),
+              );
+            } else {
+              return Container(
+                width: double.infinity,
+                margin: const EdgeInsets.only(bottom: 20, right: 40),
+                padding: const EdgeInsets.all(30),
+                decoration: BoxDecoration(
+                  color: AppColors.whiteColor,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: WebView(context),
+              );
+            }
+          },
+        ),
+      );
+    });
   }
 
   Widget WebView(BuildContext context) {
@@ -189,6 +208,13 @@ class _RekapPermintaanSectionState extends State<RekapPermintaanSection> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 10),
+                CustomFormUser(
+                  title: 'Jumlah Banyak Data',
+                  controller: countDataController,
+                  keyboardType: TextInputType.number,
+                  hintText: 'Default 25 data',
+                ),
                 const SizedBox(height: 20),
                 Row(
                   children: [
@@ -203,6 +229,9 @@ class _RekapPermintaanSectionState extends State<RekapPermintaanSection> {
                               startDateController.text,
                               finishDateController.text,
                               page: selectedPageNumber,
+                              pageSize: countDataController.text.isEmpty
+                                  ? 25
+                                  : int.parse(countDataController.text),
                             );
                       },
                       titleButton: 'SUBMIT',
@@ -213,6 +242,7 @@ class _RekapPermintaanSectionState extends State<RekapPermintaanSection> {
                         setState(() {
                           startDateController.text = '';
                           finishDateController.text = '';
+                          countDataController.text = '';
                           isSubmit = false;
                         });
                         permintaanController.setDataPermintaanAdmin(null);
@@ -304,9 +334,15 @@ class _RekapPermintaanSectionState extends State<RekapPermintaanSection> {
                                   context
                                       .read<PermintaanController>()
                                       .getAllPermintaanByDate(
-                                          startDateController.text,
-                                          finishDateController.text,
-                                          page: selectedPageNumber);
+                                        startDateController.text,
+                                        finishDateController.text,
+                                        page: selectedPageNumber,
+                                        pageSize:
+                                            countDataController.text.isEmpty
+                                                ? 25
+                                                : int.parse(
+                                                    countDataController.text),
+                                      );
                                 },
                                 pageTotal:
                                     permintaan.meta!.pagination!.pageCount!,
@@ -348,59 +384,57 @@ class _RekapPermintaanSectionState extends State<RekapPermintaanSection> {
                   ),
                 ),
                 const SizedBox(height: 15),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: CustomFormUser(
-                        title: 'Start Date',
-                        controller: startDateController,
-                        keyboardType: TextInputType.none,
-                        onTap: () async {
-                          DateTime? result = await showDatePicker(
-                            context: context,
-                            initialDate: DateTime.now(),
-                            firstDate: DateTime(2023, 01, 01),
-                            lastDate: DateTime(DateTime.now().year + 1),
-                          );
-                          if (result != null) {
-                            setState(
-                              () {
-                                startDateController.text =
-                                    DateFormat('yyyy-MM-dd').format(result);
-                                isSubmit = false;
-                              },
-                            );
-                          }
+                CustomFormUser(
+                  title: 'Start Date',
+                  controller: startDateController,
+                  keyboardType: TextInputType.none,
+                  onTap: () async {
+                    DateTime? result = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2023, 01, 01),
+                      lastDate: DateTime(DateTime.now().year + 1),
+                    );
+                    if (result != null) {
+                      setState(
+                        () {
+                          startDateController.text =
+                              DateFormat('yyyy-MM-dd').format(result);
+                          isSubmit = false;
                         },
-                      ),
-                    ),
-                    const SizedBox(width: 15),
-                    Expanded(
-                      child: CustomFormUser(
-                        title: 'Finish Date',
-                        controller: finishDateController,
-                        keyboardType: TextInputType.none,
-                        onTap: () async {
-                          DateTime? result = await showDatePicker(
-                            context: context,
-                            initialDate: DateTime.now(),
-                            firstDate: DateTime(2023, 01, 01),
-                            lastDate: DateTime(DateTime.now().year + 1),
-                          );
-                          if (result != null) {
-                            setState(
-                              () {
-                                finishDateController.text =
-                                    DateFormat('yyyy-MM-dd').format(result);
-                                isSubmit = false;
-                              },
-                            );
-                          }
+                      );
+                    }
+                  },
+                ),
+                const SizedBox(height: 15),
+                CustomFormUser(
+                  title: 'Finish Date',
+                  controller: finishDateController,
+                  keyboardType: TextInputType.none,
+                  onTap: () async {
+                    DateTime? result = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2023, 01, 01),
+                      lastDate: DateTime(DateTime.now().year + 1),
+                    );
+                    if (result != null) {
+                      setState(
+                        () {
+                          finishDateController.text =
+                              DateFormat('yyyy-MM-dd').format(result);
+                          isSubmit = false;
                         },
-                      ),
-                    ),
-                  ],
+                      );
+                    }
+                  },
+                ),
+                const SizedBox(height: 20),
+                CustomFormUser(
+                  title: 'Jumlah Banyak Data',
+                  controller: countDataController,
+                  keyboardType: TextInputType.number,
+                  hintText: 'Default 25 data',
                 ),
                 const SizedBox(height: 20),
                 Row(
@@ -416,6 +450,9 @@ class _RekapPermintaanSectionState extends State<RekapPermintaanSection> {
                               startDateController.text,
                               finishDateController.text,
                               page: selectedPageNumber,
+                              pageSize: countDataController.text.isEmpty
+                                  ? 25
+                                  : int.parse(countDataController.text),
                             );
                       },
                       titleButton: 'SUBMIT',
@@ -426,16 +463,16 @@ class _RekapPermintaanSectionState extends State<RekapPermintaanSection> {
                         setState(() {
                           startDateController.text = '';
                           finishDateController.text = '';
+                          countDataController.text = '';
                           isSubmit = false;
                         });
                         permintaanController.setDataPermintaanAdmin(null);
                       },
                       titleButton: 'CLEAR',
                     ),
-                    const SizedBox(width: 20),
                   ],
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 20),
                 isSubmit
                     ? SuccessButton(
                         onTap: () =>
@@ -519,9 +556,15 @@ class _RekapPermintaanSectionState extends State<RekapPermintaanSection> {
                                   context
                                       .read<PermintaanController>()
                                       .getAllPermintaanByDate(
-                                          startDateController.text,
-                                          finishDateController.text,
-                                          page: selectedPageNumber);
+                                        startDateController.text,
+                                        finishDateController.text,
+                                        page: selectedPageNumber,
+                                        pageSize:
+                                            countDataController.text.isEmpty
+                                                ? 25
+                                                : int.parse(
+                                                    countDataController.text),
+                                      );
                                 },
                                 pageTotal:
                                     permintaan.meta!.pagination!.pageCount!,

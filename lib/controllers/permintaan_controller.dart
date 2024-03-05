@@ -72,7 +72,6 @@ class PermintaanController extends ChangeNotifier {
 
   void changeState(DataState state) {
     dataState = state;
-    notifyListeners();
   }
 
   void setSelectedStatus(String value) {
@@ -145,27 +144,48 @@ class PermintaanController extends ChangeNotifier {
           await PermintaanService.getAllPermintaanByKomersial();
       _countKomersial = komersial.meta!.pagination!.total.toString();
       changeState(DataState.filled);
+      notifyListeners();
     } catch (e) {
       changeState(DataState.error);
+      notifyListeners();
     }
   }
 
   void getAllPermintaanByDate(String startDate, String finishDate,
-      {int? page}) async {
+      {int? page, int? pageSize}) async {
     changeState(DataState.loading);
     try {
       final data;
       if (startDate.isNotEmpty || finishDate.isNotEmpty) {
         data = await PermintaanService.getAllPermintaanByDate(
-            startDate: startDate, finishDate: finishDate, page: page);
+            startDate: startDate,
+            finishDate: finishDate,
+            page: page,
+            pageSize: pageSize);
       } else {
-        data = await PermintaanService.getAllPermintaan(page: page);
+        data = await PermintaanService.getAllPermintaan(
+            page: page, pageSize: pageSize);
       }
       _permintaan = data;
 
       changeState(DataState.filled);
+      notifyListeners();
     } catch (e) {
       changeState(DataState.error);
+      notifyListeners();
+    }
+  }
+
+  void deletePermintaan(BuildContext context, String idPermintaan) async {
+    final result =
+        await PermintaanService.deletePermintaanByAdmin(idPermintaan);
+    if (result == true) {
+      // ignore: use_build_context_synchronously
+      AppMethods.successToast(context, 'Data permintaan berhasil dihapus');
+      notifyListeners();
+    } else {
+      // ignore: use_build_context_synchronously
+      AppMethods.dangerToast(context, 'Gagal menghapus data, coba lagi');
     }
   }
 }

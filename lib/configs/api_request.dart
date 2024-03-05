@@ -24,11 +24,11 @@ class APIRequest {
         headers: headers,
         body: body,
       );
-      DMethod.printTitle('try', response.body);
+      // DMethod.printTitle('try', response.body);
       Map responseBody = jsonDecode(response.body);
       return responseBody;
     } catch (e) {
-      DMethod.printTitle('catch', e.toString());
+      // DMethod.printTitle('catch', e.toString());
       return null;
     }
   }

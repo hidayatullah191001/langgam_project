@@ -12,8 +12,8 @@ class _BannerTopState extends State<BannerTop> {
 
   @override
   void initState() {
-    getDataUser();
     super.initState();
+    getDataUser();
     context.read<SettingController>().getSettingWeb();
   }
 
@@ -139,6 +139,10 @@ class BannerTopMobile extends StatefulWidget {
 
 class _BannerTopMobileState extends State<BannerTopMobile> {
   Map<String, dynamic> user = {};
+
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
   @override
   void initState() {
     getDataUser();
@@ -157,6 +161,7 @@ class _BannerTopMobileState extends State<BannerTopMobile> {
   Widget build(BuildContext context) {
     final controller = context.watch<NavbarController>();
     final settingController = context.watch<SettingController>();
+
     return Row(
       children: [
         Row(
@@ -206,58 +211,44 @@ class _BannerTopMobileState extends State<BannerTopMobile> {
             }),
           ],
         ),
-        const SizedBox(
-          width: 24,
-        ),
-        Expanded(
-          child: Text(
-            'BMKG Langgam Buka Jam : 08.00 - 21.00 Senin - Sabtu',
-            style: AppTheme.whiteTextStyle.copyWith(
-              fontSize: 12,
-            ),
+        const Spacer(),
+        InkWell(
+          onTap: () {
+            if (user['username'] == null &&
+                user['email'] == null &&
+                user['token'] == null) {
+              context.go('/register');
+            } else {
+              context.go('/my-account');
+            }
+          },
+          child: Row(
+            children: [
+              const CircleAvatar(
+                radius: 14,
+                backgroundColor: Color(0xff2850b8),
+                child: FaIcon(
+                  FontAwesomeIcons.user,
+                  color: AppColors.whiteColor,
+                  size: 16,
+                ),
+              ),
+              const SizedBox(
+                width: 8,
+              ),
+              Text(
+                user['username'] == null &&
+                        user['email'] == null &&
+                        user['password'] == null
+                    ? 'LOGIN / DAFTAR'
+                    : 'HALO, ${user['username']}'.toUpperCase(),
+                style: AppTheme.whiteTextStyle.copyWith(
+                  fontSize: 12,
+                ),
+              ),
+            ],
           ),
         ),
-        const Spacer(),
-        Builder(builder: (context) {
-          return InkWell(
-            onTap: () {
-              if (user['username'] == null &&
-                  user['email'] == null &&
-                  user['token'] == null) {
-                Scaffold.of(context).openEndDrawer();
-                controller.pickDrawer('Login');
-              } else {
-                context.go('/my-account');
-              }
-            },
-            child: Row(
-              children: [
-                const CircleAvatar(
-                  radius: 14,
-                  backgroundColor: Color(0xff2850b8),
-                  child: FaIcon(
-                    FontAwesomeIcons.user,
-                    color: AppColors.whiteColor,
-                    size: 16,
-                  ),
-                ),
-                const SizedBox(
-                  width: 8,
-                ),
-                Text(
-                  user['username'] == null &&
-                          user['email'] == null &&
-                          user['password'] == null
-                      ? 'LOGIN / DAFTAR'
-                      : 'HALO, ${user['username']}'.toUpperCase(),
-                  style: AppTheme.whiteTextStyle.copyWith(
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-          );
-        })
       ],
     );
   }

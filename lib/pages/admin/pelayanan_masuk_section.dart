@@ -21,26 +21,55 @@ class _PelayananMasukSectionState extends State<PelayananMasukSection> {
   String _selectedStatus = 'Semua Permintaan';
   int _selectedIndex = 0;
   int selectedPageNumber = 1;
+  double selectedPageSize = 10;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 20, right: 40),
-      padding: const EdgeInsets.all(30),
-      decoration: BoxDecoration(
-        color: AppColors.whiteColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          if (constraints.maxWidth < 1200) {
-            return MobileView(context);
-          } else {
-            return WebView(context);
-          }
-        },
-      ),
+    // return Container(
+    //   width: double.infinity,
+    //   margin: const EdgeInsets.only(bottom: 20, right: 40),
+    //   padding: const EdgeInsets.all(30),
+    //   decoration: BoxDecoration(
+    //     color: AppColors.whiteColor,
+    //     borderRadius: BorderRadius.circular(20),
+    //   ),
+    //   child: LayoutBuilder(
+    //     builder: (context, constraints) {
+    //       if (constraints.maxWidth < 800) {
+    //         return MobileView(context);
+    //       } else {
+    //         return WebView(context);
+    //       }
+    //     },
+    //   ),
+    // );
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 800) {
+          return Container(
+            width: double.infinity,
+            margin: const EdgeInsets.only(bottom: 20, right: 10),
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: AppColors.whiteColor,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: MobileView(context),
+          );
+        } else {
+          return Container(
+            width: double.infinity,
+            margin: const EdgeInsets.only(bottom: 20, right: 40),
+            padding: const EdgeInsets.all(30),
+            decoration: BoxDecoration(
+              color: AppColors.whiteColor,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: WebView(context),
+          );
+        }
+      },
     );
   }
 
@@ -84,13 +113,41 @@ class _PelayananMasukSectionState extends State<PelayananMasukSection> {
             },
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 12),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Entries : ${selectedPageSize.toInt()}',
+              style: AppTheme.greyTextStyle.copyWith(
+                fontSize: 14,
+              ),
+            ),
+            Expanded(
+              child: FlutterAdvanceSlider(
+                min: 0,
+                max: 100,
+                displayDivders: false,
+                divderCount: 10,
+                onChanged: (v) {
+                  setState(() {
+                    selectedPageSize = v;
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
         Expanded(
           child: FutureBuilder(
             future: _selectedStatus == 'Semua Permintaan'
-                ? PermintaanService.getAllPermintaan()
+                ? PermintaanService.getAllPermintaan(
+                    page: selectedPageNumber,
+                    pageSize: selectedPageSize.toInt())
                 : PermintaanService.getAllPermintaanByStatus(_selectedStatus,
-                    page: selectedPageNumber),
+                    page: selectedPageNumber,
+                    pageSize: selectedPageSize.toInt()),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
@@ -148,8 +205,8 @@ class _PelayananMasukSectionState extends State<PelayananMasukSection> {
                         shrinkWrap: true,
                         itemCount: model.data!.length.toInt(),
                         itemBuilder: (context, index) {
-                          return ItemPesananAdminMobileWidget(
-                            pesananUser: model.data![index],
+                          return ItemPesananAdminWidgetMobile(
+                            model.data![index],
                           );
                         },
                       ),
@@ -186,48 +243,81 @@ class _PelayananMasukSectionState extends State<PelayananMasukSection> {
       children: [
         SizedBox(
           width: MediaQuery.of(context).size.width * 0.18,
-          child: ListView.builder(
-            padding: EdgeInsets.zero,
-            shrinkWrap: true,
-            itemCount: status.length,
-            itemBuilder: (context, index) {
-              return GestureDetector(
-                onTap: () {
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Filter',
+                style: AppTheme.blackTextStyle.copyWith(
+                  fontWeight: AppTheme.bold,
+                  fontSize: 18,
+                ),
+              ),
+              const SizedBox(height: 15),
+              Text(
+                'Entries : ${selectedPageSize.toInt()}',
+                style: AppTheme.greyTextStyle.copyWith(
+                  fontSize: 14,
+                ),
+              ),
+              FlutterAdvanceSlider(
+                min: 0,
+                max: 100,
+                displayDivders: false,
+                onChanged: (v) {
                   setState(() {
-                    _selectedIndex = index;
-                    _selectedStatus = status[index];
+                    selectedPageSize = v;
                   });
                 },
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(9),
-                    color: _selectedIndex == index
-                        ? AppColors.backgroundColor2
-                        : Colors.transparent,
-                  ),
-                  child: Text(
-                    status[index],
-                    style: AppTheme.blackTextStyle.copyWith(
-                      fontWeight: AppTheme.bold,
+              ),
+              const SizedBox(height: 20),
+              ListView.builder(
+                padding: EdgeInsets.zero,
+                shrinkWrap: true,
+                itemCount: status.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _selectedIndex = index;
+                        _selectedStatus = status[index];
+                      });
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(9),
+                        color: _selectedIndex == index
+                            ? AppColors.backgroundColor2
+                            : Colors.transparent,
+                      ),
+                      child: Text(
+                        status[index],
+                        style: AppTheme.blackTextStyle.copyWith(
+                          fontWeight: AppTheme.bold,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              );
-            },
+                  );
+                },
+              ),
+            ],
           ),
         ),
         const SizedBox(width: 20),
         Expanded(
           child: FutureBuilder(
             future: _selectedStatus == 'Semua Permintaan'
-                ? PermintaanService.getAllPermintaan(page: selectedPageNumber)
+                ? PermintaanService.getAllPermintaan(
+                    page: selectedPageNumber,
+                    pageSize: selectedPageSize.toInt())
                 : PermintaanService.getAllPermintaanByStatus(_selectedStatus,
-                    page: selectedPageNumber),
+                    page: selectedPageNumber,
+                    pageSize: selectedPageSize.toInt()),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
@@ -281,13 +371,13 @@ class _PelayananMasukSectionState extends State<PelayananMasukSection> {
                   child: Column(
                     children: [
                       ListView.builder(
-                        physics: NeverScrollableScrollPhysics(),
+                        physics: const NeverScrollableScrollPhysics(),
                         padding: EdgeInsets.zero,
                         shrinkWrap: true,
                         itemCount: model.data!.length.toInt(),
                         itemBuilder: (context, index) {
-                          return ItemPesananAdminWidget(
-                            pesananUser: model.data![index],
+                          return ItemPesananAdminWidgetWeb(
+                            model.data![index],
                           );
                         },
                       ),
@@ -317,6 +407,238 @@ class _PelayananMasukSectionState extends State<PelayananMasukSection> {
       ],
     );
   }
+
+  Widget ItemPesananAdminWidgetWeb(
+      listPermintaanModelAdmin.PermintaanAdminData pesananUser) {
+    final controller = context.watch<AdminController>();
+    final permintaanController = context.watch<PermintaanController>();
+    return Container(
+      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: AppColors.backgroundColor3,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '#${pesananUser.attributes!.nomorPermintaan}',
+                style: AppTheme.primaryTextStyle
+                    .copyWith(fontWeight: AppTheme.bold),
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                decoration: BoxDecoration(
+                  color: AppColors.backgroundColor2,
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Text(
+                  pesananUser.attributes!.status.toString(),
+                  style: AppTheme.blackTextStyle
+                      .copyWith(fontWeight: AppTheme.bold),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(
+                  pesananUser.attributes!.nama.toString(),
+                  style: AppTheme.blackTextStyle
+                      .copyWith(fontSize: 18, fontWeight: AppTheme.medium),
+                ),
+                Text(
+                  'Dibuat pada ${AppMethods.date(pesananUser.attributes!.createdAt.toString())}',
+                  style: AppTheme.blackTextStyle.copyWith(fontSize: 12),
+                ),
+              ]),
+              const SizedBox(height: 5),
+              Expanded(
+                child: Column(
+                  children: [
+                    RichText(
+                      textAlign: TextAlign.center,
+                      text: TextSpan(
+                        text:
+                            '${pesananUser.attributes!.layanan == null ? '' : pesananUser.attributes!.layanan!.attributes!.judul} ',
+                        style: AppTheme.primaryTextStyle.copyWith(
+                          fontWeight: AppTheme.bold,
+                        ),
+                        children: [
+                          TextSpan(
+                              text:
+                                  'untuk ${pesananUser.attributes!.kuantitas} item',
+                              style: AppTheme.softgreyTextStyle),
+                        ],
+                      ),
+                    ),
+                    Text(
+                      '${AppMethods.currency(pesananUser.attributes!.total.toString())}',
+                      style: AppTheme.primaryTextStyle.copyWith(
+                        fontWeight: AppTheme.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 15),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  InkWell(
+                    onTap: () {
+                      controller.pickMenu('Detail Permintaan', 1);
+                      permintaanController.setDataPermintaanAdmin(pesananUser);
+                    },
+                    child: const CircleAvatar(
+                      backgroundColor: AppColors.primaryColor,
+                      radius: 15,
+                      child: Icon(Icons.remove_red_eye,
+                          color: AppColors.whiteColor, size: 17),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  InkWell(
+                    onTap: () async {
+                      CoolAlert.show(
+                        context: context,
+                        type: CoolAlertType.warning,
+                        width: MediaQuery.of(context).size.width * 0.3,
+                        confirmBtnText: 'Hapus',
+                        confirmBtnColor: AppColors.dangerColor,
+                        cancelBtnText: 'Batal',
+                        showCancelBtn: true,
+                        text: 'Kamu yakin ingin menghapus data permintaan ini?',
+                        onConfirmBtnTap: () {
+                          permintaanController.deletePermintaan(
+                              context, pesananUser.id.toString());
+                          setState(() {});
+                        },
+                      );
+                    },
+                    child: const CircleAvatar(
+                      radius: 15,
+                      backgroundColor: AppColors.dangerColor,
+                      child: Icon(Icons.delete,
+                          color: AppColors.whiteColor, size: 17),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget ItemPesananAdminWidgetMobile(
+      listPermintaanModelAdmin.PermintaanAdminData pesananUser) {
+    final controller = context.watch<AdminController>();
+    final permintaanController = context.watch<PermintaanController>();
+    return Container(
+      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: AppColors.backgroundColor3,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '#${pesananUser.attributes!.nomorPermintaan}',
+                style: AppTheme.primaryTextStyle
+                    .copyWith(fontWeight: AppTheme.bold, fontSize: 14),
+              ),
+              Text(
+                pesananUser.attributes!.status.toString(),
+                style: AppTheme.blackTextStyle
+                    .copyWith(fontWeight: AppTheme.bold, fontSize: 14),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(
+              pesananUser.attributes!.nama.toString(),
+              style: AppTheme.blackTextStyle
+                  .copyWith(fontSize: 18, fontWeight: AppTheme.medium),
+            ),
+            Text(
+              'Dibuat pada ${AppMethods.date(pesananUser.attributes!.createdAt.toString())}',
+              style: AppTheme.blackTextStyle.copyWith(fontSize: 12),
+            ),
+          ]),
+          const SizedBox(height: 10),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              InkWell(
+                onTap: () {
+                  controller.pickMenu('Detail Permintaan', 1);
+
+                  permintaanController.setDataPermintaanAdmin(pesananUser);
+                },
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: AppColors.primaryColor,
+                  ),
+                  child: Text('Lihat Detail',
+                      style: AppTheme.whiteTextStyle.copyWith(fontSize: 14)),
+                ),
+              ),
+              const SizedBox(width: 10),
+              InkWell(
+                onTap: () async {
+                  CoolAlert.show(
+                    context: context,
+                    type: CoolAlertType.warning,
+                    width: MediaQuery.of(context).size.width * 0.3,
+                    confirmBtnText: 'Hapus',
+                    confirmBtnColor: AppColors.dangerColor,
+                    cancelBtnText: 'Batal',
+                    showCancelBtn: true,
+                    text: 'Kamu yakin ingin menghapus data permintaan ini?',
+                    onConfirmBtnTap: () {
+                      permintaanController.deletePermintaan(
+                          context, pesananUser.id.toString());
+                      setState(() {});
+                    },
+                  );
+                },
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: AppColors.dangerColor,
+                  ),
+                  child: Text('Hapus',
+                      style: AppTheme.whiteTextStyle.copyWith(fontSize: 14)),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class ItemPesananAdminWidget extends StatefulWidget {
@@ -331,19 +653,6 @@ class ItemPesananAdminWidget extends StatefulWidget {
 }
 
 class _ItemPesananAdminWidgetState extends State<ItemPesananAdminWidget> {
-  void deletePermintaan(String idPermintaan) async {
-    final result =
-        await PermintaanService.deletePermintaanByAdmin(idPermintaan);
-    if (result == true) {
-      // ignore: use_build_context_synchronously
-      AppMethods.successToast(context, 'Data permintaan berhasil dihapus');
-      setState(() {});
-    } else {
-      // ignore: use_build_context_synchronously
-      AppMethods.dangerToast(context, 'Gagal menghapus data, coba lagi');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final controller = context.watch<AdminController>();
@@ -456,13 +765,11 @@ class _ItemPesananAdminWidgetState extends State<ItemPesananAdminWidget> {
                         showCancelBtn: true,
                         text: 'Kamu yakin ingin menghapus data permintaan ini?',
                         onConfirmBtnTap: () {
-                          deletePermintaan(widget.pesananUser.id.toString());
+                          permintaanController.deletePermintaan(
+                              context, widget.pesananUser.id.toString());
+                          setState(() {});
                         },
-                      ).then((value) {
-                        context.go('/auth/admin');
-                        controller.pickMenu('Permintaan Data Masuk', 1);
-                        // context.go('/auth/admin');
-                      });
+                      ).then((value) => setState(() {}));
                     },
                     child: const CircleAvatar(
                       radius: 15,
@@ -551,12 +858,13 @@ class _ItemPesananAdminMobileWidgetState
           ]),
           const SizedBox(height: 10),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               InkWell(
                 onTap: () {
-                  controller.pickMenu('Detail Permintaan', 1);
                   permintaanController
                       .setDataPermintaanAdmin(widget.pesananUser);
+                  controller.pickMenu('Detail Permintaan', 1);
                 },
                 child: Container(
                   padding:

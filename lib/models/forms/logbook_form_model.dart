@@ -28,6 +28,7 @@ class LogbookFormData {
   String? waktuPengambilan;
   String? keterangan;
   String? petugas;
+  String? namaPetugas;
 
   LogbookFormData(
       {this.perihalPermohonan,
@@ -38,7 +39,8 @@ class LogbookFormData {
       this.status,
       this.waktuPengambilan,
       this.keterangan,
-      this.petugas});
+      this.petugas,
+      this.namaPetugas});
 
   LogbookFormData.fromJson(Map<String, dynamic> json) {
     perihalPermohonan = json['perihal_permohonan'];
@@ -50,6 +52,7 @@ class LogbookFormData {
     waktuPengambilan = json['waktu_pengambilan'];
     keterangan = json['keterangan'];
     petugas = json['petugas'];
+    namaPetugas = json['nama_petugas'];
   }
 
   Map<String, dynamic> toJson() {
@@ -63,6 +66,7 @@ class LogbookFormData {
     data['waktu_pengambilan'] = this.waktuPengambilan;
     data['keterangan'] = this.keterangan;
     data['petugas'] = this.petugas;
+    data['nama_petugas'] = this.namaPetugas;
 
     return data;
   }

@@ -10,22 +10,13 @@ class CartPage extends StatefulWidget {
 class _CartPageState extends State<CartPage> {
   Map<String, dynamic> user = {};
   bool isDataCartLoaded = false;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    // context.watch<CartController>().getDataCart();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      getDataUser();
-      loadDataCart();
-    });
-  }
-
-  loadDataCart() {
     context.read<CartController>().getDataCart();
-    setState(() {
-      isDataCartLoaded = true;
-    });
+    getDataUser();
   }
 
   getDataUser() async {
@@ -40,7 +31,7 @@ class _CartPageState extends State<CartPage> {
     final searchController = context.watch<PencarianController>();
 
     return LayoutBuilder(builder: (context, BoxConstraints constraints) {
-      if (constraints.maxWidth < 1200) {
+      if (constraints.maxWidth < 800) {
         return MobileView(searchController, context);
       } else {
         return WebView(searchController);
@@ -61,58 +52,60 @@ class _CartPageState extends State<CartPage> {
           Container(),
         ],
       ),
-      body: Consumer(builder: (context, SettingController controller, widget) {
-        if (controller.dataState == DataState.loading) {
-          return const Center(child: CircularProgressIndicator());
-        } else {
-          return SafeArea(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Navbar(
-                    isMobile: true,
-                  ),
-                  !searchController.isSearchBoolean
-                      ? defaultWidgetMobile(context)
-                      : searchWidgetMobile(),
-                ],
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Navbar(
+                isMobile: true,
               ),
-            ),
-          );
-        }
-      }),
+              !searchController.isSearchBoolean
+                  ? defaultWidgetMobile(context)
+                  : searchWidgetMobile(),
+            ],
+          ),
+        ),
+      ),
       endDrawer: const LoginDrawer(),
     );
   }
 
   Widget WebView(PencarianController searchController) {
-    return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          SliverList(
-            delegate: SliverChildListDelegate([
-              const BannerTop(),
-            ]),
+    final settingController = context.watch<SettingController>();
+    if (settingController.dataState == DataState.loading) {
+      return const Center(child: CircularProgressIndicator());
+    } else {
+      return Scaffold(
+        body: SafeArea(
+          child: CustomScrollView(
+            cacheExtent: 5000,
+            slivers: [
+              SliverList(
+                delegate: SliverChildListDelegate([
+                  const BannerTop(),
+                ]),
+              ),
+              SliverAppBar(
+                pinned: true,
+                floating: false,
+                collapsedHeight: 101.0,
+                automaticallyImplyLeading: false,
+                flexibleSpace: Navbar(),
+                actions: const [SizedBox()],
+              ),
+              SliverList(
+                delegate: SliverChildListDelegate([
+                  !searchController.isSearchBoolean
+                      ? defaultWidget(context)
+                      : searchWidget(context),
+                ]),
+              ),
+            ],
           ),
-          SliverAppBar(
-            pinned: true,
-            floating: false,
-            collapsedHeight: 101.0,
-            automaticallyImplyLeading: false,
-            flexibleSpace: Navbar(),
-            actions: [SizedBox()],
-          ),
-          SliverList(
-            delegate: SliverChildListDelegate([
-              !searchController.isSearchBoolean
-                  ? defaultWidget(context)
-                  : searchWidget(context),
-            ]),
-          ),
-        ],
-      ),
-      endDrawer: const LoginDrawer(),
-    );
+        ),
+        endDrawer: const LoginDrawer(),
+      );
+    }
   }
 
   Widget defaultWidget(BuildContext context) {
@@ -258,6 +251,7 @@ class _CartPageState extends State<CartPage> {
               return ListView.builder(
                 padding: EdgeInsets.zero,
                 itemCount: data.data!.length,
+                physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
                   final LayananData layanan = data.data![index];
@@ -283,18 +277,18 @@ class _CartPageState extends State<CartPage> {
             cart['user']['id'] == user['id'] &&
             cart['user']['email'] == user['email'])
         .toList();
+
     return Container(
       width: double.infinity,
       color: AppColors.backgroundColor3,
       padding: const EdgeInsets.symmetric(
-        horizontal: 150,
+        horizontal: 20,
         vertical: 50,
       ),
-      child: Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          carts.length == 0
+          carts.isEmpty
               ? Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -321,71 +315,29 @@ class _CartPageState extends State<CartPage> {
                     ],
                   ),
                 )
-              : Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const SizedBox(
-                            width: 120,
-                          ),
-                          Text(
-                            'PRODUK',
-                            style: AppTheme.blackTextStyle.copyWith(
-                              fontWeight: AppTheme.bold,
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 140,
-                          ),
-                          Text(
-                            'HARGA',
-                            style: AppTheme.blackTextStyle.copyWith(
-                              fontWeight: AppTheme.bold,
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 50,
-                          ),
-                          Text(
-                            'JUMLAH',
-                            style: AppTheme.blackTextStyle.copyWith(
-                              fontWeight: AppTheme.bold,
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 1,
-                          ),
-                          Text(
-                            'SUBTOTAL',
-                            style: AppTheme.blackTextStyle.copyWith(
-                              fontWeight: AppTheme.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 15),
-                      const Divider(),
-                      ListView.builder(
-                        shrinkWrap: true,
-                        padding: EdgeInsets.zero,
-                        itemCount: carts.length,
-                        itemBuilder: (context, index) {
-                          final productCart = carts[index];
-                          return ItemCartProduct(context,
-                              data: productCart, index: index);
-                        },
-                      ),
-                      const Divider(),
-                    ],
-                  ),
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 15),
+                    const Divider(),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      padding: EdgeInsets.zero,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: carts.length,
+                      itemBuilder: (context, index) {
+                        final productCart = carts[index];
+                        return ItemCartProduct(context,
+                            data: productCart, index: index);
+                      },
+                    ),
+                    const Divider(),
+                  ],
                 ),
-          const SizedBox(width: 30),
+          const SizedBox(height: 30),
           Container(
-            width: 300,
             padding: const EdgeInsets.all(24),
+            margin: const EdgeInsets.symmetric(horizontal: 100),
             decoration: BoxDecoration(
               border: Border.all(
                 color: AppColors.softgreyColor,
@@ -512,7 +464,7 @@ class _CartPageState extends State<CartPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          carts.length == 0
+          carts.isEmpty
               ? Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -547,6 +499,7 @@ class _CartPageState extends State<CartPage> {
                     ListView.builder(
                       shrinkWrap: true,
                       padding: EdgeInsets.zero,
+                      physics: const NeverScrollableScrollPhysics(),
                       itemCount: carts.length,
                       itemBuilder: (context, index) {
                         final productCart = carts[index];
@@ -675,136 +628,124 @@ class _CartPageState extends State<CartPage> {
     cartController.setItemsCount(int.parse(data['item']));
     cartController.setTotalHarga(int.parse(data['totalHarga']));
 
-    return Padding(
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 100),
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 7),
-      child: Expanded(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            InkWell(
-              onTap: () {
-                cartController.removeCart(index);
-              },
-              child: const Icon(
-                Icons.close,
-                color: AppColors.greyColor,
-              ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          InkWell(
+            onTap: () {
+              cartController.removeCart(index);
+            },
+            child: const Icon(
+              Icons.close,
+              color: AppColors.greyColor,
             ),
-            const SizedBox(width: 20),
-            Container(
-              width: 70,
-              height: 50,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: NetworkImage(
-                      '${Constant.host}${data['product']["gambar"]}'),
-                  fit: BoxFit.cover,
-                ),
-                borderRadius: BorderRadius.circular(8),
+          ),
+          const SizedBox(width: 20),
+          Container(
+            width: 100,
+            height: 80,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: NetworkImage(
+                    '${Constant.host}${data['product']["gambar"]}'),
+                fit: BoxFit.cover,
               ),
+              borderRadius: BorderRadius.circular(8),
             ),
-            const SizedBox(width: 20),
-            SizedBox(
-              width: 170,
-              child: Expanded(
-                child: Text(
-                  data['product']['judul'].toString(),
-                  style: AppTheme.blackTextStyle
-                      .copyWith(fontWeight: AppTheme.bold, fontSize: 14),
-                ),
+          ),
+          const SizedBox(width: 20),
+          Text(
+            data['product']['judul'].toString(),
+            style: AppTheme.blackTextStyle
+                .copyWith(fontWeight: AppTheme.bold, fontSize: 14),
+          ),
+          Spacer(),
+          Row(
+            children: [
+              Text(
+                AppMethods.currency(data['product']['harga'].toString()),
+                style: AppTheme.greyTextStyle.copyWith(fontSize: 14),
               ),
-            ),
-            Expanded(
-              child: SizedBox(
-                width: 90,
-                child: Column(
-                  children: [
-                    Text(
-                      AppMethods.currency(data['product']['harga'].toString()),
-                      style: AppTheme.greyTextStyle.copyWith(fontSize: 14),
-                    ),
-                    const SizedBox(width: 2),
-                    Text(
-                      data['product']['satuan'].toString(),
-                      style: AppTheme.greyTextStyle.copyWith(
-                          color: AppColors.softgreyColor, fontSize: 14),
-                    ),
-                  ],
-                ),
+              const SizedBox(width: 2),
+              Text(
+                data['product']['satuan'].toString(),
+                style: AppTheme.greyTextStyle
+                    .copyWith(color: AppColors.softgreyColor, fontSize: 14),
               ),
-            ),
-            SizedBox(
-              width: 80,
-              child: Row(
-                children: [
-                  InkWell(
-                    onTap: () {
-                      if (cartController.itemsCount == 1) {
-                        cartController.removeCart(index);
-                      } else {
-                        cartController.removerinCartPage(index);
-                      }
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: Colors.blue.withOpacity(0.1),
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(6),
-                          bottomLeft: Radius.circular(6),
-                        ),
-                      ),
-                      child: const Icon(
-                        Icons.remove,
-                        color: AppColors.primaryColor,
-                        size: 16,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(5),
+            ],
+          ),
+          Spacer(),
+          Row(
+            children: [
+              InkWell(
+                onTap: () {
+                  if (cartController.itemsCount == 1) {
+                    cartController.removeCart(index);
+                  } else {
+                    cartController.removerinCartPage(index);
+                  }
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
                     color: Colors.blue.withOpacity(0.1),
-                    child: Text(
-                      cartController.itemsCount.toString(),
-                      style: AppTheme.blackTextStyle.copyWith(
-                        fontSize: 12,
-                        fontWeight: AppTheme.medium,
-                      ),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(6),
+                      bottomLeft: Radius.circular(6),
                     ),
                   ),
-                  InkWell(
-                    onTap: () {
-                      cartController.addinCartPage(index);
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: Colors.blue.withOpacity(0.1),
-                        borderRadius: const BorderRadius.only(
-                          topRight: Radius.circular(6),
-                          bottomRight: Radius.circular(6),
-                        ),
-                      ),
-                      child: const Icon(
-                        Icons.add,
-                        color: AppColors.primaryColor,
-                        size: 16,
-                      ),
+                  child: const Icon(
+                    Icons.remove,
+                    color: AppColors.primaryColor,
+                    size: 16,
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(8),
+                color: Colors.blue.withOpacity(0.1),
+                child: Text(
+                  cartController.itemsCount.toString(),
+                  style: AppTheme.blackTextStyle.copyWith(
+                    fontSize: 12,
+                    fontWeight: AppTheme.medium,
+                  ),
+                ),
+              ),
+              InkWell(
+                onTap: () {
+                  cartController.addinCartPage(index);
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withOpacity(0.1),
+                    borderRadius: const BorderRadius.only(
+                      topRight: Radius.circular(6),
+                      bottomRight: Radius.circular(6),
                     ),
                   ),
-                ],
+                  child: const Icon(
+                    Icons.add,
+                    color: AppColors.primaryColor,
+                    size: 16,
+                  ),
+                ),
               ),
+            ],
+          ),
+          const SizedBox(width: 20),
+          Text(
+            AppMethods.currency(cartController.totalHarga.toString()),
+            style: AppTheme.primaryTextStyle.copyWith(
+              fontWeight: AppTheme.bold,
+              fontSize: 18,
             ),
-            const SizedBox(width: 20),
-            Text(
-              AppMethods.currency(cartController.totalHarga.toString()),
-              style: AppTheme.primaryTextStyle.copyWith(
-                fontWeight: AppTheme.bold,
-                fontSize: 18,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

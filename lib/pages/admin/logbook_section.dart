@@ -9,46 +9,136 @@ class LogbookSection extends StatefulWidget {
 
 class _LogbookSectionState extends State<LogbookSection> {
   int selectedPageNumber = 1;
+  TextEditingController startDateController = TextEditingController();
+  TextEditingController finishDateController = TextEditingController();
+  TextEditingController countDataController = TextEditingController();
+
+  Future<void> toXLSX(List<LogbookData> data) async {
+    List<String> row = [
+      'Perihal Permohonan',
+      'Nama Pemohon',
+      'Nomor Telepon',
+      'Waktu Pengerjaan',
+      'Pembayaran',
+      'Waktu Pengambilan',
+      'Nama Petugas',
+      'Dibuat Pada',
+      'Diperbarui Pada',
+    ];
+
+    if (data.isNotEmpty) {
+      if (data.isNotEmpty) {
+        var simplexlsx = SimpleXLSX();
+        simplexlsx.sheetName = 'sheet';
+
+        //add data
+        var idx = 0;
+        data.forEach((item) {
+          List<String> column = [
+            item.attributes!.perihalPermohonan.toString(),
+            item.attributes!.namaPemohon.toString(),
+            item.attributes!.nomorTelepon.toString(),
+            item.attributes!.waktuPengerjaan.toString(),
+            AppMethods.currency(item.attributes!.pembayaran.toString()),
+            item.attributes!.waktuPengambilan.toString(),
+            item.attributes!.namaPetugas.toString(),
+            AppMethods.date(item.attributes!.createdAt.toString()),
+            AppMethods.date(item.attributes!.updatedAt.toString()),
+          ];
+
+          if (idx == 0) {
+            //add titles
+            simplexlsx.addRow(row);
+          }
+          {
+            //add values
+            simplexlsx.addRow(column);
+          }
+          idx++;
+        });
+
+        final bytes = simplexlsx.build();
+
+        final blob = html.Blob([
+          Uint8List.fromList(bytes)
+        ], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        final url = html.Url.createObjectUrlFromBlob(blob);
+        final anchor = html.AnchorElement(href: url)
+          ..setAttribute("download",
+              "Rekap Logbook ${startDateController.text} - ${finishDateController.text}.xlsx")
+          ..click();
+        html.Url.revokeObjectUrl(url);
+        startDateController.text = '';
+        finishDateController.text = '';
+        countDataController.text = '';
+        context.pop();
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 20, right: 40),
-      padding: const EdgeInsets.all(30),
-      decoration: BoxDecoration(
-        color: AppColors.whiteColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          if (constraints.maxWidth < 800) {
-            return MobileView(context);
-          } else {
-            return WebView(context);
-          }
-        },
-      ),
-    );
+    return LayoutBuilder(builder: (context, constraints) {
+      bool mobile = false;
+      if (constraints.maxWidth < 800) {
+        mobile = true;
+      } else {
+        mobile == false;
+      }
+      return Container(
+        width: double.infinity,
+        margin: EdgeInsets.only(bottom: 20, right: mobile ? 10 : 40),
+        padding: EdgeInsets.all(mobile ? 20 : 30),
+        decoration: BoxDecoration(
+          color: AppColors.whiteColor,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth < 800) {
+              return MobileView(context);
+            } else {
+              return WebView(context);
+            }
+          },
+        ),
+      );
+    });
   }
 
   Widget WebView(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        PrimaryButton(
-          onTap: () {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return Dialog(
-                  child: ModalCreateLogbook(context, false),
-                );
-              },
-            );
-          },
-          titleButton: 'Buat Logbook',
-        ),
+        Row(children: [
+          PrimaryButton(
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return Dialog(
+                    child: ModalCreateLogbook(context, false),
+                  );
+                },
+              );
+            },
+            titleButton: 'Buat Logbook',
+          ),
+          const SizedBox(width: 10),
+          SuccessButton(
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return Dialog(
+                    child: ModalPrintLogbook(context, false),
+                  );
+                },
+              );
+            },
+            titleButton: 'Cetak Logbook',
+          ),
+        ]),
         const SizedBox(
           height: 20,
         ),
@@ -151,19 +241,35 @@ class _LogbookSectionState extends State<LogbookSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          PrimaryButton(
-            onTap: () {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return Dialog(
-                    child: ModalCreateLogbook(context, true),
-                  );
-                },
-              );
-            },
-            titleButton: 'Buat Logbook',
-          ),
+          Row(children: [
+            PrimaryButton(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Dialog(
+                      child: ModalCreateLogbook(context, true),
+                    );
+                  },
+                );
+              },
+              titleButton: 'Buat Logbook',
+            ),
+            const SizedBox(width: 10),
+            SuccessButton(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Dialog(
+                      child: ModalPrintLogbook(context, true),
+                    );
+                  },
+                );
+              },
+              titleButton: 'Cetak Logbook',
+            ),
+          ]),
           const SizedBox(
             height: 20,
           ),
@@ -257,44 +363,62 @@ class _LogbookSectionState extends State<LogbookSection> {
     );
   }
 
-  Widget ModalViewLogbook(BuildContext context, LogbookAttributes logbook) {
+  Widget ModalViewLogbook(BuildContext context, LogbookAttributes logbook,
+      {bool isMobile = false}) {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.3,
+      width: MediaQuery.of(context).size.width * 0.7,
       padding: const EdgeInsets.all(20),
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ItemDetailLogbookWidget(
+                title: 'Nama Petugas',
+                value: logbook.namaPetugas.toString(),
+                isMobile: isMobile),
+            const SizedBox(height: 10),
+            ItemDetailLogbookWidget(
                 title: 'Perihal Permohonan',
-                value: logbook.perihalPermohonan.toString()),
+                value: logbook.perihalPermohonan.toString(),
+                isMobile: isMobile),
             const SizedBox(height: 10),
             ItemDetailLogbookWidget(
-                title: 'Nama Pemohon', value: logbook.namaPemohon.toString()),
+                title: 'Nama Pemohon',
+                value: logbook.namaPemohon.toString(),
+                isMobile: isMobile),
             const SizedBox(height: 10),
             ItemDetailLogbookWidget(
-                title: 'Nomor Telepon', value: logbook.nomorTelepon.toString()),
+                title: 'Nomor Telepon',
+                value: logbook.nomorTelepon.toString(),
+                isMobile: isMobile),
             const SizedBox(height: 10),
             ItemDetailLogbookWidget(
                 title: 'Waktu Pengerjaan',
-                value: logbook.waktuPengerjaan.toString()),
+                value: logbook.waktuPengerjaan.toString(),
+                isMobile: isMobile),
             const SizedBox(height: 10),
             ItemDetailLogbookWidget(
-                title: 'Pembayaran', value: logbook.pembayaran.toString()),
+                title: 'Pembayaran',
+                value: AppMethods.currency(logbook.pembayaran.toString()),
+                isMobile: isMobile),
             const SizedBox(height: 10),
-            ItemDetailLogbookWidget(
-                title: 'Status', value: logbook.status.toString()),
-            const SizedBox(height: 10),
+            // ItemDetailLogbookWidget(
+            //     title: 'Status', value: logbook.status.toString()),
+            // const SizedBox(height: 10),
             ItemDetailLogbookWidget(
                 title: 'Waktu Pengambilan',
-                value: logbook.waktuPengambilan.toString()),
+                value: logbook.waktuPengambilan.toString(),
+                isMobile: isMobile),
             const SizedBox(height: 10),
             ItemDetailLogbookWidget(
-                title: 'Keterangan', value: logbook.keterangan.toString()),
+                title: 'Keterangan',
+                value: logbook.keterangan.toString(),
+                isMobile: isMobile),
             const SizedBox(height: 10),
             ItemDetailLogbookWidget(
                 title: 'Dibuat pada',
-                value: AppMethods.date(logbook.createdAt.toString())),
+                value: AppMethods.date(logbook.createdAt.toString()),
+                isMobile: isMobile),
             const SizedBox(height: 10),
           ],
         ),
@@ -302,33 +426,58 @@ class _LogbookSectionState extends State<LogbookSection> {
     );
   }
 
-  Row ItemDetailLogbookWidget({required String title, required String value}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(title, style: AppTheme.blackTextStyle),
-        const SizedBox(width: 10),
-        Text(
-          value,
-          style: AppTheme.primaryTextStyle.copyWith(
-            fontWeight: AppTheme.bold,
+  Widget ItemDetailLogbookWidget(
+      {required String title, required String value, bool isMobile = false}) {
+    if (isMobile) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: AppTheme.blackTextStyle),
+          const SizedBox(width: 10),
+          Text(
+            value,
+            style: AppTheme.primaryTextStyle.copyWith(
+              fontWeight: AppTheme.bold,
+            ),
           ),
-        ),
-      ],
-    );
+        ],
+      );
+    } else {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(title, style: AppTheme.blackTextStyle),
+          const SizedBox(width: 10),
+          Text(
+            value,
+            style: AppTheme.primaryTextStyle.copyWith(
+              fontWeight: AppTheme.bold,
+            ),
+          ),
+        ],
+      );
+    }
   }
 
   Widget ModalCreateLogbook(BuildContext context, bool isMobile) {
     final logbookController = context.watch<LogbookController>();
+    logbookController.setEmptyVariable();
     return Container(
       width: isMobile
-          ? MediaQuery.of(context).size.width * 0.4
+          ? MediaQuery.of(context).size.width * 0.6
           : MediaQuery.of(context).size.width * 0.3,
       padding: const EdgeInsets.all(20),
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            CustomFormUser(
+              controller: logbookController.namaPetugasController,
+              title: 'Nama petugas',
+              isMandatory: true,
+            ),
+            const SizedBox(height: 10),
+            // Perihal Permohonan
             Row(
               children: [
                 Text('Perihal permohonan ', style: AppTheme.blackTextStyle),
@@ -341,7 +490,6 @@ class _LogbookSectionState extends State<LogbookSection> {
               ],
             ),
             const SizedBox(height: 5),
-            // Perihal Permohonan
             DropdownButtonFormField<String>(
               value: logbookController.selectedPerihalPermohonan,
               onChanged: (String? value) {
@@ -390,44 +538,43 @@ class _LogbookSectionState extends State<LogbookSection> {
               isMandatory: true,
             ),
             const SizedBox(height: 10),
-            Row(
-              children: [
-                Text('Keperluan ', style: AppTheme.blackTextStyle),
-                Text(
-                  '*',
-                  style: AppTheme.blackTextStyle.copyWith(
-                    color: AppColors.dangerColor,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 5),
-            // Status
-            DropdownButtonFormField<String>(
-              value: logbookController.selectedStatus,
-              onChanged: (String? value) {
-                // logbookController.statusController.text = value!;
-                logbookController.setSelectedStatus(value!);
-              },
-              decoration: InputDecoration(
-                hintStyle: AppTheme.greyTextStyle.copyWith(
-                  fontSize: 12,
-                ),
-                isDense: true,
-                border: OutlineInputBorder(
-                  borderSide:
-                      const BorderSide(color: AppColors.greyColor, width: 2),
-                  borderRadius: BorderRadius.circular(7),
-                ),
-              ),
-              items: logbookController.statuses.map((status) {
-                return DropdownMenuItem<String>(
-                  value: status,
-                  child: Text(status.toString()),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 10),
+            // Row(
+            //   children: [
+            //     Text('Status ', style: AppTheme.blackTextStyle),
+            //     Text(
+            //       '*',
+            //       style: AppTheme.blackTextStyle.copyWith(
+            //         color: AppColors.dangerColor,
+            //       ),
+            //     ),
+            //   ],
+            // ),
+            // const SizedBox(height: 5),
+            // // Status
+            // DropdownButtonFormField<String>(
+            //   value: logbookController.selectedStatus,
+            //   onChanged: (String? value) {
+            //     logbookController.setSelectedStatus(value!);
+            //   },
+            //   decoration: InputDecoration(
+            //     hintStyle: AppTheme.greyTextStyle.copyWith(
+            //       fontSize: 12,
+            //     ),
+            //     isDense: true,
+            //     border: OutlineInputBorder(
+            //       borderSide:
+            //           const BorderSide(color: AppColors.greyColor, width: 2),
+            //       borderRadius: BorderRadius.circular(7),
+            //     ),
+            //   ),
+            //   items: logbookController.statuses.map((status) {
+            //     return DropdownMenuItem<String>(
+            //       value: status,
+            //       child: Text(status.toString()),
+            //     );
+            //   }).toList(),
+            // ),
+            // const SizedBox(height: 10),
             CustomFormUser(
               controller: logbookController.waktuPengambilan,
               title: 'Waktu Pengambilan',
@@ -450,7 +597,6 @@ class _LogbookSectionState extends State<LogbookSection> {
             CustomFormUser(
               controller: logbookController.keteranganController,
               title: 'Keterangan',
-              isMandatory: true,
             ),
             const SizedBox(height: 20),
             PrimaryButton(
@@ -470,18 +616,23 @@ class _LogbookSectionState extends State<LogbookSection> {
   Widget ModalEditLogbook(BuildContext context, bool isMobile,
       LogbookAttributes logbook, String idLogbook) {
     final logbookController = context.watch<LogbookController>();
-    if (logbook != null) {
-      logbookController.setDefaultUpdateValue(logbook);
-    }
+    logbookController.setDefaultUpdateValue(logbook);
     return Container(
       width: isMobile
-          ? MediaQuery.of(context).size.width * 0.4
+          ? MediaQuery.of(context).size.width * 0.6
           : MediaQuery.of(context).size.width * 0.3,
       padding: const EdgeInsets.all(20),
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            CustomFormUser(
+              controller: logbookController.namaPetugasController,
+              title: 'Nama petugas',
+              isMandatory: true,
+            ),
+            const SizedBox(height: 10),
+            // Perihal Permohonan
             Row(
               children: [
                 Text('Perihal permohonan ', style: AppTheme.blackTextStyle),
@@ -494,7 +645,6 @@ class _LogbookSectionState extends State<LogbookSection> {
               ],
             ),
             const SizedBox(height: 5),
-            // Perihal Permohonan
             DropdownButtonFormField<String>(
               value: logbookController.selectedPerihalPermohonan,
               onChanged: (String? value) {
@@ -543,44 +693,44 @@ class _LogbookSectionState extends State<LogbookSection> {
               isMandatory: true,
             ),
             const SizedBox(height: 10),
-            Row(
-              children: [
-                Text('Keperluan ', style: AppTheme.blackTextStyle),
-                Text(
-                  '*',
-                  style: AppTheme.blackTextStyle.copyWith(
-                    color: AppColors.dangerColor,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 5),
-            // Status
-            DropdownButtonFormField<String>(
-              value: logbookController.selectedStatus,
-              onChanged: (String? value) {
-                // logbookController.statusController.text = value!;
-                logbookController.setSelectedStatus(value!);
-              },
-              decoration: InputDecoration(
-                hintStyle: AppTheme.greyTextStyle.copyWith(
-                  fontSize: 12,
-                ),
-                isDense: true,
-                border: OutlineInputBorder(
-                  borderSide:
-                      const BorderSide(color: AppColors.greyColor, width: 2),
-                  borderRadius: BorderRadius.circular(7),
-                ),
-              ),
-              items: logbookController.statuses.map((status) {
-                return DropdownMenuItem<String>(
-                  value: status,
-                  child: Text(status.toString()),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 10),
+            // Row(
+            //   children: [
+            //     Text('Status ', style: AppTheme.blackTextStyle),
+            //     Text(
+            //       '*',
+            //       style: AppTheme.blackTextStyle.copyWith(
+            //         color: AppColors.dangerColor,
+            //       ),
+            //     ),
+            //   ],
+            // ),
+            // const SizedBox(height: 5),
+            // // Status
+            // DropdownButtonFormField<String>(
+            //   value: logbookController.selectedStatus,
+            //   onChanged: (String? value) {
+            //     // logbookController.statusController.text = value!;
+            //     logbookController.setSelectedStatus(value!);
+            //   },
+            //   decoration: InputDecoration(
+            //     hintStyle: AppTheme.greyTextStyle.copyWith(
+            //       fontSize: 12,
+            //     ),
+            //     isDense: true,
+            //     border: OutlineInputBorder(
+            //       borderSide:
+            //           const BorderSide(color: AppColors.greyColor, width: 2),
+            //       borderRadius: BorderRadius.circular(7),
+            //     ),
+            //   ),
+            //   items: logbookController.statuses.map((status) {
+            //     return DropdownMenuItem<String>(
+            //       value: status,
+            //       child: Text(status.toString()),
+            //     );
+            //   }).toList(),
+            // ),
+            // const SizedBox(height: 10),
             CustomFormUser(
               controller: logbookController.waktuPengambilan,
               title: 'Waktu Pengambilan',
@@ -603,7 +753,6 @@ class _LogbookSectionState extends State<LogbookSection> {
             CustomFormUser(
               controller: logbookController.keteranganController,
               title: 'Keterangan',
-              isMandatory: true,
             ),
             const SizedBox(height: 20),
             PrimaryButton(
@@ -637,6 +786,22 @@ class _LogbookSectionState extends State<LogbookSection> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
+                'Nama Petugas',
+                style: AppTheme.greyTextStyle
+                    .copyWith(fontSize: 14, fontWeight: AppTheme.medium),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                '${logbook.namaPetugas ?? 'Tidak ada'}',
+                style: AppTheme.primaryTextStyle
+                    .copyWith(fontWeight: AppTheme.bold),
+              ),
+            ],
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
                 'Perihal Permohohanan',
                 style: AppTheme.greyTextStyle
                     .copyWith(fontSize: 14, fontWeight: AppTheme.medium),
@@ -665,22 +830,22 @@ class _LogbookSectionState extends State<LogbookSection> {
               ),
             ],
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Status',
-                style: AppTheme.greyTextStyle
-                    .copyWith(fontSize: 14, fontWeight: AppTheme.medium),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                '${logbook.status ?? 'Tidak ada'}',
-                style: AppTheme.primaryTextStyle
-                    .copyWith(fontWeight: AppTheme.bold),
-              ),
-            ],
-          ),
+          // Column(
+          //   crossAxisAlignment: CrossAxisAlignment.start,
+          //   children: [
+          //     Text(
+          //       'Status',
+          //       style: AppTheme.greyTextStyle
+          //           .copyWith(fontSize: 14, fontWeight: AppTheme.medium),
+          //     ),
+          //     const SizedBox(height: 10),
+          //     Text(
+          //       '${logbook.status ?? 'Tidak ada'}',
+          //       style: AppTheme.primaryTextStyle
+          //           .copyWith(fontWeight: AppTheme.bold),
+          //     ),
+          //   ],
+          // ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -753,10 +918,7 @@ class _LogbookSectionState extends State<LogbookSection> {
                     showCancelBtn: true,
                     onConfirmBtnTap: () {
                       logbookController.deleteLogbookAdmin(context, id);
-                      context.pop();
-                    },
-                    onCancelBtnTap: () {
-                      context.pop();
+                      setState(() {});
                     },
                   );
                 },
@@ -791,6 +953,18 @@ class _LogbookSectionState extends State<LogbookSection> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
+                'Nama Petugas',
+                style: AppTheme.greyTextStyle
+                    .copyWith(fontSize: 14, fontWeight: AppTheme.medium),
+              ),
+              const SizedBox(height: 5),
+              Text(
+                '${logbook.namaPetugas ?? 'Tidak ada'}',
+                style: AppTheme.primaryTextStyle
+                    .copyWith(fontWeight: AppTheme.bold),
+              ),
+              const SizedBox(height: 5),
+              Text(
                 'Perihal Permohohanan',
                 style: AppTheme.greyTextStyle
                     .copyWith(fontSize: 14, fontWeight: AppTheme.medium),
@@ -813,18 +987,18 @@ class _LogbookSectionState extends State<LogbookSection> {
                 style: AppTheme.primaryTextStyle
                     .copyWith(fontWeight: AppTheme.bold),
               ),
-              const SizedBox(height: 5),
-              Text(
-                'Status',
-                style: AppTheme.greyTextStyle
-                    .copyWith(fontSize: 14, fontWeight: AppTheme.medium),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                '${logbook.status ?? 'Tidak ada'}',
-                style: AppTheme.primaryTextStyle
-                    .copyWith(fontWeight: AppTheme.bold),
-              ),
+              // const SizedBox(height: 5),
+              // Text(
+              //   'Status',
+              //   style: AppTheme.greyTextStyle
+              //       .copyWith(fontSize: 14, fontWeight: AppTheme.medium),
+              // ),
+              // const SizedBox(height: 10),
+              // Text(
+              //   '${logbook.status ?? 'Tidak ada'}',
+              //   style: AppTheme.primaryTextStyle
+              //       .copyWith(fontWeight: AppTheme.bold),
+              // ),
               const SizedBox(height: 10),
               Text(
                 'Waktu Pengerjaan',
@@ -848,7 +1022,8 @@ class _LogbookSectionState extends State<LogbookSection> {
                     context: context,
                     builder: (BuildContext context) {
                       return Dialog(
-                        child: ModalViewLogbook(context, logbook),
+                        child:
+                            ModalViewLogbook(context, logbook, isMobile: true),
                       );
                     },
                   );
@@ -910,6 +1085,94 @@ class _LogbookSectionState extends State<LogbookSection> {
                 ),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget ModalPrintLogbook(BuildContext context, bool isMobile) {
+    return Container(
+      width: isMobile
+          ? MediaQuery.of(context).size.width * 0.5
+          : MediaQuery.of(context).size.width * 0.3,
+      height: MediaQuery.of(context).size.height * 0.5,
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: CustomFormUser(
+                  title: 'Start Date',
+                  controller: startDateController,
+                  keyboardType: TextInputType.none,
+                  onTap: () async {
+                    DateTime? result = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2023, 01, 01),
+                      lastDate: DateTime(DateTime.now().year + 1),
+                    );
+                    if (result != null) {
+                      setState(
+                        () {
+                          startDateController.text =
+                              DateFormat('yyyy-MM-dd').format(result);
+                        },
+                      );
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(width: 15),
+              Expanded(
+                child: CustomFormUser(
+                  title: 'Finish Date',
+                  controller: finishDateController,
+                  keyboardType: TextInputType.none,
+                  onTap: () async {
+                    DateTime? result = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2023, 01, 01),
+                      lastDate: DateTime(DateTime.now().year + 1),
+                    );
+                    if (result != null) {
+                      setState(
+                        () {
+                          finishDateController.text =
+                              DateFormat('yyyy-MM-dd').format(result);
+                        },
+                      );
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          CustomFormUser(
+            title: 'Jumlah Banyak Data',
+            controller: countDataController,
+            keyboardType: TextInputType.number,
+            hintText: 'Default 25 data',
+          ),
+          const SizedBox(height: 20),
+          SuccessButton(
+            onTap: () async {
+              LogbookModel logbook = await LogbookService.getAllLogbookByDate(
+                  startDate: startDateController.text,
+                  finishDate: finishDateController.text,
+                  pageSize: countDataController.text.isEmpty
+                      ? 25
+                      : int.parse(countDataController.text));
+              final data = logbook.data;
+              toXLSX(data!);
+            },
+            titleButton: "Cetak Excel",
           ),
         ],
       ),

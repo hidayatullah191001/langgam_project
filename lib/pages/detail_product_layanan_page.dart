@@ -37,53 +37,69 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
     final layananController = context.watch<LayananController>();
     final searchController = context.watch<PencarianController>();
 
-    return Consumer(
-      builder: (context, SettingController controller, widget) {
-        if (controller.dataState == DataState.loading) {
-          return Center(child: CircularProgressIndicator());
+    // return Consumer(
+    //   builder: (context, SettingController controller, widget) {
+    //     if (controller.dataState == DataState.loading) {
+    //       return Center(child: CircularProgressIndicator());
+    //     }
+    //     return LayoutBuilder(
+    //       builder: (context, constraints) {
+    //         if (constraints.maxWidth < 1200) {
+    //           return MobileView(searchController, context);
+    //         } else {
+    //           return WebView(layananController, searchController);
+    //         }
+    //       },
+    //     );
+    //   },
+    // );
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 1200) {
+          return MobileView(searchController, context);
+        } else {
+          return WebView(layananController, searchController);
         }
-        return LayoutBuilder(
-          builder: (context, constraints) {
-            if (constraints.maxWidth < 1200) {
-              return MobileView(searchController, context);
-            } else {
-              return WebView(layananController, searchController);
-            }
-          },
-        );
       },
     );
   }
 
   Widget MobileView(
       PencarianController searchController, BuildContext context) {
-    return Scaffold(
-      drawerEnableOpenDragGesture: false,
-      endDrawerEnableOpenDragGesture: false,
-      appBar: AppBar(
-        title: BannerTopMobile(),
-        backgroundColor: AppColors.primaryColor,
-        iconTheme: const IconThemeData(color: AppColors.whiteColor),
-        actions: [
-          new Container(),
-        ],
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Navbar(
-                isMobile: true,
-              ),
-              !searchController.isSearchBoolean
-                  ? defaultWidgetMobile()
-                  : searchWidgetMobile(),
+    return Consumer(builder: (context, SettingController controller, widget) {
+      if (controller.dataState == DataState.loading) {
+        return Center(child: CircularProgressIndicator());
+      } else {
+        return Scaffold(
+          drawerEnableOpenDragGesture: false,
+          endDrawerEnableOpenDragGesture: false,
+          appBar: AppBar(
+            title: BannerTopMobile(),
+            backgroundColor: AppColors.primaryColor,
+            iconTheme: const IconThemeData(color: AppColors.whiteColor),
+            actions: [
+              Container(),
             ],
           ),
-        ),
-      ),
-      endDrawer: const LoginDrawer(),
-    );
+          body: SafeArea(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Navbar(
+                    isMobile: true,
+                  ),
+                  !searchController.isSearchBoolean
+                      ? defaultWidgetMobile()
+                      : searchWidgetMobile(),
+                ],
+              ),
+            ),
+          ),
+          endDrawer: const LoginDrawer(),
+        );
+      }
+    });
   }
 
   Widget WebView(LayananController layananController,

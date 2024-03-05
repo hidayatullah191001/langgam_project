@@ -63,19 +63,21 @@ class LogbookAttributes {
   String? createdAt;
   String? updatedAt;
   Petugas? petugas;
-
-  LogbookAttributes(
-      {this.perihalPermohonan,
-      this.namaPemohon,
-      this.nomorTelepon,
-      this.waktuPengerjaan,
-      this.pembayaran,
-      this.status,
-      this.waktuPengambilan,
-      this.keterangan,
-      this.createdAt,
-      this.updatedAt,
-      this.petugas});
+  String? namaPetugas;
+  LogbookAttributes({
+    this.perihalPermohonan,
+    this.namaPemohon,
+    this.nomorTelepon,
+    this.waktuPengerjaan,
+    this.pembayaran,
+    this.status,
+    this.waktuPengambilan,
+    this.keterangan,
+    this.createdAt,
+    this.updatedAt,
+    this.petugas,
+    this.namaPetugas,
+  });
 
   LogbookAttributes.fromJson(Map<String, dynamic> json) {
     perihalPermohonan = json['perihal_permohonan'];
@@ -88,6 +90,7 @@ class LogbookAttributes {
     keterangan = json['keterangan'];
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
+    namaPetugas = json['nama_petugas'];
     petugas =
         json['petugas'] != null ? Petugas.fromJson(json['petugas']) : null;
   }
@@ -104,6 +107,7 @@ class LogbookAttributes {
     data['keterangan'] = keterangan;
     data['createdAt'] = createdAt;
     data['updatedAt'] = updatedAt;
+    data['nama_petugas'] = namaPetugas;
     if (petugas != null) {
       data['petugas'] = petugas!.toJson();
     }

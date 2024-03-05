@@ -14,6 +14,7 @@ class _BantuanPageState extends State<BantuanPage> {
     // TODO: implement initState
     super.initState();
     context.read<BantuanController>().getBantuanBySlug(widget.slug);
+    context.read<SettingController>().getSettingWeb();
   }
 
   @override
@@ -25,13 +26,14 @@ class _BantuanPageState extends State<BantuanPage> {
       if (constraints.maxWidth < 800) {
         return mobileView();
       } else {
-        return webView(searchController, controller);
+        return webView();
       }
     });
   }
 
   Widget mobileView() {
     final searchController = context.watch<PencarianController>();
+    final settingController = context.watch<SettingController>();
     return Scaffold(
       drawerEnableOpenDragGesture: false,
       endDrawerEnableOpenDragGesture: false,
@@ -43,88 +45,62 @@ class _BantuanPageState extends State<BantuanPage> {
           new Container(),
         ],
       ),
-      body: Consumer(builder: (context, SettingController controller, widget) {
-        if (controller.dataState == DataState.loading) {
-          return const Center(child: CircularProgressIndicator());
-        } else {
-          return SafeArea(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Navbar(
-                    isMobile: true,
-                  ),
-                  !searchController.isSearchBoolean
-                      ? defaultWidgetMobile()
-                      : searchWidgetMobile(),
-                ],
+      body: settingController.dataState == DataState.loading
+          ? const Center(child: CircularProgressIndicator())
+          : SafeArea(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Navbar(
+                      isMobile: true,
+                    ),
+                    !searchController.isSearchBoolean
+                        ? defaultWidgetMobile()
+                        : searchWidgetMobile(),
+                  ],
+                ),
               ),
             ),
-          );
-        }
-      }),
       endDrawer: const LoginDrawer(),
     );
   }
 
-  Widget webView(
-      PencarianController searchController, NavbarController controller) {
-    return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, BoxConstraints constraints) {
-          if (constraints.maxWidth <= 1200) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Lottie.asset('lottie/maintenance.json'),
-                      Text(
-                        'Saat ini hanya tersedia untuk Website. Gunakan laptop untuk membuka',
-                        style: AppTheme.blackTextStyle.copyWith(
-                          fontSize: 18,
-                          fontWeight: AppTheme.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ]),
-              ),
-            );
-          } else {
-            return CustomScrollView(
-              cacheExtent: 5000,
-              slivers: [
-                SliverList(
-                  delegate: SliverChildListDelegate([
-                    const BannerTop(),
-                  ]),
-                ),
-                SliverAppBar(
-                  pinned: true,
-                  floating: false,
-                  collapsedHeight: 101.0,
-                  automaticallyImplyLeading: false,
-                  flexibleSpace: Navbar(),
-                  actions: [SizedBox()],
-                ),
-                SliverList(
-                  delegate: SliverChildListDelegate([
-                    !searchController.isSearchBoolean
-                        ? defaultWidget(context)
-                        : searchWidget(context),
-                  ]),
-                ),
-              ],
-            );
-          }
-        },
-      ),
-      endDrawer: controller.selectedDrawer == 'Login'
-          ? const LoginDrawer()
-          : Container(),
-    );
+  Widget webView() {
+    final searchController = context.watch<PencarianController>();
+    final settingController = context.watch<SettingController>();
+
+    if (settingController.dataState == DataState.loading) {
+      return const Center(child: CircularProgressIndicator());
+    } else {
+      return Scaffold(
+        body: CustomScrollView(
+          cacheExtent: 5000,
+          slivers: [
+            SliverList(
+              delegate: SliverChildListDelegate([
+                const BannerTop(),
+              ]),
+            ),
+            SliverAppBar(
+              pinned: true,
+              floating: false,
+              collapsedHeight: 101.0,
+              automaticallyImplyLeading: false,
+              flexibleSpace: Navbar(),
+              actions: [SizedBox()],
+            ),
+            SliverList(
+              delegate: SliverChildListDelegate([
+                !searchController.isSearchBoolean
+                    ? defaultWidget(context)
+                    : searchWidget(context),
+              ]),
+            ),
+          ],
+        ),
+        endDrawer: const LoginDrawer(),
+      );
+    }
   }
 
   Widget defaultWidget(BuildContext context) {

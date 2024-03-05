@@ -1,7 +1,7 @@
 part of '../pages.dart';
 
-class DashboardSection extends StatelessWidget {
-  const DashboardSection({Key? key}) : super(key: key);
+class DashboardSectionMobile extends StatelessWidget {
+  const DashboardSectionMobile({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -11,81 +11,16 @@ class DashboardSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // RichText(
-        //   text: TextSpan(
-        //     text: 'Halo, ',
-        //     style: AppTheme.greyTextStyle,
-        //     children: <TextSpan>[
-        //       TextSpan(
-        //         text: 'hidayatullahd745',
-        //         style: AppTheme.greyTextStyle.copyWith(
-        //           fontWeight: AppTheme.bold,
-        //         ),
-        //       ),
-        //       TextSpan(
-        //         text: ' (bukan ',
-        //         style: AppTheme.greyTextStyle,
-        //       ),
-        //       TextSpan(
-        //         text: 'hidayatullahd745? ',
-        //         style: AppTheme.greyTextStyle.copyWith(
-        //           fontWeight: AppTheme.bold,
-        //         ),
-        //       ),
-        //       TextSpan(
-        //         text: 'Keluar',
-        //         style: AppTheme.primaryTextStyle.copyWith(
-        //           fontWeight: AppTheme.bold,
-        //         ),
-        //       ),
-        //       TextSpan(
-        //         text: ')',
-        //         style: AppTheme.greyTextStyle,
-        //       ),
-        //     ],
-        //   ),
-        // ),
-        // const SizedBox(height: 10),
-        // RichText(
-        //   text: TextSpan(
-        //     text: 'Dari dasbor akun anda, Anda dapat melihat ',
-        //     style: AppTheme.greyTextStyle,
-        //     children: <TextSpan>[
-        //       TextSpan(text: 'pesanan baru', style: AppTheme.greyTextStyle),
-        //       TextSpan(
-        //         text: ', mengelola ',
-        //         style: AppTheme.greyTextStyle,
-        //       ),
-        //       TextSpan(
-        //         text: 'alamat pengiriman dan penagihan',
-        //         style: AppTheme.primaryTextStyle,
-        //       ),
-        //       TextSpan(
-        //         text: ', dan ',
-        //         style: AppTheme.greyTextStyle,
-        //       ),
-        //       TextSpan(
-        //         text: 'edit kata sandi anda dan detail akun Anda',
-        //         style: AppTheme.primaryTextStyle,
-        //       ),
-        //       TextSpan(
-        //         text: '.',
-        //         style: AppTheme.greyTextStyle,
-        //       ),
-        //     ],
-        //   ),
-        // ),
-        // const SizedBox(height: 50),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            fastButtonDasbor(context,
+            fastButtonDasborMobile(context,
                 title: 'Pesanan',
                 icon: Icons.file_open_outlined,
                 first: true, onTap: () {
               controller.pickMenu('Pesanan', 1);
             }),
-            fastButtonDasbor(context,
+            fastButtonDasborMobile(context,
                 title: 'Unduhan',
                 icon: Icons.file_download_outlined,
                 last: true, onTap: () {
@@ -96,11 +31,11 @@ class DashboardSection extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            fastButtonDasbor(context,
+            fastButtonDasborMobile(context,
                 title: 'Detail Akun', icon: Icons.person_outlined, onTap: () {
               controller.pickMenu('Detail Akun', 5);
             }),
-            // fastButtonDasbor(
+            // fastButtonDasborMobile(
             //   context,
             //   title: 'Logout',
             //   icon: Icons.logout,
@@ -123,8 +58,8 @@ class DashboardSection extends StatelessWidget {
             //         showCancelBtn: true,
             //         onConfirmBtnTap: () {
             //           authController.logout();
+            //           context.replace('/');
             //           context.pop();
-            //           context.push('/');
             //         },
             //       ).then((value) => context.pop());
             //     }
@@ -135,7 +70,7 @@ class DashboardSection extends StatelessWidget {
         // Row(
         //   mainAxisAlignment: MainAxisAlignment.start,
         //   children: [
-        //     fastButtonDasbor(
+        //     fastButtonDasborMobile(
         //       context,
         //       title: 'Logout',
         //       icon: Icons.logout,
@@ -152,7 +87,7 @@ class DashboardSection extends StatelessWidget {
     );
   }
 
-  Widget fastButtonDasbor(
+  Widget fastButtonDasborMobile(
     BuildContext context, {
     bool first = false,
     bool last = false,
@@ -166,14 +101,14 @@ class DashboardSection extends StatelessWidget {
         onTap: onTap,
         child: Container(
           margin: EdgeInsets.only(
-            left: first ? 0 : 10,
-            right: last ? 0 : 10,
+            left: first ? 0 : 5,
+            right: last ? 0 : 5,
             bottom: 20,
             top: 20,
           ),
           padding: const EdgeInsets.symmetric(
-            horizontal: 70,
-            vertical: 30,
+            horizontal: 15,
+            vertical: 15,
           ),
           decoration: BoxDecoration(
             color: typeLogout ? AppColors.dangerColor : Colors.transparent,
@@ -196,9 +131,11 @@ class DashboardSection extends StatelessWidget {
                 style: typeLogout
                     ? AppTheme.whiteTextStyle.copyWith(
                         fontWeight: AppTheme.bold,
+                        fontSize: 14,
                       )
                     : AppTheme.greyTextStyle.copyWith(
                         fontWeight: AppTheme.bold,
+                        fontSize: 14,
                       ),
               ),
             ],

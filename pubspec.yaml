@@ -61,7 +61,11 @@ dependencies:
   essential_xlsx: ^2.0.0
   google_sign_in: ^6.2.1
   mailer: ^6.1.0
-  
+  flutter_widget_from_html_core: ^0.14.11
+  webview_flutter_web: ^0.2.2+4
+  webviewx_plus: ^0.4.1
+  flutter_advance_slider: ^1.2.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

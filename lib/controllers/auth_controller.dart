@@ -17,11 +17,7 @@ class AuthController extends ChangeNotifier {
   }
 
   logout() async {
-    final result = await AppSession.removeUserInformation();
-    if (result) {
-      return true;
-    } else {
-      return false;
-    }
+    await AppSession.removeUserInformation();
+    notifyListeners();
   }
 }

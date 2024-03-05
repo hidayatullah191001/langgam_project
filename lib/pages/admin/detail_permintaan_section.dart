@@ -134,64 +134,72 @@ class _DetailPermintaanSectionState extends State<DetailPermintaanSection> {
       }
     }
 
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 20, right: 40),
-      padding: const EdgeInsets.all(30),
-      decoration: BoxDecoration(
-        color: AppColors.whiteColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          InkWell(
-            onTap: () => adminController.pickMenu('Permintaan Data Masuk', 1),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                const Icon(Icons.arrow_back_ios_new_rounded,
-                    color: AppColors.primaryColor),
-                const SizedBox(width: 5),
-                Text(
-                  'Kembali',
-                  style: AppTheme.primaryTextStyle.copyWith(
-                    fontWeight: AppTheme.bold,
+    return LayoutBuilder(builder: (context, constraints) {
+      bool mobile = false;
+      if (constraints.maxWidth < 800) {
+        mobile = true;
+      } else {
+        mobile == false;
+      }
+      return Container(
+        width: double.infinity,
+        margin: EdgeInsets.only(bottom: 20, right: mobile ? 10 : 40),
+        padding: EdgeInsets.all(mobile ? 20 : 30),
+        decoration: BoxDecoration(
+          color: AppColors.whiteColor,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            InkWell(
+              onTap: () => adminController.pickMenu('Permintaan Data Masuk', 1),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  const Icon(Icons.arrow_back_ios_new_rounded,
+                      color: AppColors.primaryColor),
+                  const SizedBox(width: 5),
+                  Text(
+                    'Kembali',
+                    style: AppTheme.primaryTextStyle.copyWith(
+                      fontWeight: AppTheme.bold,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 20),
-          Expanded(child: LayoutBuilder(
-            builder: (context, constraints) {
-              if (constraints.maxWidth < 800) {
-                return MobileView(
-                    dataPermintaan,
-                    openURLInNewTab,
-                    uploadFileBillingPembayaran,
-                    uploadFileDokumenPermintaan,
-                    permintaanController,
-                    context,
-                    adminController);
-              } else {
-                return WebView(
-                    dataPermintaan,
-                    openURLInNewTab,
-                    uploadFileBillingPembayaran,
-                    uploadFileDokumenPermintaan,
-                    permintaanController,
-                    context,
-                    adminController);
-              }
-            },
-          )),
-        ],
-      ),
-    );
+            const SizedBox(height: 10),
+            Expanded(child: LayoutBuilder(
+              builder: (context, constraints) {
+                if (constraints.maxWidth < 800) {
+                  return MobileView(
+                      dataPermintaan,
+                      openURLInNewTab,
+                      uploadFileBillingPembayaran,
+                      uploadFileDokumenPermintaan,
+                      permintaanController,
+                      context,
+                      adminController);
+                } else {
+                  return WebView(
+                      dataPermintaan,
+                      openURLInNewTab,
+                      uploadFileBillingPembayaran,
+                      uploadFileDokumenPermintaan,
+                      permintaanController,
+                      context,
+                      adminController);
+                }
+              },
+            )),
+          ],
+        ),
+      );
+    });
   }
 
-  ListView MobileView(
+  Widget MobileView(
       listPermintaanModelAdmin.PermintaanAdminAttributes dataPermintaan,
       void openURLInNewTab(String url),
       Future<Null> uploadFileBillingPembayaran(),
@@ -199,66 +207,65 @@ class _DetailPermintaanSectionState extends State<DetailPermintaanSection> {
       PermintaanController permintaanController,
       BuildContext context,
       AdminController adminController) {
-    return ListView(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-              "Kode Pesanan : ",
-              style: AppTheme.blackTextStyle.copyWith(
-                fontWeight: AppTheme.medium,
-                fontSize: 14,
+    return SizedBox(
+      width: double.infinity,
+      child: ListView(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                "Kode Pesanan : ",
+                style: AppTheme.blackTextStyle.copyWith(
+                  fontWeight: AppTheme.medium,
+                  fontSize: 14,
+                ),
               ),
-            ),
-            const SizedBox(width: 5),
-            Expanded(
-              child: Text(
+              const SizedBox(width: 5),
+              Text(
                 dataPermintaan.nomorPermintaan.toString(),
                 style: AppTheme.blackTextStyle.copyWith(
                   fontWeight: AppTheme.medium,
                   fontSize: 14,
                 ),
               ),
-            ),
-          ],
-        ),
-        dataPermintaan.layanan != null
-            ? Expanded(
-                child: Text(
+            ],
+          ),
+          dataPermintaan.layanan != null
+              ? Text(
                   dataPermintaan.layanan!.attributes!.judul.toString(),
                   style: AppTheme.blackTextStyle.copyWith(
                     fontWeight: AppTheme.bold,
                     fontSize: 22,
                   ),
-                ),
-              )
-            : Container(),
-        Text(
-          dataPermintaan.status.toString(),
-          style: AppTheme.greenTextStyle.copyWith(
-            fontWeight: AppTheme.bold,
+                )
+              : Container(),
+          Text(
+            dataPermintaan.status.toString(),
+            style: AppTheme.greenTextStyle.copyWith(
+              fontWeight: AppTheme.bold,
+            ),
           ),
-        ),
-        const SizedBox(height: 15),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            InformasiPesanan(dataPermintaan),
-            const SizedBox(height: 15),
-            InformasiPemesan(dataPermintaan),
-          ],
-        ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            BerkasPemesanMobile(dataPermintaan, openURLInNewTab,
-                uploadFileBillingPembayaran, uploadFileDokumenPermintaan),
-            const SizedBox(height: 15),
-            PembaharuanData(permintaanController, context, adminController),
-          ],
-        ),
-      ],
+          const SizedBox(height: 15),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              InformasiPesanan(dataPermintaan),
+              const SizedBox(height: 15),
+              InformasiPemesan(dataPermintaan),
+            ],
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              BerkasPemesanMobile(dataPermintaan, openURLInNewTab,
+                  uploadFileBillingPembayaran, uploadFileDokumenPermintaan),
+              const SizedBox(height: 15),
+              PembaharuanData(permintaanController, context, adminController),
+            ],
+          ),
+        ],
+      ),
     );
   }
 

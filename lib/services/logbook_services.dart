@@ -9,7 +9,7 @@ class LogbookService {
     String filters = "\$eq";
 
     Map? responseBody = await APIRequest.gets(
-      '${Constant.apirest}/logbook-harians?populate=*&filters[petugas][id][$filters]=$idUser&pagination[page]=$page',
+      '${Constant.apirest}/logbook-harians?populate=*&filters[petugas][id][$filters]=$idUser&pagination[page]=$page&sort[0]=createdAt:desc',
       headers: {
         'Authorization': 'Bearer $token',
       },
@@ -107,6 +107,43 @@ class LogbookService {
         'success': false,
         'error': 'Something went wrong',
       };
+    }
+  }
+
+  static Future<LogbookModel> getAllLogbookByDate(
+      {String? startDate, String? finishDate, int? pageSize}) async {
+    final String token = await AppSession.getToken();
+    // 2024-01-12
+    String gte = "\$gte";
+    String lte = "\$lte";
+    String filters;
+    String pagination;
+
+    if (startDate != null) {
+      filters = "filters[createdAt][$gte]=$startDate&sort[0]=createdAt:desc";
+    } else if (finishDate != null) {
+      filters = "filters[createdAt][$lte]=$finishDate&sort[0]=createdAt:desc";
+    } else {
+      filters =
+          "filters[createdAt][$gte]=$startDate&filters[createdAt][$lte]=$finishDate&sort[0]=createdAt:desc";
+    }
+
+    if (pageSize != null) {
+      pagination = "pagination[pageSize]=$pageSize";
+    } else {
+      pagination = "";
+    }
+
+    Map? responseBody = await APIRequest.gets(
+        '${Constant.apirest}/logbook-harians?populate=*&$filters&$pagination',
+        headers: {
+          'Authorization': 'Bearer $token',
+        });
+    if (responseBody == null) throw "Data kosong";
+    if (responseBody['data'] != null) {
+      return LogbookModel.fromJson(responseBody as Map<String, dynamic>);
+    } else {
+      throw Exception();
     }
   }
 }

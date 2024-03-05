@@ -2,19 +2,28 @@ part of 'services.dart';
 
 class LayananServices {
   static Future<Layanan> getAllLayanans(
-      {bool filter = false, String? slugBidangLayanan, int? page}) async {
+      {bool filter = false,
+      String? slugBidangLayanan,
+      int? page,
+      int? pageSize}) async {
     // String token = await AppSession.getToken();
     Map? responseBody = {};
     String filters = "\$eq";
 
     if (filter == false) {
-      responseBody = await APIRequest.gets(
-        '${Constant.apirest}/layanans?populate=*&pagination[page]=$page&sort[0]=createdAt:desc',
-      );
+      if (pageSize != null) {
+        responseBody = await APIRequest.gets(
+          '${Constant.apirest}/layanans?populate=*&pagination[page]=$page&sort[0]=createdAt:desc&pagination[pageSize]=$pageSize',
+        );
+      } else {
+        responseBody = await APIRequest.gets(
+          '${Constant.apirest}/layanans?populate=*&pagination[page]=$page&sort[0]=createdAt:desc',
+        );
+      }
     } else {
       if (slugBidangLayanan != null) {
         responseBody = await APIRequest.gets(
-          '${Constant.apirest}/layanans?populate=gambar&filters[bidang_layanan][slug][$filters]=$slugBidangLayanan&pagination[page]=$page&sort[0]=createdAt:desc',
+          '${Constant.apirest}/layanans?populate=*&filters[bidang_layanan][slug][$filters]=$slugBidangLayanan&pagination[page]=$page&sort[0]=createdAt:desc&pagination[pageSize]=$pageSize',
         );
       }
     }

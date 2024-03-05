@@ -9,24 +9,31 @@ class MyAccountPage extends StatefulWidget {
 
 class _MyAccountPageState extends State<MyAccountPage> {
   @override
-  Widget build(BuildContext context) {
-    final searchController = context.watch<PencarianController>();
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    context.read<SettingController>().getSettingWeb();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
       if (constraints.maxWidth < 1200) {
-        return mobileView(searchController, context);
-      } else {}
-      return webView(searchController);
+        return mobileView(context);
+      } else {
+        return webView();
+      }
     });
   }
 
-  Widget mobileView(
-      PencarianController searchController, BuildContext context) {
+  Widget mobileView(BuildContext context) {
+    final searchController = context.watch<PencarianController>();
+
     return Scaffold(
       drawerEnableOpenDragGesture: false,
       endDrawerEnableOpenDragGesture: false,
       appBar: AppBar(
-        title: BannerTopMobile(),
+        title: const BannerTopMobile(),
         backgroundColor: AppColors.primaryColor,
         iconTheme: const IconThemeData(color: AppColors.whiteColor),
         actions: [
@@ -51,7 +58,9 @@ class _MyAccountPageState extends State<MyAccountPage> {
     );
   }
 
-  Widget webView(PencarianController searchController) {
+  Widget webView() {
+    final searchController = context.watch<PencarianController>();
+
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -196,7 +205,7 @@ class _MyAccountPageState extends State<MyAccountPage> {
 
           if (snapshot.hasData) {
             Layanan data = snapshot.data!;
-            if (data.data!.length < 1) {
+            if (data.data!.isEmpty) {
               return Center(
                 child: Column(
                   children: [
@@ -226,12 +235,14 @@ class _MyAccountPageState extends State<MyAccountPage> {
               return ListView.builder(
                 padding: EdgeInsets.zero,
                 itemCount: data.data!.length,
+                physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
                   final LayananData layanan = data.data![index];
                   return ItemLayananCardList(
                     data: layanan,
                     id: layanan.id!,
+                    isMobile: true,
                   );
                 },
               );
@@ -276,27 +287,25 @@ class _MyAccountPageState extends State<MyAccountPage> {
                   itemBuilder: (context, index) {
                     return GestureDetector(
                       onTap: () {
-                        controller.pickMenu(menuUser[index], index);
                         if (menuUser[index] == 'Logout') {
                           CoolAlert.show(
-                              context: context,
-                              type: CoolAlertType.warning,
-                              width: MediaQuery.of(context).size.width * 0.3,
-                              confirmBtnText: 'Logout',
-                              confirmBtnColor: AppColors.dangerColor,
-                              cancelBtnText: 'Batal',
-                              confirmBtnTextStyle: AppTheme.whiteTextStyle,
-                              cancelBtnTextStyle: AppTheme.darkGreyTextStyle,
-                              text: 'Kamu yakin ingin keluar dari aplikasi?',
-                              showCancelBtn: true,
-                              onConfirmBtnTap: () {
-                                authController.logout();
-                                context.replace('/');
-                                context.pop();
-                              },
-                              onCancelBtnTap: () {
-                                context.pop();
-                              }).then((value) => context.pop());
+                            context: context,
+                            type: CoolAlertType.warning,
+                            width: MediaQuery.of(context).size.width * 0.3,
+                            confirmBtnText: 'Logout',
+                            confirmBtnColor: AppColors.dangerColor,
+                            cancelBtnText: 'Batal',
+                            confirmBtnTextStyle: AppTheme.whiteTextStyle,
+                            cancelBtnTextStyle: AppTheme.darkGreyTextStyle,
+                            text: 'Kamu yakin ingin keluar dari aplikasi?',
+                            showCancelBtn: true,
+                            onConfirmBtnTap: () {
+                              authController.logout();
+                              context.replace('/');
+                            },
+                          ).then((value) => context.pop());
+                        } else {
+                          controller.pickMenu(menuUser[index], index);
                         }
                       },
                       child: Container(
@@ -392,30 +401,28 @@ class _MyAccountPageState extends State<MyAccountPage> {
                   padding: EdgeInsets.zero,
                   scrollDirection: Axis.horizontal,
                   itemCount: menuUser.length,
-                  itemBuilder: (context, index) {
+                  itemBuilder: (ctx, index) {
                     return GestureDetector(
                       onTap: () {
-                        controller.pickMenu(menuUser[index], index);
                         if (menuUser[index] == 'Logout') {
                           CoolAlert.show(
-                              context: context,
-                              type: CoolAlertType.warning,
-                              width: MediaQuery.of(context).size.width * 0.3,
-                              confirmBtnText: 'Logout',
-                              confirmBtnColor: AppColors.dangerColor,
-                              cancelBtnText: 'Batal',
-                              confirmBtnTextStyle: AppTheme.whiteTextStyle,
-                              cancelBtnTextStyle: AppTheme.darkGreyTextStyle,
-                              text: 'Kamu yakin ingin keluar dari aplikasi?',
-                              showCancelBtn: true,
-                              onConfirmBtnTap: () {
-                                authController.logout();
-                                context.replace('/');
-                                context.pop();
-                              },
-                              onCancelBtnTap: () {
-                                context.pop();
-                              }).then((value) => context.pop());
+                            context: context,
+                            type: CoolAlertType.warning,
+                            width: MediaQuery.of(context).size.width * 0.3,
+                            confirmBtnText: 'Logout',
+                            confirmBtnColor: AppColors.dangerColor,
+                            cancelBtnText: 'Batal',
+                            confirmBtnTextStyle: AppTheme.whiteTextStyle,
+                            cancelBtnTextStyle: AppTheme.darkGreyTextStyle,
+                            text: 'Kamu yakin ingin keluar dari aplikasi?',
+                            showCancelBtn: true,
+                            onConfirmBtnTap: () {
+                              authController.logout();
+                              context.replace('/');
+                            },
+                          ).then((value) => context.pop());
+                        } else {
+                          controller.pickMenu(menuUser[index], index);
                         }
                       },
                       child: Container(
@@ -449,10 +456,10 @@ class _MyAccountPageState extends State<MyAccountPage> {
             color: AppColors.softgreyColor.withOpacity(0.2),
           ),
           const SizedBox(height: 20),
-          buildConditionalWidgetMobile(
-              controller.selectedMenu == 'Dasbor', const DashboardSection()),
-          buildConditionalWidgetMobile(
-              controller.selectedMenu == 'Pesanan', const PesananSection()),
+          buildConditionalWidgetMobile(controller.selectedMenu == 'Dasbor',
+              const DashboardSectionMobile()),
+          buildConditionalWidgetMobile(controller.selectedMenu == 'Pesanan',
+              const PesananMobileSection()),
           // buildConditionalWidgetMobile(
           //     controller.selectedMenu == 'Messages', const MessageSection()),
           buildConditionalWidgetMobile(
@@ -475,7 +482,7 @@ class _MyAccountPageState extends State<MyAccountPage> {
           // Ini ada di halaman pesanan_section.dart
           buildConditionalWidgetMobile(
               controller.selectedMenu == 'Detail pesanan',
-              const DetailPesananSection()),
+              const DetailPesananSectionMobile()),
         ],
       ),
     );

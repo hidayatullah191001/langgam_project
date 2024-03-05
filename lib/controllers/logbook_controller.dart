@@ -2,6 +2,7 @@ part of 'controller.dart';
 
 class LogbookController extends ChangeNotifier {
   TextEditingController namaPemohanController = TextEditingController();
+  TextEditingController namaPetugasController = TextEditingController();
   TextEditingController nomorTeleponController = TextEditingController();
   TextEditingController waktuPengerjaanController = TextEditingController();
   TextEditingController pembayaranController = TextEditingController();
@@ -11,8 +12,8 @@ class LogbookController extends ChangeNotifier {
   final List<String> _perihalPermohonan = ['Kalibrasi', 'Data MKG'];
   List<String> get perihalPermohonans => _perihalPermohonan;
 
-  final List<String> _statuses = ['On Process', 'Selesai'];
-  List<String> get statuses => _statuses;
+  // final List<String> _statuses = ['On Process', 'Selesai'];
+  // List<String> get statuses => _statuses;
 
   String? _selectedPerihalPermohonan;
   String? get selectedPerihalPermohonan => _selectedPerihalPermohonan;
@@ -21,25 +22,24 @@ class LogbookController extends ChangeNotifier {
     _selectedPerihalPermohonan = value;
   }
 
-  String? _selectedStatus;
-  String? get selectedStatus => _selectedStatus;
+  // String? _selectedStatus;
+  // String? get selectedStatus => _selectedStatus;
 
-  void setSelectedStatus(String value) {
-    _selectedStatus = value;
-  }
+  // void setSelectedStatus(String value) {
+  //   _selectedStatus = value;
+  // }
 
   void createLogbookAdmin(BuildContext context) async {
     final userLogin = await AppSession.getUserInformation();
     String idUser = userLogin['id'];
 
     if (_selectedPerihalPermohonan!.isEmpty ||
+        namaPetugasController.text.isEmpty ||
         namaPemohanController.text.isEmpty ||
         nomorTeleponController.text.isEmpty ||
         waktuPengerjaanController.text.isEmpty ||
         pembayaranController.text.isEmpty ||
-        _selectedStatus!.isEmpty ||
-        waktuPengambilan.text.isEmpty ||
-        keteranganController.text.isEmpty) {
+        waktuPengambilan.text.isEmpty) {
       AppMethods.dangerToast(context, "Field mandatory tidak boleh kosong");
     } else {
       final data = LogbookFormModel(
@@ -49,10 +49,11 @@ class LogbookController extends ChangeNotifier {
           nomorTelepon: nomorTeleponController.text,
           waktuPengerjaan: waktuPengerjaanController.text,
           pembayaran: int.parse(pembayaranController.text),
-          status: _selectedStatus,
+          status: null,
           waktuPengambilan: waktuPengambilan.text,
           keterangan: keteranganController.text,
           petugas: idUser,
+          namaPetugas: namaPetugasController.text,
         ),
       );
 
@@ -61,6 +62,8 @@ class LogbookController extends ChangeNotifier {
       if (result['success'] == true) {
         AppMethods.successToast(context, 'Logbook created successfully');
         setEmptyVariable();
+        setSelectedPerihalPermohonan('');
+        // setSelectedStatus('');
       } else {
         AppMethods.dangerToast(context, result['error']);
       }
@@ -73,12 +76,11 @@ class LogbookController extends ChangeNotifier {
 
     if (_selectedPerihalPermohonan!.isEmpty ||
         namaPemohanController.text.isEmpty ||
+        namaPetugasController.text.isEmpty ||
         nomorTeleponController.text.isEmpty ||
         waktuPengerjaanController.text.isEmpty ||
         pembayaranController.text.isEmpty ||
-        _selectedStatus!.isEmpty ||
-        waktuPengambilan.text.isEmpty ||
-        keteranganController.text.isEmpty) {
+        waktuPengambilan.text.isEmpty) {
       AppMethods.dangerToast(context, "Field mandatory tidak boleh kosong");
     } else {
       final data = LogbookFormModel(
@@ -88,15 +90,15 @@ class LogbookController extends ChangeNotifier {
           nomorTelepon: nomorTeleponController.text,
           waktuPengerjaan: waktuPengerjaanController.text,
           pembayaran: int.parse(pembayaranController.text),
-          status: _selectedStatus,
+          status: null,
           waktuPengambilan: waktuPengambilan.text,
           keterangan: keteranganController.text,
           petugas: idUser,
+          namaPetugas: namaPetugasController.text,
         ),
       );
 
       final result = await LogbookService.updateLogbook(data, id);
-      print(result);
       if (result['success'] == true) {
         AppMethods.successToast(context, 'Logbook updated successfully');
         setEmptyVariable();
@@ -117,14 +119,14 @@ class LogbookController extends ChangeNotifier {
   }
 
   void setDefaultUpdateValue(LogbookAttributes model) {
-    keteranganController.text = model.keterangan!;
-    namaPemohanController.text = model.namaPemohon!;
-    nomorTeleponController.text = model.nomorTelepon!;
+    keteranganController.text = model.keterangan ?? '';
+    namaPemohanController.text = model.namaPemohon ?? '';
+    nomorTeleponController.text = model.nomorTelepon ?? '';
     pembayaranController.text = model.pembayaran.toString();
-    waktuPengerjaanController.text = model.waktuPengerjaan!;
-    waktuPengambilan.text = model.waktuPengambilan!;
-    _selectedStatus = model.status!;
-    _selectedPerihalPermohonan = model.perihalPermohonan!;
+    waktuPengerjaanController.text = model.waktuPengerjaan ?? '';
+    waktuPengambilan.text = model.waktuPengambilan ?? '';
+    namaPetugasController.text = model.namaPetugas ?? '';
+    _selectedPerihalPermohonan = model.perihalPermohonan ?? '';
     notifyListeners();
   }
 
@@ -135,8 +137,8 @@ class LogbookController extends ChangeNotifier {
     pembayaranController.text = '';
     waktuPengerjaanController.text = '';
     waktuPengambilan.text = '';
-    _selectedStatus = '';
-    _selectedPerihalPermohonan = '';
+    namaPetugasController.text = '';
+    _selectedPerihalPermohonan = null;
     notifyListeners();
   }
 }

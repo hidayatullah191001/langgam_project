@@ -11,60 +11,67 @@ class ProductLayananPage extends StatefulWidget {
 
 class _ProductLayananPageState extends State<ProductLayananPage> {
   String? title = "Semua Layanan";
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
   int selectedPageNumber = 1;
+
+  double selectedPageSize = 10;
   int _selectedCategoryIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     final searchController = context.watch<PencarianController>();
-    return LayoutBuilder(builder: (context, constraints) {
-      if (constraints.maxWidth < 1200) {
-        return MobileView(searchController, context);
-      } else {
-        return WebView(searchController);
-      }
-    });
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 1200) {
+          return MobileView(searchController, context);
+        } else {
+          return WebView(searchController);
+        }
+      },
+    );
   }
 
   Widget MobileView(
       PencarianController searchController, BuildContext context) {
-    return Scaffold(
-      drawerEnableOpenDragGesture: false,
-      endDrawerEnableOpenDragGesture: false,
-      appBar: AppBar(
-        title: BannerTopMobile(),
-        backgroundColor: AppColors.primaryColor,
-        iconTheme: const IconThemeData(color: AppColors.whiteColor),
-        actions: [
-          new Container(),
-        ],
-      ),
-      body: Consumer(builder: (context, SettingController controller, widget) {
+    return Consumer(
+      builder: (context, SettingController controller, widget) {
         if (controller.dataState == DataState.loading) {
           return const Center(child: CircularProgressIndicator());
         } else {
-          return SafeArea(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Navbar(
-                    isMobile: true,
-                  ),
-                  !searchController.isSearchBoolean
-                      ? defaultWidgetMobile()
-                      : searchWidgetMobile(),
-                ],
+          return Scaffold(
+            drawerEnableOpenDragGesture: false,
+            endDrawerEnableOpenDragGesture: false,
+            appBar: AppBar(
+              title: const BannerTopMobile(),
+              backgroundColor: AppColors.primaryColor,
+              iconTheme: const IconThemeData(color: AppColors.whiteColor),
+              actions: [
+                Container(),
+              ],
+            ),
+            body: SafeArea(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Navbar(
+                      isMobile: true,
+                    ),
+                    !searchController.isSearchBoolean
+                        ? defaultWidgetMobile()
+                        : searchWidgetMobile(),
+                  ],
+                ),
               ),
             ),
+            endDrawer: const LoginDrawer(),
           );
         }
-      }),
-      endDrawer: const LoginDrawer(),
+      },
     );
   }
 
@@ -250,6 +257,7 @@ class _ProductLayananPageState extends State<ProductLayananPage> {
                   return ItemLayananCardList(
                     data: layanan,
                     id: layanan.id!,
+                    isMobile: true,
                   );
                 },
               );
@@ -262,7 +270,6 @@ class _ProductLayananPageState extends State<ProductLayananPage> {
   }
 
   Widget ContentSection() {
-    final controller = context.watch<LayananController>();
     return Container(
       width: double.infinity,
       color: AppColors.whiteColor,
@@ -278,7 +285,33 @@ class _ProductLayananPageState extends State<ProductLayananPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    title.toString(),
+                    'Filter',
+                    style: AppTheme.blackTextStyle.copyWith(
+                      fontWeight: AppTheme.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  Text(
+                    'Entries : ${selectedPageSize.toInt()}',
+                    style: AppTheme.greyTextStyle.copyWith(
+                      fontSize: 14,
+                    ),
+                  ),
+                  FlutterAdvanceSlider(
+                    min: 0,
+                    max: 100,
+                    displayDivders: false,
+                    divderCount: 10,
+                    onChanged: (v) {
+                      setState(() {
+                        selectedPageSize = v;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Bidang Layanan',
                     style: AppTheme.blackTextStyle.copyWith(
                       fontWeight: AppTheme.bold,
                       fontSize: 18,
@@ -344,32 +377,30 @@ class _ProductLayananPageState extends State<ProductLayananPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  //Container untuk membuat Filtering Nantinya
-                  //Kemungkinan nanti pakai API
-                  // Container(
-                  //   alignment: Alignment.centerLeft,
-                  //   margin: const EdgeInsets.only(bottom: 20),
-                  //   height: 30,
-                  //   color: AppColors.greyColor,
-                  // ),
                   FutureBuilder(
                     future: widget.slugBidangLayanan == null
                         ? LayananServices.getAllLayanans(
-                            page: selectedPageNumber)
+                            page: selectedPageNumber,
+                            pageSize: selectedPageSize.toInt(),
+                          )
                         : LayananServices.getAllLayanans(
                             filter: true,
                             slugBidangLayanan: widget.slugBidangLayanan,
                             page: selectedPageNumber,
+                            pageSize: selectedPageSize.toInt(),
                           ),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
+                        return const Center(child: CircularProgressIndicator());
                       }
 
                       if (!snapshot.hasData) {
                         return Center(
-                            child: Text(snapshot.error.toString(),
-                                style: AppTheme.blackTextStyle));
+                          child: Text(
+                            snapshot.error.toString(),
+                            style: AppTheme.blackTextStyle,
+                          ),
+                        );
                       }
 
                       if (snapshot.hasData) {
@@ -389,7 +420,7 @@ class _ProductLayananPageState extends State<ProductLayananPage> {
                                 );
                               },
                             ),
-                            data.data!.length > 0
+                            data.data!.isNotEmpty
                                 ? NumberPagination(
                                     onPageChanged: (int pageNumber) {
                                       //do somthing for selected page
@@ -420,25 +451,20 @@ class _ProductLayananPageState extends State<ProductLayananPage> {
   }
 
   Widget ContentSectionMobile() {
-    final controller = context.watch<LayananController>();
     return Container(
       width: double.infinity,
       color: AppColors.whiteColor,
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 50.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const SizedBox(height: 20),
           SizedBox(
-            height: 50,
+            height: 35,
             child: FutureBuilder(
               future: LayananServices.getAllBidangLayanans(),
               builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
                 if (snapshot.hasData) {
                   final List data = snapshot.data as List;
 
@@ -498,23 +524,57 @@ class _ProductLayananPageState extends State<ProductLayananPage> {
             ),
           ),
           const SizedBox(height: 25),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Entries : ${selectedPageSize.toInt()}',
+                style: AppTheme.greyTextStyle.copyWith(
+                  fontSize: 14,
+                ),
+              ),
+              Expanded(
+                child: FlutterAdvanceSlider(
+                  min: 0,
+                  max: 100,
+                  displayDivders: false,
+                  divderCount: 10,
+                  onChanged: (v) {
+                    setState(() {
+                      selectedPageSize = v;
+                    });
+                  },
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 25),
           FutureBuilder(
             future: widget.slugBidangLayanan == null
-                ? LayananServices.getAllLayanans(page: selectedPageNumber)
+                ? LayananServices.getAllLayanans(
+                    page: selectedPageNumber,
+                    pageSize: selectedPageSize.toInt())
                 : LayananServices.getAllLayanans(
                     filter: true,
                     slugBidangLayanan: widget.slugBidangLayanan,
                     page: selectedPageNumber,
+                    pageSize: selectedPageSize.toInt(),
                   ),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
+                return const Padding(
+                  padding: EdgeInsets.all(40),
+                  child: Center(child: CircularProgressIndicator()),
+                );
               }
 
               if (!snapshot.hasData) {
                 return Center(
-                    child: Text(snapshot.error.toString(),
-                        style: AppTheme.blackTextStyle));
+                  child: Text(
+                    snapshot.error.toString(),
+                    style: AppTheme.blackTextStyle,
+                  ),
+                );
               }
 
               if (snapshot.hasData) {
@@ -525,7 +585,7 @@ class _ProductLayananPageState extends State<ProductLayananPage> {
                     ListView.builder(
                       padding: EdgeInsets.zero,
                       itemCount: data.data!.length,
-                      physics: NeverScrollableScrollPhysics(),
+                      physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       itemBuilder: (context, index) {
                         final LayananData layanan = data.data![index];
@@ -536,7 +596,7 @@ class _ProductLayananPageState extends State<ProductLayananPage> {
                         );
                       },
                     ),
-                    data.data!.length > 0
+                    data.data!.isNotEmpty
                         ? NumberPagination(
                             onPageChanged: (int pageNumber) {
                               //do somthing for selected page

@@ -10,12 +10,12 @@ class Navbar extends StatefulWidget {
 
 class _NavbarState extends State<Navbar> {
   Map<String, dynamic> user = {};
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      getDataUser();
-    });
+    getDataUser();
+    // context.read<CartController>().getDataCart();
   }
 
   getDataUser() async {
@@ -27,12 +27,15 @@ class _NavbarState extends State<Navbar> {
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.watch<NavbarController>();
     final cartController = context.watch<CartController>();
     final searchController = context.watch<PencarianController>();
-
+    final banyakData = cartController.carts
+        .where((cart) =>
+            cart['user']['id'] == user['id'] &&
+            cart['user']['email'] == user['email'])
+        .length
+        .toString();
     return Container(
-      width: double.infinity,
       height: 101,
       decoration: const BoxDecoration(
         color: AppColors.whiteColor,
@@ -62,7 +65,7 @@ class _NavbarState extends State<Navbar> {
                     ),
                   ),
                   !widget.isMobile!
-                      ? SizedBox(
+                      ? const SizedBox(
                           width: 24,
                         )
                       : Container(),
@@ -76,7 +79,7 @@ class _NavbarState extends State<Navbar> {
                 ],
               ),
             ),
-            Flexible(
+            Expanded(
               child: Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
@@ -87,7 +90,6 @@ class _NavbarState extends State<Navbar> {
                       searchController.setSearchBoolean(true);
                     } else {
                       searchController.setSearchBoolean(false);
-                      searchController.setValueSearch('');
                     }
                   },
                   decoration: InputDecoration(
@@ -147,29 +149,29 @@ class _NavbarState extends State<Navbar> {
                           color: Color(0xffe4e4e4),
                         ),
                       ),
-                      GestureDetector(
-                        onTap: () {
-                          context.go('/berita');
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: Row(
-                            children: [
-                              Text(
-                                'BERITA',
-                                style: AppTheme.secondaryTextStyle.copyWith(
-                                  fontWeight: AppTheme.semiBold,
-                                ),
-                              ),
-                              const Icon(
-                                Icons.keyboard_arrow_down_rounded,
-                                color: Color(0xffe4e4e4),
-                                size: 16,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                      // GestureDetector(
+                      //   onTap: () {
+                      //     context.go('/berita');
+                      //   },
+                      //   child: Padding(
+                      //     padding: const EdgeInsets.symmetric(horizontal: 12),
+                      //     child: Row(
+                      //       children: [
+                      //         Text(
+                      //           'BERITA',
+                      //           style: AppTheme.secondaryTextStyle.copyWith(
+                      //             fontWeight: AppTheme.semiBold,
+                      //           ),
+                      //         ),
+                      //         const Icon(
+                      //           Icons.keyboard_arrow_down_rounded,
+                      //           color: Color(0xffe4e4e4),
+                      //           size: 16,
+                      //         ),
+                      //       ],
+                      //     ),
+                      //   ),
+                      // ),
                       Container(
                         width: 1,
                         height: 16,
@@ -207,12 +209,7 @@ class _NavbarState extends State<Navbar> {
                               backgroundColor: AppColors.primaryColor,
                               radius: 8,
                               child: Text(
-                                cartController.carts
-                                    .where((cart) =>
-                                        cart['user']['id'] == user['id'] &&
-                                        cart['user']['email'] == user['email'])
-                                    .length
-                                    .toString(),
+                                user['id'] == null ? '0' : banyakData,
                                 style: AppTheme.whiteTextStyle
                                     .copyWith(fontSize: 10),
                               ),
@@ -245,12 +242,7 @@ class _NavbarState extends State<Navbar> {
                           backgroundColor: AppColors.primaryColor,
                           radius: 8,
                           child: Text(
-                            cartController.carts
-                                .where((cart) =>
-                                    cart['user']['id'] == user['id'] &&
-                                    cart['user']['email'] == user['email'])
-                                .length
-                                .toString(),
+                            user['id'] == null ? '0' : banyakData,
                             style:
                                 AppTheme.whiteTextStyle.copyWith(fontSize: 10),
                           ),

@@ -161,7 +161,7 @@ class HeroSectionCartMobile extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 40),
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
       color: AppColors.primaryColor,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -177,25 +177,26 @@ class HeroSectionCartMobile extends StatelessWidget {
             },
             styleBeforeHovered: heroPosition == 'KERANJANG BELANJA'
                 ? AppTheme.whiteTextStyle.copyWith(
-                    fontSize: 17,
+                    fontSize: 12,
                     fontWeight: AppTheme.bold,
                   )
                 : AppTheme.greyTextStyle.copyWith(
-                    fontSize: 17,
+                    fontSize: 12,
                     fontWeight: AppTheme.bold,
                     color: AppColors.softgreyColor,
                   ),
             styleHovered: AppTheme.whiteTextStyle.copyWith(
-              fontSize: 17,
+              fontSize: 12,
               fontWeight: AppTheme.bold,
             ),
           ),
-          const SizedBox(width: 5),
+          const SizedBox(width: 2),
           const Icon(
             Icons.arrow_right_alt_sharp,
             color: AppColors.softgreyColor,
+            size: 14,
           ),
-          const SizedBox(width: 5),
+          const SizedBox(width: 2),
           TextButtonHovered(
             text: 'PEMESANAN',
             onTap: () {
@@ -209,34 +210,35 @@ class HeroSectionCartMobile extends StatelessWidget {
             },
             styleBeforeHovered: heroPosition == 'PEMESANAN'
                 ? AppTheme.whiteTextStyle.copyWith(
-                    fontSize: 17,
+                    fontSize: 12,
                     fontWeight: AppTheme.bold,
                   )
                 : AppTheme.greyTextStyle.copyWith(
-                    fontSize: 17,
+                    fontSize: 12,
                     fontWeight: AppTheme.bold,
                     color: AppColors.softgreyColor,
                   ),
             styleHovered: AppTheme.whiteTextStyle.copyWith(
-              fontSize: 17,
+              fontSize: 12,
               fontWeight: AppTheme.bold,
             ),
           ),
-          const SizedBox(width: 5),
+          const SizedBox(width: 2),
           const Icon(
             Icons.arrow_right_alt_sharp,
             color: AppColors.softgreyColor,
+            size: 14,
           ),
-          const SizedBox(width: 5),
+          const SizedBox(width: 2),
           Text(
             'SELESAI',
             style: heroPosition == 'SELESAI'
                 ? AppTheme.whiteTextStyle.copyWith(
-                    fontSize: 17,
+                    fontSize: 12,
                     fontWeight: AppTheme.bold,
                   )
                 : AppTheme.greyTextStyle.copyWith(
-                    fontSize: 17,
+                    fontSize: 12,
                     fontWeight: AppTheme.bold,
                     color: AppColors.softgreyColor,
                   ),

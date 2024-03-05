@@ -180,6 +180,7 @@ class _DetailBeritaPageState extends State<DetailBeritaPage> {
                   return ItemLayananCardList(
                     data: layanan,
                     id: layanan.id!,
+                    isMobile: true,
                   );
                 },
               );
