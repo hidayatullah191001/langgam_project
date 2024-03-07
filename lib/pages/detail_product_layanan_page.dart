@@ -15,13 +15,16 @@ class DetailProductLayananPage extends StatefulWidget {
 class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
   String stateDesk = 'DESKRIPSI';
   Map<String, dynamic> user = {};
+  TextEditingController merkController = TextEditingController();
+  TextEditingController seriController = TextEditingController();
+  TextEditingController tipeController = TextEditingController();
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     getDataUser();
     context.read<WilayahController>().getAllDataProvinces();
-    context.read<LayananController>().getLayananBySlug(widget.slug);
     context.read<SettingController>().getSettingWeb();
   }
 
@@ -37,30 +40,35 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
     final layananController = context.watch<LayananController>();
     final searchController = context.watch<PencarianController>();
 
-    // return Consumer(
-    //   builder: (context, SettingController controller, widget) {
-    //     if (controller.dataState == DataState.loading) {
-    //       return Center(child: CircularProgressIndicator());
-    //     }
-    //     return LayoutBuilder(
-    //       builder: (context, constraints) {
-    //         if (constraints.maxWidth < 1200) {
-    //           return MobileView(searchController, context);
-    //         } else {
-    //           return WebView(layananController, searchController);
-    //         }
-    //       },
-    //     );
-    //   },
-    // );
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (constraints.maxWidth < 1200) {
-          return MobileView(searchController, context);
-        } else {
-          return WebView(layananController, searchController);
+    return FutureBuilder(
+      future: layananController.getLayananBySlug(widget.slug),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
         }
+        if (!snapshot.hasData) {
+          return Center(
+            child: Text(
+              'Failed to get Data, try again!',
+              style: AppTheme.blackTextStyle.copyWith(
+                fontWeight: AppTheme.bold,
+              ),
+            ),
+          );
+        }
+
+        if (snapshot.hasData) {
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth < 1200) {
+                return MobileView(searchController, context);
+              } else {
+                return WebView(layananController, searchController);
+              }
+            },
+          );
+        }
+        return Container();
       },
     );
   }
@@ -69,13 +77,13 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
       PencarianController searchController, BuildContext context) {
     return Consumer(builder: (context, SettingController controller, widget) {
       if (controller.dataState == DataState.loading) {
-        return Center(child: CircularProgressIndicator());
+        return const Center(child: CircularProgressIndicator());
       } else {
         return Scaffold(
           drawerEnableOpenDragGesture: false,
           endDrawerEnableOpenDragGesture: false,
           appBar: AppBar(
-            title: BannerTopMobile(),
+            title: const BannerTopMobile(),
             backgroundColor: AppColors.primaryColor,
             iconTheme: const IconThemeData(color: AppColors.whiteColor),
             actions: [
@@ -179,7 +187,7 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
 
           if (snapshot.hasData) {
             Layanan data = snapshot.data!;
-            if (data.data!.length < 1) {
+            if (data.data!.isEmpty) {
               return Center(
                 child: Column(
                   children: [
@@ -293,6 +301,7 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
   Widget ContentSection() {
     final controller = context.watch<LayananController>();
     final cartController = context.watch<CartController>();
+
     return Container(
       width: double.infinity,
       color: AppColors.whiteColor,
@@ -363,6 +372,7 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                 const SizedBox(width: 20),
                 Expanded(
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         controller.layanan!.attributes!.judul.toString(),
@@ -480,12 +490,6 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                             ),
                           ),
                           const SizedBox(width: 15),
-                          // Expanded(
-                          //   child: PrimaryButton(
-                          //     onTap: () {},
-                          //     titleButton: 'PESAN SEKARANG',
-                          //   ),
-                          // ),
                         ],
                       ),
                     ],
@@ -494,13 +498,13 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
               ],
             ),
           ),
-          Divider(),
+          const Divider(),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Column(
                 children: [
-                  stateDesk == 'DESKRIPSI'
+                  controller.stateDesk == 'DESKRIPSI'
                       ? Container(
                           width: 50,
                           height: 3,
@@ -513,11 +517,12 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                   TextButtonHovered(
                     text: 'DESKRIPSI',
                     onTap: () {
-                      setState(() {
-                        stateDesk = 'DESKRIPSI';
-                      });
+                      // setState(() {
+                      //   stateDesk = 'DESKRIPSI';
+                      // });
+                      controller.changeStateDesk('DESKRIPSI');
                     },
-                    styleBeforeHovered: stateDesk == 'DESKRIPSI'
+                    styleBeforeHovered: controller.stateDesk == 'DESKRIPSI'
                         ? AppTheme.blackTextStyle.copyWith(
                             fontSize: 18,
                             fontWeight: AppTheme.bold,
@@ -536,7 +541,7 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
               const SizedBox(width: 24),
               Column(
                 children: [
-                  stateDesk == 'SYARAT & KETENTUAN'
+                  controller.stateDesk == 'SYARAT & KETENTUAN'
                       ? Container(
                           width: 50,
                           height: 3,
@@ -549,19 +554,21 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                   TextButtonHovered(
                     text: 'SYARAT & KETENTUAN',
                     onTap: () {
-                      setState(() {
-                        stateDesk = 'SYARAT & KETENTUAN';
-                      });
+                      // setState(() {
+                      //   stateDesk = 'SYARAT & KETENTUAN';
+                      // });
+                      controller.changeStateDesk('SYARAT & KETENTUAN');
                     },
-                    styleBeforeHovered: stateDesk == 'SYARAT & KETENTUAN'
-                        ? AppTheme.blackTextStyle.copyWith(
-                            fontSize: 18,
-                            fontWeight: AppTheme.bold,
-                          )
-                        : AppTheme.greyTextStyle.copyWith(
-                            fontSize: 18,
-                            fontWeight: AppTheme.bold,
-                          ),
+                    styleBeforeHovered:
+                        controller.stateDesk == 'SYARAT & KETENTUAN'
+                            ? AppTheme.blackTextStyle.copyWith(
+                                fontSize: 18,
+                                fontWeight: AppTheme.bold,
+                              )
+                            : AppTheme.greyTextStyle.copyWith(
+                                fontSize: 18,
+                                fontWeight: AppTheme.bold,
+                              ),
                     styleHovered: AppTheme.blackTextStyle.copyWith(
                       fontSize: 18,
                       fontWeight: AppTheme.bold,
@@ -572,12 +579,12 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
             ],
           ),
           const SizedBox(height: 15),
-          stateDesk == 'DESKRIPSI'
+          controller.stateDesk == 'DESKRIPSI'
               ? ContentDeskripsi()
               : ContentSyaratKetentuan(),
           // Divider(),
           // UlasanSection(),
-          Divider(),
+          const Divider(),
           ProdukTerkaitSection(),
         ],
       ),
@@ -619,7 +626,6 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                   onTap: () {
                     context.go(
                         '/layanan/${controller.layanan!.attributes!.bidangLayanan!.attributes!.slug!}');
-                    ;
                   },
                   styleBeforeHovered: AppTheme.greyTextStyle,
                   styleHovered: AppTheme.blackTextStyle.copyWith(
@@ -651,7 +657,7 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  height: 360,
+                  height: 200,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
                     image: DecorationImage(
@@ -667,7 +673,7 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                     Text(
                       controller.layanan!.attributes!.judul.toString(),
                       style: AppTheme.blackTextStyle.copyWith(
-                        fontSize: 50,
+                        fontSize: 30,
                         fontWeight: AppTheme.bold,
                       ),
                     ),
@@ -788,13 +794,13 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
               ],
             ),
           ),
-          Divider(),
+          const Divider(),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Column(
                 children: [
-                  stateDesk == 'DESKRIPSI'
+                  controller.stateDesk == 'DESKRIPSI'
                       ? Container(
                           width: 50,
                           height: 3,
@@ -807,11 +813,9 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                   TextButtonHovered(
                     text: 'DESKRIPSI',
                     onTap: () {
-                      setState(() {
-                        stateDesk = 'DESKRIPSI';
-                      });
+                      controller.changeStateDesk('DESKRIPSI');
                     },
-                    styleBeforeHovered: stateDesk == 'DESKRIPSI'
+                    styleBeforeHovered: controller.stateDesk == 'DESKRIPSI'
                         ? AppTheme.blackTextStyle.copyWith(
                             fontSize: 18,
                             fontWeight: AppTheme.bold,
@@ -830,7 +834,7 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
               const SizedBox(width: 24),
               Column(
                 children: [
-                  stateDesk == 'SYARAT & KETENTUAN'
+                  controller.stateDesk == 'SYARAT & KETENTUAN'
                       ? Container(
                           width: 50,
                           height: 3,
@@ -843,19 +847,18 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                   TextButtonHovered(
                     text: 'SYARAT & KETENTUAN',
                     onTap: () {
-                      setState(() {
-                        stateDesk = 'SYARAT & KETENTUAN';
-                      });
+                      controller.changeStateDesk('SYARAT & KETENTUAN');
                     },
-                    styleBeforeHovered: stateDesk == 'SYARAT & KETENTUAN'
-                        ? AppTheme.blackTextStyle.copyWith(
-                            fontSize: 18,
-                            fontWeight: AppTheme.bold,
-                          )
-                        : AppTheme.greyTextStyle.copyWith(
-                            fontSize: 18,
-                            fontWeight: AppTheme.bold,
-                          ),
+                    styleBeforeHovered:
+                        controller.stateDesk == 'SYARAT & KETENTUAN'
+                            ? AppTheme.blackTextStyle.copyWith(
+                                fontSize: 18,
+                                fontWeight: AppTheme.bold,
+                              )
+                            : AppTheme.greyTextStyle.copyWith(
+                                fontSize: 18,
+                                fontWeight: AppTheme.bold,
+                              ),
                     styleHovered: AppTheme.blackTextStyle.copyWith(
                       fontSize: 18,
                       fontWeight: AppTheme.bold,
@@ -866,12 +869,10 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
             ],
           ),
           const SizedBox(height: 15),
-          stateDesk == 'DESKRIPSI'
+          controller.stateDesk == 'DESKRIPSI'
               ? ContentDeskripsi(isMobile: true)
               : ContentSyaratKetentuan(isMobile: true),
-          // Divider(),
-          // UlasanSection(),
-          Divider(),
+          const Divider(),
           ProdukTerkaitSectionMobile(),
         ],
       ),
@@ -883,7 +884,9 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
     final controller = context.watch<CartController>();
     final wilayahController = context.watch<WilayahController>();
     final layananController = context.watch<LayananController>();
-
+    String judulBidangLayanan = layananController
+        .layanan!.attributes!.bidangLayanan!.attributes!.judul
+        .toString();
     return Container(
       width: isMobile
           ? MediaQuery.of(context).size.width * 0.8
@@ -893,86 +896,104 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Pilih lokasi',
-              style: AppTheme.blackTextStyle.copyWith(
-                fontWeight: AppTheme.bold,
-              ),
-            ),
-            const SizedBox(height: 10),
-            // START PROVINSI
-            DropdownButtonFormField<String>(
-              value: wilayahController.selectedProvince,
-              onChanged: (String? value) {
-                wilayahController.setSelectedProvince(value);
-                if (wilayahController.selectedProvince!.isNotEmpty) {
-                  wilayahController
-                      .getAllDataCities(wilayahController.selectedProvince!);
-                }
-              },
-              decoration: InputDecoration(
-                hintStyle: AppTheme.greyTextStyle.copyWith(
-                  fontSize: 12,
-                ),
-                isDense: true,
-                border: OutlineInputBorder(
-                  borderSide:
-                      const BorderSide(color: AppColors.greyColor, width: 2),
-                  borderRadius: BorderRadius.circular(7),
-                ),
-              ),
-              items: wilayahController.provinces.map((data) {
-                return DropdownMenuItem<String>(
-                  value: data.attributes!.namaProvinsi,
-                  child: Text(data.attributes!.namaProvinsi.toString()),
-                );
-              }).toList(),
-              hint: Text('Pilih Provinsi', style: AppTheme.greyTextStyle),
-            ),
-            // END PROVINSI
+            judulBidangLayanan != 'Jasa Kalibrasi'
+                ? Column(children: [
+                    Text(
+                      'Pilih lokasi',
+                      style: AppTheme.blackTextStyle.copyWith(
+                        fontWeight: AppTheme.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    // START PROVINSI
+                    DropdownButtonFormField<String>(
+                      value: wilayahController.selectedProvince,
+                      onChanged: (String? value) {
+                        wilayahController.setSelectedProvince(value);
+                        if (wilayahController.selectedProvince!.isNotEmpty) {
+                          wilayahController.getAllDataCities(
+                              wilayahController.selectedProvince!);
+                        }
+                      },
+                      decoration: InputDecoration(
+                        hintStyle: AppTheme.greyTextStyle.copyWith(
+                          fontSize: 12,
+                        ),
+                        isDense: true,
+                        border: OutlineInputBorder(
+                          borderSide: const BorderSide(
+                              color: AppColors.greyColor, width: 2),
+                          borderRadius: BorderRadius.circular(7),
+                        ),
+                      ),
+                      items: wilayahController.provinces.map((data) {
+                        return DropdownMenuItem<String>(
+                          value: data.attributes!.namaProvinsi,
+                          child: Text(data.attributes!.namaProvinsi.toString()),
+                        );
+                      }).toList(),
+                      hint:
+                          Text('Pilih Provinsi', style: AppTheme.greyTextStyle),
+                    ),
+                    // END PROVINSI
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    // START OF KOTAS
+                    DropdownButtonFormField<String>(
+                      value: wilayahController.selectedCity,
+                      onChanged: (String? value) {
+                        setState(() {
+                          wilayahController.setSelectedCity(value);
+                          wilayahController.setSelectedDistrict(null);
+                        });
+                        if (wilayahController.selectedCity!.isNotEmpty) {
+                          wilayahController.getAllDataKecamatan(
+                              wilayahController.selectedCity!);
+                        }
+                      },
+                      decoration: InputDecoration(
+                        hintStyle: AppTheme.greyTextStyle.copyWith(
+                          fontSize: 12,
+                        ),
+                        isDense: true,
+                        border: OutlineInputBorder(
+                          borderSide: const BorderSide(
+                              color: AppColors.greyColor, width: 2),
+                          borderRadius: BorderRadius.circular(7),
+                        ),
+                      ),
+                      items: wilayahController
+                          .getCitiesByProvince(
+                              wilayahController.selectedProvince ?? "")
+                          .map((city) {
+                        return DropdownMenuItem<String>(
+                          value: city.attributes!.namaKota,
+                          child: Text(city.attributes!.namaKota.toString()),
+                        );
+                      }).toList(),
+                      hint: Text('Pilih Kota', style: AppTheme.greyTextStyle),
+                    ),
+                  ])
+                : Column(children: [
+                    CustomFormUser(
+                      title: 'Merk',
+                      controller: merkController,
+                    ),
+                    const SizedBox(height: 10),
+                    CustomFormUser(
+                      title: 'Tipe',
+                      controller: tipeController,
+                    ),
+                    const SizedBox(height: 10),
+                    CustomFormUser(
+                      title: 'Seri',
+                      controller: seriController,
+                    ),
+                    const SizedBox(height: 10),
+                  ]),
             const SizedBox(
-              height: 10,
-            ),
-            // START OF KOTAS
-            DropdownButtonFormField<String>(
-              value: wilayahController.selectedCity,
-              onChanged: (String? value) {
-                setState(() {
-                  wilayahController.setSelectedCity(value);
-                  wilayahController.setSelectedDistrict(null);
-                });
-                if (wilayahController.selectedCity!.isNotEmpty) {
-                  wilayahController
-                      .getAllDataKecamatan(wilayahController.selectedCity!);
-                }
-              },
-              decoration: InputDecoration(
-                hintStyle: AppTheme.greyTextStyle.copyWith(
-                  fontSize: 12,
-                ),
-                isDense: true,
-                border: OutlineInputBorder(
-                  borderSide:
-                      const BorderSide(color: AppColors.greyColor, width: 2),
-                  borderRadius: BorderRadius.circular(7),
-                ),
-              ),
-              items: wilayahController
-                  .getCitiesByProvince(wilayahController.selectedProvince ?? "")
-                  .map((city) {
-                return DropdownMenuItem<String>(
-                  value: city.attributes!.namaKota,
-                  child: Text(city.attributes!.namaKota.toString()),
-                );
-              }).toList(),
-              hint: Text('Pilih Kota', style: AppTheme.greyTextStyle),
-            ),
-            // END OF KOTAS
-            const SizedBox(
-              height: 10,
-            ),
-            const SizedBox(
-              height: 12,
+              height: 25,
             ),
             PrimaryButton(
               onTap: () {
@@ -991,21 +1012,43 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                     ),
                   );
                 } else {
-                  final productItem = {
-                    'user': user,
-                    'product': {
-                      'id': layananController.layanan!.id,
-                      'judul': layananController.layanan!.attributes!.judul,
-                      'harga': layananController.layanan!.attributes!.harga,
-                      'satuan': layananController.layanan!.attributes!.satuan,
-                      'gambar': layananController
-                          .layanan!.attributes!.gambar!.data!.attributes?.url,
-                    },
-                    'provinsi': wilayahController.selectedProvince,
-                    'kota': wilayahController.selectedCity,
-                    'item': controller.itemsCount.toString(),
-                    'totalHarga': controller.totalHarga.toString(),
-                  };
+                  Map<String, dynamic> productItem = {};
+                  if (judulBidangLayanan != 'Jasa Kalibrasi') {
+                    productItem = {
+                      'user': user,
+                      'product': {
+                        'id': layananController.layanan!.id,
+                        'judul': layananController.layanan!.attributes!.judul,
+                        'harga': layananController.layanan!.attributes!.harga,
+                        'satuan': layananController.layanan!.attributes!.satuan,
+                        'gambar': layananController
+                            .layanan!.attributes!.gambar!.data!.attributes?.url,
+                        'bidang-layanan': judulBidangLayanan,
+                      },
+                      'provinsi': wilayahController.selectedProvince,
+                      'kota': wilayahController.selectedCity,
+                      'item': controller.itemsCount.toString(),
+                      'totalHarga': controller.totalHarga.toString(),
+                    };
+                  } else {
+                    productItem = {
+                      'user': user,
+                      'product': {
+                        'id': layananController.layanan!.id,
+                        'judul': layananController.layanan!.attributes!.judul,
+                        'harga': layananController.layanan!.attributes!.harga,
+                        'satuan': layananController.layanan!.attributes!.satuan,
+                        'gambar': layananController
+                            .layanan!.attributes!.gambar!.data!.attributes?.url,
+                        'bidang-layanan': judulBidangLayanan,
+                      },
+                      'merk': merkController.text,
+                      'seri': seriController.text,
+                      'tipe': tipeController.text,
+                      'item': controller.itemsCount.toString(),
+                      'totalHarga': controller.totalHarga.toString(),
+                    };
+                  }
                   controller.addToCart(productItem);
                   wilayahController.setSelectedProvince(null);
                   wilayahController.setSelectedCity(null);
@@ -1030,7 +1073,7 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
     final String bidangLayananId =
         controller.layanan!.attributes!.bidangLayanan!.id.toString();
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 150, vertical: 50.0),
+      padding: const EdgeInsets.symmetric(horizontal: 150, vertical: 50.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
@@ -1057,7 +1100,7 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                   LayananServices.getLayananByBidangLayananId(bidangLayananId),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
+                  return const Center(
                     child: CircularProgressIndicator(),
                   );
                 }
@@ -1085,54 +1128,52 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                           left: index == 0 ? 0 : 8,
                           right: index == 3 ? 0 : 8,
                         ),
-                        child: Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                height: 150,
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    image: NetworkImage(
-                                        '${Constant.host}${layanan.attributes!.gambar!.data!.attributes!.url ?? ''}'),
-                                    fit: BoxFit.cover,
-                                  ),
-                                  borderRadius: BorderRadius.circular(12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              height: 150,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: NetworkImage(
+                                      '${Constant.host}${layanan.attributes!.gambar!.data!.attributes!.url ?? ''}'),
+                                  fit: BoxFit.cover,
                                 ),
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                              const SizedBox(height: 10),
-                              Text(
-                                layanan.attributes!.judul.toString(),
-                                style: AppTheme.blackTextStyle
-                                    .copyWith(fontWeight: AppTheme.bold),
-                              ),
-                              const SizedBox(height: 20),
-                              Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      AppMethods.currency(
-                                          layanan.attributes!.harga.toString()),
-                                      style: AppTheme.primaryTextStyle.copyWith(
-                                        fontWeight: AppTheme.bold,
-                                      ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              layanan.attributes!.judul.toString(),
+                              style: AppTheme.blackTextStyle
+                                  .copyWith(fontWeight: AppTheme.bold),
+                            ),
+                            const SizedBox(height: 20),
+                            Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    AppMethods.currency(
+                                        layanan.attributes!.harga.toString()),
+                                    style: AppTheme.primaryTextStyle.copyWith(
+                                      fontWeight: AppTheme.bold,
                                     ),
-                                    const SizedBox(width: 5),
-                                    Text(
-                                      layanan.attributes!.satuan.toString(),
-                                      style: AppTheme.greyTextStyle,
-                                    ),
-                                  ]),
-                              const SizedBox(height: 10),
-                              PrimaryButton(
-                                onTap: () {
-                                  context.go(
-                                      '/layanan/${layanan.attributes!.slug}');
-                                },
-                                titleButton: 'LIHAT DETAIL',
-                              ),
-                            ],
-                          ),
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    layanan.attributes!.satuan.toString(),
+                                    style: AppTheme.greyTextStyle,
+                                  ),
+                                ]),
+                            const SizedBox(height: 10),
+                            PrimaryButton(
+                              onTap: () {
+                                context
+                                    .go('/layanan/${layanan.attributes!.slug}');
+                              },
+                              titleButton: 'LIHAT DETAIL',
+                            ),
+                          ],
                         ),
                       );
                     },
@@ -1180,7 +1221,7 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                   LayananServices.getLayananByBidangLayananId(bidangLayananId),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
+                  return const Center(
                     child: CircularProgressIndicator(),
                   );
                 }
@@ -1199,11 +1240,11 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                     padding: EdgeInsets.zero,
                     scrollDirection: Axis.horizontal,
                     shrinkWrap: true,
-                    itemCount: data.data!.length >= 3 ? 3 : data.data!.length,
+                    itemCount: data.data!.length >= 5 ? 5 : data.data!.length,
                     itemBuilder: (context, index) {
                       final layanan = data.data![index];
                       return Container(
-                        width: MediaQuery.of(context).size.width * 0.3,
+                        width: MediaQuery.of(context).size.width * 0.6,
                         padding: EdgeInsets.only(
                           left: index == 0 ? 0 : 8,
                           right: index == 3 ? 0 : 8,
@@ -1286,7 +1327,7 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                 ListView.builder(
                   padding: EdgeInsets.zero,
                   shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
+                  physics: const NeverScrollableScrollPhysics(),
                   itemCount: ulasanUser.length,
                   itemBuilder: (context, index) {
                     final Map data = ulasanUser[index];
@@ -1420,17 +1461,10 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                     ),
                   );
                 }
+                return null;
               },
             )
           : Container(),
-      // child: Column(
-      //   children: [
-      //     Text(
-      //       'Informasi cuaca memainkan peran kunci dalam kegiatan olahraga dengan berbagai manfaat, termasuk:',
-      //       style: AppTheme.greyTextStyle,
-      //     ),
-      //   ],
-      // ),
     );
   }
 
@@ -1482,8 +1516,8 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 const Padding(
-                                  padding: const EdgeInsets.only(top: 13.0),
-                                  child: const Icon(
+                                  padding: EdgeInsets.only(top: 13.0),
+                                  child: Icon(
                                     Icons.circle,
                                     size: 7,
                                     color: AppColors.greyColor,
@@ -1503,7 +1537,7 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                               ],
                             ),
                           );
-                        }).toList(),
+                        }),
                         const SizedBox(height: 20),
                       ],
                     );
@@ -1549,8 +1583,8 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 const Padding(
-                                  padding: const EdgeInsets.only(top: 13.0),
-                                  child: const Icon(
+                                  padding: EdgeInsets.only(top: 13.0),
+                                  child: Icon(
                                     Icons.circle,
                                     size: 7,
                                     color: AppColors.greyColor,
@@ -1572,7 +1606,7 @@ class _DetailProductLayananPageState extends State<DetailProductLayananPage> {
                               ],
                             ),
                           );
-                        }).toList(),
+                        }),
                         const SizedBox(height: 20),
                       ],
                     );

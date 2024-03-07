@@ -71,32 +71,67 @@ class CheckoutController extends ChangeNotifier {
         final data = cart[i];
         String lokasiPesanan = "${data['kota']} - ${data['provinsi']}";
 
-        PermintaanFormModel model = PermintaanFormModel(
-          data: Data(
-            nama: "${namaDepanController.text} ${namaBelakangController.text}",
-            email: alamatEmailController.text,
-            alamat: alamatJalanController.text,
-            telepon: teleponController.text,
-            perusahaan: namaPerusahaanController.text,
-            provinsi: provinsi,
-            kota: kota,
-            kecamatan: kecamatan,
-            status: "Permintaan Masuk",
-            komersial: isKomersial,
-            metadata: [
-              Metadata(field: "Lokasi Pesanan", data: lokasiPesanan),
-              Metadata(
-                  field: "Catatan User", data: catatanPesananController.text),
-            ],
-            customerUser: data['user']['id'].toString(),
-            harga: data['product']['harga'],
-            kuantitas: int.parse(data['item']),
-            layanan: data['product']['id'].toString(),
-            total: int.parse(data['totalHarga']),
-            nomorPermintaan: AppMethods.generateOrderString(14),
-          ),
-        );
-        response = await CheckoutService.createPermintaanUser(model);
+        final bidangLayanan = data['product']['bidang-layanan'];
+
+        if (bidangLayanan != 'Jasa Kalibrasi') {
+          PermintaanFormModel model = PermintaanFormModel(
+            data: Data(
+              nama:
+                  "${namaDepanController.text} ${namaBelakangController.text}",
+              email: alamatEmailController.text,
+              alamat: alamatJalanController.text,
+              telepon: teleponController.text,
+              perusahaan: namaPerusahaanController.text,
+              provinsi: provinsi,
+              kota: kota,
+              kecamatan: kecamatan,
+              status: "Permintaan Masuk",
+              komersial: isKomersial,
+              metadata: [
+                Metadata(field: "Lokasi Pesanan", data: lokasiPesanan),
+                Metadata(
+                    field: "Catatan User", data: catatanPesananController.text),
+              ],
+              customerUser: data['user']['id'].toString(),
+              harga: data['product']['harga'],
+              kuantitas: int.parse(data['item']),
+              layanan: data['product']['id'].toString(),
+              total: int.parse(data['totalHarga']),
+              nomorPermintaan: AppMethods.generateOrderString(14),
+            ),
+          );
+          response = await CheckoutService.createPermintaanUser(model);
+        } else {
+          PermintaanFormModel model = PermintaanFormModel(
+            data: Data(
+              nama:
+                  "${namaDepanController.text} ${namaBelakangController.text}",
+              email: alamatEmailController.text,
+              alamat: alamatJalanController.text,
+              telepon: teleponController.text,
+              perusahaan: namaPerusahaanController.text,
+              provinsi: provinsi,
+              kota: kota,
+              kecamatan: kecamatan,
+              status: "Permintaan Masuk",
+              komersial: isKomersial,
+              metadata: [
+                Metadata(field: "Tipe", data: data['tipe']),
+                Metadata(field: "Seri", data: data['seri']),
+                Metadata(field: "Merk", data: data['merk']),
+                Metadata(
+                    field: "Catatan User", data: catatanPesananController.text),
+              ],
+              customerUser: data['user']['id'].toString(),
+              harga: data['product']['harga'],
+              kuantitas: int.parse(data['item']),
+              layanan: data['product']['id'].toString(),
+              total: int.parse(data['totalHarga']),
+              nomorPermintaan: AppMethods.generateOrderString(14),
+            ),
+          );
+          response = await CheckoutService.createPermintaanUser(model);
+        }
       }
       if (response['success'] == true) {
         // permintaanModel.PermintaanModel permintaan =

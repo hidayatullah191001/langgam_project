@@ -426,15 +426,18 @@ class _DetailPesananSectionMobileState
                   ? 'Komersial'
                   : 'Free',
         ),
-        ItemDetailPesananMobile(
-          title: 'Lokasi Pesanan:',
-          price:
-              '${permintaanController.dataPermintaan.attributes!.metadata![0].data}',
-        ),
-        ItemDetailPesananMobile(
-          title: 'Catatan User:',
-          price:
-              '${permintaanController.dataPermintaan.attributes!.metadata![1].data}',
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: permintaanController.dataPermintaan.attributes!.metadata
+                  ?.map(
+                    (item) => ItemDetailPesananMobile(
+                      title: item.field.toString(),
+                      price: item.data ??
+                          'Tidak ada', // Menggunakan data dari setiap elemen
+                    ),
+                  )
+                  .toList() ??
+              [], // Menggunakan elvis operator untuk mengatasi jika metadata null
         ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,

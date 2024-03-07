@@ -202,7 +202,7 @@ class _ProductLayananPageState extends State<ProductLayananPage> {
     return Container(
       width: double.infinity,
       color: AppColors.whiteColor,
-      padding: EdgeInsets.symmetric(
+      padding: const EdgeInsets.symmetric(
         horizontal: 10,
       ),
       child: FutureBuilder(

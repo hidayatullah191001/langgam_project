@@ -331,19 +331,24 @@ class _FooterMobileState extends State<FooterMobile> {
   @override
   void initState() {
     super.initState();
-    context.read<SettingController>().getSettingWeb();
+    // getSettingWeb();
   }
+
+  // getSettingWeb() async {
+  //   await context.read<SettingController>().getSettingWeb();
+  // }
 
   @override
   Widget build(BuildContext context) {
-    final settingController = context.watch<SettingController>();
-    final setting = settingController.setting.data!.attributes!;
+    // final settingController = context.watch<SettingController>();
+    // final setting = settingController.setting.data!.attributes!;
     return Container(
       width: double.infinity,
       color: AppColors.footerprimaryColor,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
       child: Consumer(builder: (context, SettingController controller, widget) {
         if (controller.dataState == DataState.filled) {
+          final setting = controller.setting.data!.attributes!;
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

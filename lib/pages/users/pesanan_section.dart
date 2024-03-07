@@ -388,7 +388,7 @@ class _DetailPesananSectionState extends State<DetailPesananSection> {
                         'Permintaan anda berhasil kami terima. Harap upload surat permintaan terlebih dahulu untuk melanjutkan proses'),
                 const StatusWidget(
                     message: 'Permintaan anda telah ditolak oleh admin'),
-              ] else if (status == "Menunggu pembayaran") ...[
+              ] else if (status == "Menunggu Pembayaran") ...[
                 const StatusWidget(
                     message:
                         'Permintaan anda berhasil kami terima. Harap upload surat permintaan terlebih dahulu untuk melanjutkan proses'),
@@ -479,16 +479,40 @@ class _DetailPesananSectionState extends State<DetailPesananSection> {
                   ? 'Komersial'
                   : 'Free',
         ),
-        ItemDetailPesanan(
-          title: 'Lokasi Pesanan:',
-          price:
-              '${permintaanController.dataPermintaan.attributes!.metadata![0].data}',
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: permintaanController.dataPermintaan.attributes!.metadata
+                  ?.map(
+                    (item) => ItemDetailPesanan(
+                      title: item.field.toString(),
+                      price: item.data ??
+                          'Tidak ada', // Menggunakan data dari setiap elemen
+                    ),
+                  )
+                  .toList() ??
+              [], // Menggunakan elvis operator untuk mengatasi jika metadata null
         ),
-        ItemDetailPesanan(
-          title: 'Catatan User:',
-          price:
-              '${permintaanController.dataPermintaan.attributes!.metadata![1].data}',
-        ),
+
+        // ItemDetailPesanan(
+        //   title: 'Tipe item :',
+        //   price:
+        //       '${permintaanController.dataPermintaan.attributes!.metadata![0].data}',
+        // ),
+        // ItemDetailPesanan(
+        //   title: 'Seri item :',
+        //   price:
+        //       '${permintaanController.dataPermintaan.attributes!.metadata![1].data}',
+        // ),
+        // ItemDetailPesanan(
+        //   title: 'Merk Item :',
+        //   price:
+        //       '${permintaanController.dataPermintaan.attributes!.metadata![2].data}',
+        // ),
+        // ItemDetailPesanan(
+        //   title: 'Catatan User :',
+        //   price:
+        //       '${permintaanController.dataPermintaan.attributes!.metadata![3].data}',
+        // ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

@@ -7,7 +7,7 @@ import 'package:langgam_project/pages/pages.dart';
 import 'package:provider/provider.dart';
 
 void main() {
-  // debugPrint = (String? message, {int? wrapWidth}) => null;
+  debugPrint = (String? message, {int? wrapWidth}) => null;
 
   runApp(
     MultiProvider(

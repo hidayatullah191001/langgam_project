@@ -19,6 +19,14 @@ class LayananController extends ChangeNotifier {
   LayananData? _layanan;
   LayananData? get layanan => _layanan;
 
+  String _stateDesk = 'DESKRIPSI';
+  String get stateDesk => _stateDesk;
+
+  changeStateDesk(String value) {
+    _stateDesk = value;
+    notifyListeners();
+  }
+
   void getDataLayanans({String? slug}) async {
     final Layanan data;
 
@@ -66,10 +74,14 @@ class LayananController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void getLayananBySlug(String slug) async {
+  Future<dynamic> getLayananBySlug(String slug) async {
     final Layanan data = await LayananServices.getLayananBySlug(slug);
-    _layanan = data.data![0];
-    notifyListeners();
+    if (data != null) {
+      _layanan = data.data![0];
+      return data;
+    } else {
+      return null;
+    }
   }
 
   // void setLayananFromApi(Layanan? data) {

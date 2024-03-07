@@ -19,26 +19,6 @@ class _IndexPageState extends State<IndexPage> {
     context.read<SettingController>().getSettingWeb();
   }
 
-  void _scrollToNext() {
-    double targetPosition = _scrollController.position.pixels + 300.0;
-    _scrollController.animateTo(
-      targetPosition,
-      duration: Duration(milliseconds: 500),
-      curve: Curves.easeInOut,
-    );
-  }
-
-  void _scrollToBefore() {
-    double targetPosition = _scrollController.position.pixels - 300.0;
-    _scrollController.animateTo(
-      targetPosition,
-      duration: Duration(milliseconds: 500),
-      curve: Curves.easeInOut,
-    );
-  }
-
-  bool isSearchBoolean = false;
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -63,7 +43,7 @@ class _IndexPageState extends State<IndexPage> {
         drawerEnableOpenDragGesture: false,
         endDrawerEnableOpenDragGesture: false,
         appBar: AppBar(
-          title: BannerTopMobile(),
+          title: const BannerTopMobile(),
           backgroundColor: AppColors.primaryColor,
           actions: [
             Container(),
@@ -132,7 +112,7 @@ class _IndexPageState extends State<IndexPage> {
     return Container(
       width: double.infinity,
       color: AppColors.whiteColor,
-      padding: EdgeInsets.symmetric(
+      padding: const EdgeInsets.symmetric(
         horizontal: 150.0,
       ),
       child: FutureBuilder(
@@ -151,7 +131,7 @@ class _IndexPageState extends State<IndexPage> {
 
           if (snapshot.hasData) {
             Layanan data = snapshot.data!;
-            if (data.data!.length < 1) {
+            if (data.data!.isEmpty) {
               return Center(
                 child: Column(
                   children: [

@@ -84,9 +84,10 @@ class _NavbarState extends State<Navbar> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
                 child: TextFormField(
+                  controller: searchController.cariController,
                   onChanged: (value) {
                     searchController.setValueSearch(value);
-                    if (value.length > 0) {
+                    if (value.isNotEmpty) {
                       searchController.setSearchBoolean(true);
                     } else {
                       searchController.setSearchBoolean(false);
@@ -103,6 +104,8 @@ class _NavbarState extends State<Navbar> {
                             onTap: () {
                               searchController.setSearchBoolean(false);
                               searchController.setValueSearch('');
+                              searchController.cariController.clear();
+                              setState(() {});
                             },
                             child: const Icon(
                               Icons.highlight_remove_rounded,

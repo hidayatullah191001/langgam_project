@@ -1,6 +1,7 @@
 part of 'controller.dart';
 
 class PencarianController extends ChangeNotifier {
+  TextEditingController cariController = TextEditingController();
   String? value;
   String get valueSearch => value!;
 
@@ -9,6 +10,9 @@ class PencarianController extends ChangeNotifier {
 
   void setValueSearch(String? v) {
     value = v!;
+    if (value == '') {
+      _isSearchBoolean = false;
+    }
     notifyListeners();
   }
 

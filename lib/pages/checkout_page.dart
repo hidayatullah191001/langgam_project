@@ -777,11 +777,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
-                          child: Row(
+                          child: Column(
                             children: [
                               Container(
-                                width: 60,
-                                height: 50,
+                                width: 100,
+                                height: 80,
                                 decoration: BoxDecoration(
                                   image: DecorationImage(
                                     image: NetworkImage(
@@ -792,12 +792,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 ),
                               ),
                               const SizedBox(width: 10),
-                              Expanded(
-                                child: Text(
-                                  '${productCart['product']['judul']} x ${productCart['item']}',
-                                  style: AppTheme.primaryTextStyle.copyWith(
-                                    fontSize: 14,
-                                  ),
+                              Text(
+                                '${productCart['product']['judul']} x ${productCart['item']}',
+                                style: AppTheme.primaryTextStyle.copyWith(
+                                  fontSize: 14,
                                 ),
                               ),
                             ],

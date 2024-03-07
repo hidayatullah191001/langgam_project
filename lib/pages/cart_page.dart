@@ -280,170 +280,179 @@ class _CartPageState extends State<CartPage> {
 
     return Container(
       width: double.infinity,
-      color: AppColors.backgroundColor3,
+      margin: const EdgeInsets.symmetric(horizontal: 100),
       padding: const EdgeInsets.symmetric(
         horizontal: 20,
         vertical: 50,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          carts.isEmpty
-              ? Center(
+      child: carts.isEmpty
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Lottie.asset(
+                    'lottie/empty_cart.json',
+                    width: 150,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Keranjang kamu masih kosong',
+                    style: AppTheme.greyTextStyle.copyWith(
+                      fontSize: 14,
+                      fontWeight: AppTheme.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  PrimaryButton(
+                    onTap: () {
+                      context.go('/layanan');
+                    },
+                    titleButton: 'LIHAT SEMUA LAYANAN',
+                  )
+                ],
+              ),
+            )
+          : Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Container(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 15),
+                        const Divider(),
+                        ListView.builder(
+                          shrinkWrap: true,
+                          padding: EdgeInsets.zero,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: carts.length,
+                          itemBuilder: (context, index) {
+                            final productCart = carts[index];
+                            return ItemCartProduct(context,
+                                data: productCart, index: index);
+                          },
+                        ),
+                        const Divider(),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 30),
+                Container(
+                  width: 300,
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: AppColors.softgreyColor,
+                      width: 3,
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Lottie.asset(
-                        'lottie/empty_cart.json',
-                        width: 150,
-                      ),
-                      const SizedBox(height: 10),
                       Text(
-                        'Keranjang kamu masih kosong',
-                        style: AppTheme.greyTextStyle.copyWith(
-                          fontSize: 14,
+                        'TOTAL KERANJANG BELANJA',
+                        style: AppTheme.blackTextStyle.copyWith(
                           fontWeight: AppTheme.bold,
+                          fontSize: 24,
                         ),
                       ),
-                      const SizedBox(height: 15),
-                      PrimaryButton(
-                        onTap: () {
-                          context.go('/layanan');
-                        },
-                        titleButton: 'LIHAT SEMUA LAYANAN',
-                      )
+                      const SizedBox(height: 20),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 6,
+                              horizontal: 10,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Subtotal',
+                                  style: AppTheme.blackTextStyle.copyWith(
+                                    fontWeight: AppTheme.bold,
+                                  ),
+                                ),
+                                Text(
+                                  AppMethods.currency(
+                                    cartController
+                                        .getTotalHargaAllItem()
+                                        .toString(),
+                                  ),
+                                  style: AppTheme.greyTextStyle,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Divider(),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 6,
+                          horizontal: 10,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Total',
+                              style: AppTheme.blackTextStyle.copyWith(
+                                  fontWeight: AppTheme.bold, fontSize: 18),
+                            ),
+                            Text(
+                              AppMethods.currency(
+                                cartController
+                                    .getTotalHargaAllItem()
+                                    .toString(),
+                              ),
+                              style: AppTheme.primaryTextStyle.copyWith(
+                                fontSize: 20,
+                                fontWeight: AppTheme.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                      SizedBox(
+                        width: double.infinity,
+                        child: PrimaryButton(
+                          onTap: () {
+                            if (user['token'] == null &&
+                                user['email'] == null &&
+                                user['id'] == null) {
+                              CoolAlert.show(
+                                context: context,
+                                width: MediaQuery.of(context).size.width * 0.3,
+                                type: CoolAlertType.error,
+                                text:
+                                    'Maaf, kamu harus login atau daftar terlebih dahulu',
+                              ).then((value) => context.go('/register'));
+                            } else {
+                              if (cartController.carts.length > 0) {
+                                context.go('/cart/checkout');
+                              } else {
+                                AppMethods.coolAlertDanger(context,
+                                    'Keranjang kamu masih kosong, pilih layanan dahulu');
+                              }
+                            }
+                          },
+                          titleButton: 'LANJUTKAN KE CHECKOUT',
+                          fontSize: 14,
+                        ),
+                      ),
                     ],
                   ),
                 )
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 15),
-                    const Divider(),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      padding: EdgeInsets.zero,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: carts.length,
-                      itemBuilder: (context, index) {
-                        final productCart = carts[index];
-                        return ItemCartProduct(context,
-                            data: productCart, index: index);
-                      },
-                    ),
-                    const Divider(),
-                  ],
-                ),
-          const SizedBox(height: 30),
-          Container(
-            padding: const EdgeInsets.all(24),
-            margin: const EdgeInsets.symmetric(horizontal: 100),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: AppColors.softgreyColor,
-                width: 3,
-              ),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'TOTAL KERANJANG BELANJA',
-                  style: AppTheme.blackTextStyle.copyWith(
-                    fontWeight: AppTheme.bold,
-                    fontSize: 24,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 6,
-                        horizontal: 10,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Subtotal',
-                            style: AppTheme.blackTextStyle.copyWith(
-                              fontWeight: AppTheme.bold,
-                            ),
-                          ),
-                          Text(
-                            AppMethods.currency(
-                              cartController.getTotalHargaAllItem().toString(),
-                            ),
-                            style: AppTheme.greyTextStyle,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Divider(),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 6,
-                    horizontal: 10,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Total',
-                        style: AppTheme.blackTextStyle
-                            .copyWith(fontWeight: AppTheme.bold, fontSize: 18),
-                      ),
-                      Text(
-                        AppMethods.currency(
-                          cartController.getTotalHargaAllItem().toString(),
-                        ),
-                        style: AppTheme.primaryTextStyle.copyWith(
-                          fontSize: 20,
-                          fontWeight: AppTheme.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 30),
-                SizedBox(
-                  width: double.infinity,
-                  child: PrimaryButton(
-                    onTap: () {
-                      if (user['token'] == null &&
-                          user['email'] == null &&
-                          user['id'] == null) {
-                        CoolAlert.show(
-                          context: context,
-                          width: MediaQuery.of(context).size.width * 0.3,
-                          type: CoolAlertType.error,
-                          text:
-                              'Maaf, kamu harus login atau daftar terlebih dahulu',
-                        ).then((value) => context.go('/register'));
-                      } else {
-                        if (cartController.carts.length > 0) {
-                          context.go('/cart/checkout');
-                        } else {
-                          AppMethods.coolAlertDanger(context,
-                              'Keranjang kamu masih kosong, pilih layanan dahulu');
-                        }
-                      }
-                    },
-                    titleButton: 'LANJUTKAN KE CHECKOUT',
-                    fontSize: 14,
-                  ),
-                ),
               ],
             ),
-          )
-        ],
-      ),
     );
   }
 
@@ -629,7 +638,7 @@ class _CartPageState extends State<CartPage> {
     cartController.setTotalHarga(int.parse(data['totalHarga']));
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 100),
+      // margin: const EdgeInsets.symmetric(horizontal: 100),
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 7),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -643,9 +652,9 @@ class _CartPageState extends State<CartPage> {
               color: AppColors.greyColor,
             ),
           ),
-          const SizedBox(width: 20),
+          const SizedBox(width: 10),
           Container(
-            width: 100,
+            width: 120,
             height: 80,
             decoration: BoxDecoration(
               image: DecorationImage(
@@ -656,14 +665,28 @@ class _CartPageState extends State<CartPage> {
               borderRadius: BorderRadius.circular(8),
             ),
           ),
-          const SizedBox(width: 20),
-          Text(
-            data['product']['judul'].toString(),
-            style: AppTheme.blackTextStyle
-                .copyWith(fontWeight: AppTheme.bold, fontSize: 14),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              data['product']['judul'].toString(),
+              style: AppTheme.blackTextStyle
+                  .copyWith(fontWeight: AppTheme.bold, fontSize: 14),
+            ),
           ),
-          Spacer(),
-          Row(
+          const SizedBox(width: 10),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ItemMetaData(title: 'Tipe', value: data['tipe'] ?? ''),
+              ItemMetaData(title: 'Merk', value: data['merk'] ?? ''),
+              ItemMetaData(title: 'Seri', value: data['seri'] ?? ''),
+              ItemMetaData(title: 'Provinsi', value: data['provinsi'] ?? ''),
+              ItemMetaData(title: 'Kota', value: data['kota'] ?? ''),
+            ],
+          ),
+          const SizedBox(width: 10),
+          Column(
             children: [
               Text(
                 AppMethods.currency(data['product']['harga'].toString()),
@@ -677,7 +700,7 @@ class _CartPageState extends State<CartPage> {
               ),
             ],
           ),
-          Spacer(),
+          const SizedBox(width: 10),
           Row(
             children: [
               InkWell(
@@ -737,7 +760,7 @@ class _CartPageState extends State<CartPage> {
               ),
             ],
           ),
-          const SizedBox(width: 20),
+          const SizedBox(width: 10),
           Text(
             AppMethods.currency(cartController.totalHarga.toString()),
             style: AppTheme.primaryTextStyle.copyWith(
@@ -771,10 +794,10 @@ class _CartPageState extends State<CartPage> {
                   color: AppColors.greyColor,
                 ),
               ),
-              const SizedBox(width: 20),
+              const SizedBox(width: 10),
               Container(
-                width: 150,
-                height: 120,
+                width: 80,
+                height: 60,
                 decoration: BoxDecoration(
                   image: DecorationImage(
                     image: NetworkImage(
@@ -797,17 +820,15 @@ class _CartPageState extends State<CartPage> {
                       .copyWith(fontWeight: AppTheme.bold, fontSize: 14),
                 ),
                 Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      AppMethods.currency(data['product']['harga'].toString()),
-                      style: AppTheme.greyTextStyle.copyWith(fontSize: 14),
-                    ),
-                    const SizedBox(width: 2),
-                    Text(
-                      data['product']['satuan'].toString(),
-                      style: AppTheme.greyTextStyle.copyWith(
-                          color: AppColors.softgreyColor, fontSize: 14),
-                    ),
+                    ItemMetaData(title: 'Tipe', value: data['tipe'] ?? ''),
+                    ItemMetaData(title: 'Merk', value: data['merk'] ?? ''),
+                    ItemMetaData(title: 'Seri', value: data['seri'] ?? ''),
+                    ItemMetaData(
+                        title: 'Provinsi', value: data['provinsi'] ?? ''),
+                    ItemMetaData(title: 'Kota', value: data['kota'] ?? ''),
                   ],
                 ),
                 Row(
@@ -883,5 +904,27 @@ class _CartPageState extends State<CartPage> {
         ],
       ),
     );
+  }
+
+  Widget ItemMetaData({required String title, required String value}) {
+    if (value != '') {
+      return Container(
+        margin: const EdgeInsets.only(top: 5),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(
+          color: AppColors.backgroundColor3,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Text(
+          "$title : $value",
+          style: AppTheme.primaryTextStyle.copyWith(
+            fontSize: 10,
+            fontWeight: AppTheme.medium,
+          ),
+        ),
+      );
+    } else {
+      return const SizedBox();
+    }
   }
 }

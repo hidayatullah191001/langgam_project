@@ -461,6 +461,7 @@ class _LoginFormState extends State<LoginForm> {
                   if (result['success'] == true) {
                     // ignore: use_build_context_synchronously
                     context.pop('/');
+                    setState(() {});
                   } else {
                     // ignore: use_build_context_synchronously
                     AppMethods.dangerToast(context, result['message']);
